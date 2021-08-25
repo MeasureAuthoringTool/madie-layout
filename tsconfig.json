@@ -1,10 +1,10 @@
 {
   "extends": "ts-config-single-spa",
   "compilerOptions": {
-    "jsx": "react-jsx",
-    "declarationDir": "dist",
     "declaration": true,
+    "declarationDir": "dist",
     "declarationMap": true,
+    "jsx": "react-jsx",
     "sourceMap": true
   },
   "files": ["src/madie-madie-layout.tsx"],

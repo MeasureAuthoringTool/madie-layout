@@ -1,4 +1,4 @@
-const { merge } = require("webpack-merge");
+const { mergeWithRules } = require("webpack-merge");
 const singleSpaDefaults = require("webpack-config-single-spa-react-ts");
 
 module.exports = (webpackConfigEnv, argv) => {
@@ -9,7 +9,30 @@ module.exports = (webpackConfigEnv, argv) => {
     argv,
   });
 
-  return merge(defaultConfig, {
-    // modify the webpack config however you'd like to by adding to this object
-  });
+  // We need to override the css loading rule from the parent configuration
+  // so that we can add postcss-loader to the chain
+  const newCssRule = {
+    module: {
+      rules: [
+        {
+          test: /\.css$/i,
+          include: [/node_modules/, /src/],
+          use: [
+            "style-loader",
+            "css-loader", // uses modules: true, which I think we want. Parent does not
+            "postcss-loader",
+          ],
+        },
+      ],
+    },
+  };
+
+  return mergeWithRules({
+    module: {
+      rules: {
+        test: "match",
+        use: "replace",
+      },
+    },
+  })(defaultConfig, newCssRule);
 };
