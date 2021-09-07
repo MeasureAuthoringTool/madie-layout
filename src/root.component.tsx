@@ -3,7 +3,7 @@ import tw from "twin.macro";
 import GlobalStyles from "./styles/GlobalStyles";
 import { MadieEditor } from "@madie/madie-editor";
 
-const Notice = tw.section`text-blue-900`;
+const Notice = tw.span`text-blue-900`;
 export default function Root(props) {
   const [editorVal, setEditorVal] = useState("");
   const handleMadieEditorValue = (val) => {
