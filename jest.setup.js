@@ -1,4 +1,4 @@
-import MadieEditor from "./src/types/madie-madie-editor.d.ts";
+import MadieEditor from "@madie/madie-editor";
 
 global.System = {
   import: jest.fn(mockImport),
