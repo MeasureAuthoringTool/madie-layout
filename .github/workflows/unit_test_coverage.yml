@@ -63,7 +63,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: coverage
-          path: src/coverage/lcov.info
+          path: coverage/lcov.info
 
   upload-codacy-coverage:
     name: Upload code coverage to Codacy
@@ -86,6 +86,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
       - name: Download coverage artifact
         uses: actions/download-artifact@v2
         with:
