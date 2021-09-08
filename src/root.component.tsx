@@ -16,6 +16,9 @@ export default function Root(props) {
     },
   };
 
+  // eslint-disable-next-line no-console
+  console.log(MadieEditor);
+
   return (
     <>
       <GlobalStyles />
