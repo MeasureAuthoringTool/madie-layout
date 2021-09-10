@@ -20,8 +20,8 @@ export default function Root(props) {
     <>
       <GlobalStyles />
       <Notice>{props.name} is mounted!</Notice>
-      {MadieEditor ? <MadieEditor {...outputProps} /> : ""}
-      <div>{editorVal}</div>
+      <MadieEditor {...outputProps} />
+      <div data-testid="madie-editor-value">{editorVal}</div>
     </>
   );
 }

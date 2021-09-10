@@ -1,5 +1,5 @@
 import * as React from "react";
-import { render } from "@testing-library/react";
+import { fireEvent, screen, render } from "@testing-library/react";
 import Root from "./root.component";
 
 describe("Root component", () => {
@@ -8,8 +8,10 @@ describe("Root component", () => {
     expect(getByText(/Testapp is mounted!/i)).toBeInTheDocument();
   });
 
-  it("should mount editor component", () => {
-    const { getByText } = render(<Root name="Testapp" />);
-    expect(getByText(/Editor is Mounted/i)).toBeInTheDocument();
+  it("should mount editor component", async () => {
+    render(<Root name="Testapp" />);
+    fireEvent.click(screen.getByTestId("madie-editor"));
+    const editorValdivEl = await screen.getByTestId("madie-editor-value");
+    expect(editorValdivEl.innerHTML).toEqual("Editor is Mounted");
   });
 });
