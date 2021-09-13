@@ -1,3 +1,5 @@
+/** @format */
+
 import * as React from "react";
 import { fireEvent, screen, render } from "@testing-library/react";
 import Root from "./root.component";
@@ -5,7 +7,7 @@ import Root from "./root.component";
 describe("Root component", () => {
   it("should be in the document", () => {
     const { getByText } = render(<Root name="Testapp" />);
-    expect(getByText(/Testapp is mounted!/i)).toBeInTheDocument();
+    expect(getByText(/Release Notes/i)).toBeInTheDocument();
   });
 
   it("should mount editor component", async () => {

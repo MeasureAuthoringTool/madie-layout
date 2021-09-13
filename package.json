@@ -16,7 +16,8 @@
     "watch-tests": "cross-env BABEL_ENV=test jest --watch",
     "prepare": "husky install",
     "coverage": "cross-env BABEL_ENV=test jest --coverage",
-    "build:types": "tsc"
+    "build:types": "tsc",
+    "tailwind:css": "tailwind build src/tailwind.css -c tailwind.config.js -o src/index.css"
   },
   "devDependencies": {
     "@babel/core": "^7.14.6",
@@ -39,7 +40,7 @@
     "@types/systemjs": "^6.1.0",
     "@types/testing-library__jest-dom": "^5.14.0",
     "@types/webpack-env": "^1.16.0",
-    "autoprefixer": "^10.3.3",
+    "autoprefixer": "^10.3.4",
     "babel-jest": "^27.1.0",
     "concurrently": "^6.2.0",
     "cross-env": "^7.0.3",
@@ -58,7 +59,7 @@
     "prettier": "^2.3.2",
     "pretty-quick": "^3.1.1",
     "styled-components": "^5.3.1",
-    "tailwindcss": "^2.2.9",
+    "tailwindcss": "^2.2.14",
     "ts-config-single-spa": "^3.0.0",
     "twin.macro": "^2.7.0",
     "typescript": "^4.4.2",
