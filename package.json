@@ -16,8 +16,7 @@
     "watch-tests": "cross-env BABEL_ENV=test jest --watch",
     "prepare": "husky install",
     "coverage": "cross-env BABEL_ENV=test jest --coverage",
-    "build:types": "tsc",
-    "tailwind:css": "tailwind build src/tailwind.css -c tailwind.config.js -o src/index.css"
+    "build:types": "tsc"
   },
   "devDependencies": {
     "@babel/core": "^7.14.6",

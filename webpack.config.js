@@ -25,7 +25,7 @@ module.exports = (webpackConfigEnv, argv) => {
             "css-loader", // uses modules: true, which I think we want. Parent does not
             "postcss-loader",
           ],
-        },
+        }
       ],
     },
     devServer: {
