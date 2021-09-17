@@ -50,7 +50,7 @@ export default function Root(props) {
               </Bars>
             </NavButton>
           </InnerMost>
-          <DropDown>
+          <DropDown >
             <DropMenu>
               <ListItem>
                 <InnerItem href="#" aria-label="Release Notes">

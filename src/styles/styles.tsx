@@ -13,7 +13,6 @@ export const InnerMost = tw.div`
     w-full relative flex justify-between lg:w-auto lg:static lg:block 
     lg:justify-start
 `;
-export const Image = () => <div tw="-webkit-mask-image[url(mask.png)]" />;
 
 export const DropDown = styled.div((props: any) => [
   tw`lg:flex flex-grow items-center`,
