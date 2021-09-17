@@ -16,7 +16,6 @@ export const InnerMost = tw.div`
 
 export const DropDown = styled.div((props: any) => [
   tw`lg:flex flex-grow items-center`,
-  props.open ? tw`flex` : tw`hidden`,
 ]);
 
 export const Logo = tw.a`
