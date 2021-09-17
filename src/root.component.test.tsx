@@ -1,11 +1,15 @@
+/** @format */
+
 import * as React from "react";
 import { fireEvent, screen, render } from "@testing-library/react";
 import Root from "./root.component";
+import { DropDown } from "./styles/styles";
+import { getDefaultCompilerOptions } from "typescript";
 
 describe("Root component", () => {
   it("should be in the document", () => {
     const { getByText } = render(<Root name="Testapp" />);
-    expect(getByText(/Testapp is mounted!/i)).toBeInTheDocument();
+    expect(getByText(/Release Notes/i)).toBeInTheDocument();
   });
 
   it("should mount editor component", async () => {
@@ -13,5 +17,11 @@ describe("Root component", () => {
     fireEvent.click(screen.getByTestId("madie-editor"));
     const editorValdivEl = await screen.getByTestId("madie-editor-value");
     expect(editorValdivEl.innerHTML).toEqual("Editor is Mounted");
+  });
+
+  it("should mount dropdown component ", async () => {
+    const { container } = render(<DropDown />);
+    const styles = getComputedStyle(container);
+    expect(getComputedStyle(container).display).toBe("block");
   });
 });
