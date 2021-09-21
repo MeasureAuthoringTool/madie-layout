@@ -4,7 +4,6 @@ import * as React from "react";
 import { fireEvent, screen, render } from "@testing-library/react";
 import Root from "./root.component";
 import { DropDown } from "./styles/styles";
-import { getDefaultCompilerOptions } from "typescript";
 
 describe("Root component", () => {
   it("should be in the document", () => {
@@ -17,6 +16,7 @@ describe("Root component", () => {
     fireEvent.click(screen.getByTestId("madie-editor"));
     const editorValdivEl = await screen.getByTestId("madie-editor-value");
     expect(editorValdivEl.innerHTML).toEqual("Editor is Mounted");
+    expect(localStorage.getItem("editorVal")).toEqual("Editor is Mounted");
   });
 
   it("should mount dropdown component ", async () => {
