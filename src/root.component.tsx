@@ -1,79 +1,28 @@
-import React, { useState } from "react";
-import ReactDOM from "react-dom";
-
+import React from "react";
 import GlobalStyles from "./styles/GlobalStyles";
 import { MadieEditor } from "@madie/madie-editor";
-import { tsVoidKeyword } from "@babel/types";
-import tw, { css, styled, theme } from "twin.macro";
-import {
-  Nav,
-  InnerNav,
-  InnerMost,
-  DropDown,
-  Logo,
-  NavButton,
-  DropMenu,
-  ListItem,
-  InnerItem,
-  ExtraButton,
-  Bars,
-  Bar,
-} from "./styles/styles";
-import logo from "./assets/images/madie_logo.svg";
+import { useLocalStorage } from "./custom-hooks/useLocalStorage";
+import MainNavBar from "./components/MainNavBar/MainNavBar";
 
 export default function Root(props) {
-  const [editorVal, setEditorVal] = useState("");
+  const [editorVal, setEditorVal] = useLocalStorage("editorVal", "");
+
   const handleMadieEditorValue = (val) => {
     setEditorVal(val);
   };
 
-  const outputProps = {
+  const editorProps = {
     props: {
       handleValueChanges: (val) => handleMadieEditorValue(val),
+      defaultValue: editorVal,
     },
   };
 
   return (
     <>
       <GlobalStyles />
-      <Nav>
-        <InnerNav>
-          <InnerMost>
-            <Logo href="/">
-              <img src={logo} alt="MADiE Logo" />
-            </Logo>
-            <NavButton type="button">
-              <Bars>
-                <Bar />
-                <Bar />
-                <Bar />
-              </Bars>
-            </NavButton>
-          </InnerMost>
-          <DropDown>
-            <DropMenu>
-              <ListItem>
-                <InnerItem href="#" aria-label="Release Notes">
-                  Release Notes
-                </InnerItem>
-              </ListItem>
-              <ListItem>
-                <InnerItem href="#" aria-label="Measure">
-                  Measure
-                </InnerItem>
-              </ListItem>
-              <ListItem>
-                <InnerItem href="#" aria-label="IDE">
-                  IDE
-                </InnerItem>
-              </ListItem>
-
-              <ExtraButton href="/login">Login</ExtraButton>
-            </DropMenu>
-          </DropDown>
-        </InnerNav>
-      </Nav>
-      <MadieEditor {...outputProps} />
+      <MainNavBar />
+      <MadieEditor {...editorProps} />
       <div data-testid="madie-editor-value">{editorVal}</div>
     </>
   );
