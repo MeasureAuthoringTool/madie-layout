@@ -1,6 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, SetStateAction, Dispatch } from "react";
 
-export const useLocalStorage = (key, defaultValue) => {
+export const useLocalStorage = (
+  key: string,
+  defaultValue: string
+): [string, Dispatch<SetStateAction<string>>] => {
   const [value, setValue] = useState(
     () => localStorage.getItem(key) || defaultValue
   );
