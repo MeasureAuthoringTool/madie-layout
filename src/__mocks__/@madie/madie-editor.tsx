@@ -1,7 +1,7 @@
 import React from "react";
 
 export function MadieEditor({ props }) {
-  const returnValue = "Editor is Mounted";
+  const returnValue = "library testCql version '1.0.000'";
   return (
     <div
       role="button"
