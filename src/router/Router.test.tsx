@@ -1,0 +1,58 @@
+import * as React from "react";
+import { render, waitFor } from "@testing-library/react";
+import { MemoryRouter } from "react-router";
+import { Security } from "@okta/okta-react";
+
+import Router from "./Router";
+import { oktaAuthTestProps } from "./TestAuthProvider";
+
+jest.mock("../components/home/Home", () => () => {
+  return <div data-testid="home-component-mocked">Home Component</div>;
+});
+
+jest.mock("../components/login/Login", () => () => {
+  return <div data-testid="login-component-mocked">Login Component</div>;
+});
+
+jest.mock("../components/editor/Editor", () => () => {
+  return <div data-testid="editor-component-mocked">Editor Component</div>;
+});
+
+describe("Router component", () => {
+  it("should render Home component if authentication is true", async () => {
+    const { getByTestId } = render(
+      <MemoryRouter initialEntries={["/"]}>
+        <Security {...oktaAuthTestProps(true)}>
+          <Router />
+        </Security>
+      </MemoryRouter>
+    );
+    await waitFor(() => {
+      expect(getByTestId("home-component-mocked")).toBeInTheDocument();
+    });
+  });
+
+  it("should render Editor component if authentication is true", async () => {
+    const { getByTestId } = render(
+      <MemoryRouter initialEntries={["/editor"]}>
+        <Security {...oktaAuthTestProps(true)}>
+          <Router />
+        </Security>
+      </MemoryRouter>
+    );
+    await waitFor(() => {
+      expect(getByTestId("editor-component-mocked")).toBeInTheDocument();
+    });
+  });
+
+  it("should render Login component", async () => {
+    const { getByTestId } = render(
+      <MemoryRouter initialEntries={["/login"]}>
+        <Router />
+      </MemoryRouter>
+    );
+    await waitFor(() => {
+      expect(getByTestId("login-component-mocked")).toBeInTheDocument();
+    });
+  });
+});
