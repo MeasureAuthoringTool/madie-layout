@@ -9,7 +9,7 @@ const oktaAuthTestProps = (isAuthenticated?: boolean) => {
       keyof AbstractToken | "claims"
     > => {
     const {
-      claims = { sub: "test@test.com" },
+      claims = { sub: "test@test" },
       expiresAt = 999999999,
       authorizeUrl = "",
       scopes = [],
@@ -33,8 +33,8 @@ const oktaAuthTestProps = (isAuthenticated?: boolean) => {
     idToken: testToken({
       ...authState?.idToken,
       idToken: "testIDToken",
-      issuer: "testIDToken",
-      clientId: "testIDToken",
+      issuer: "https://domain.okta.com/oauth2/default",
+      clientId: "testClientId",
     }),
     accessToken: testToken({
       ...authState?.accessToken,
@@ -46,8 +46,8 @@ const oktaAuthTestProps = (isAuthenticated?: boolean) => {
 
   const oktaAuth = (isAuthenticated: boolean) =>
     new OktaAuth({
-      issuer: "https://dev-234234.okta.com/oauth2/default",
-      clientId: "asdfasdfasdfasdf",
+      issuer: "https://domain.okta.com/oauth2/default",
+      clientId: "testClientId",
       redirectUri: window.location.origin + "/login/callback",
       transformAuthState: async (ignored: any, authState: AuthState) =>
         loggedInState(authState, isAuthenticated),
