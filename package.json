@@ -45,6 +45,7 @@
     "babel-jest": "^27.2.4",
     "concurrently": "^6.3.0",
     "cross-env": "^7.0.3",
+    "dotenv": "^10.0.0",
     "eslint": "^7.29.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-config-ts-react-important-stuff": "^3.0.0",

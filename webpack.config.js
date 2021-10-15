@@ -2,6 +2,8 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { mergeWithRules } = require("webpack-merge");
 const singleSpaDefaults = require("webpack-config-single-spa-react-ts");
 const path = require("path");
+const { DefinePlugin } = require("webpack");
+const dotenv = require("dotenv");
 
 module.exports = (webpackConfigEnv, argv) => {
   const defaultConfig = singleSpaDefaults({
@@ -63,6 +65,9 @@ module.exports = (webpackConfigEnv, argv) => {
           __dirname,
           "node_modules/@madie/madie-root/dist/index.html"
         ),
+      }),
+      new DefinePlugin({
+        "process.env": JSON.stringify(dotenv.config().parsed),
       }),
     ],
   };
