@@ -19,7 +19,6 @@ jest.mock("../components/editor/Editor", () => () => {
 });
 
 xdescribe("Router component", () => {
-
   const routerProps = {
     props: {
       oktaSignInConfig: {

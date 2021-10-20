@@ -1,4 +1,4 @@
-import React, { Dispatch, useEffect, useState} from "react";
+import React, { Dispatch, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Security } from "@okta/okta-react";
 import { OktaAuth, toRelativeUrl } from "@okta/okta-auth-js";
