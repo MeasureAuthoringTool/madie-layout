@@ -8,6 +8,7 @@ import Router from "../router/Router";
 function OktaSecurity() {
   const history = useHistory();
   const [oktaConfig, setOktaConfig] = useState<OktaConfig>();
+  const [oktaConfigErr, setOktaConfigErr] = useState<string>();
 
   const customAuthHandler = () => {
     history.push("/login");
@@ -17,14 +18,17 @@ function OktaSecurity() {
     history.replace(toRelativeUrl(originalUri, window.location.origin));
   };
 
-  if (!oktaConfig) {
+  if (!oktaConfig && !oktaConfigErr) {
     (async () => {
       await getOktaConfig()
         .then((config) => {
           setOktaConfig(config);
         })
         .catch((err) => {
-          return err;
+          console.error(err);
+          setOktaConfigErr(
+            "Unable to load Login page, Please contact administration"
+          );
         });
     })();
   }
@@ -48,7 +52,9 @@ function OktaSecurity() {
     );
   } else {
     return (
-      <div data-testid="undefined-OktaConfig">Unable to fetch oktaConfig</div>
+      <div data-testid="login-page-message">
+        {oktaConfigErr ? oktaConfigErr : "Loading..."}
+      </div>
     );
   }
 }

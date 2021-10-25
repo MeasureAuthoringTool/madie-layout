@@ -42,17 +42,13 @@ describe("Config component", () => {
   it("should handle get okta config error", async () => {
     oktaConfig.getOktaConfig = jest.fn().mockImplementation((url: string) =>
       Promise.reject({
-        oktaAuthConfig: {
-          issuer: `https://dev-Example.okta.com/oauth2/default`,
-          clientId: `0oa1t055g23yx2o5d7`,
-          redirectUri: "/login/callback",
-        },
+        oktaAuthConfig: "undefined",
       })
     );
 
     await waitFor(() => {
       const { getByTestId } = render(<OktaSecurity />);
-      expect(getByTestId("undefined-OktaConfig")).toBeInTheDocument();
+      expect(getByTestId("login-page-message")).toBeInTheDocument();
     });
   });
 });

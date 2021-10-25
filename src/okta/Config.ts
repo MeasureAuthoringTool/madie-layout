@@ -14,7 +14,7 @@ export interface OktaConfig {
   };
 }
 
-export interface OktaEnvConfig {
+interface OktaEnvConfig {
   oktaBaseUrl: string;
   clientId: string;
 }
@@ -23,6 +23,11 @@ export async function getOktaConfig(): Promise<OktaConfig> {
   const oktaEnvConfig: OktaEnvConfig = (
     await axios.get<OktaEnvConfig>("importmap/oktaConfig.json")
   ).data;
+
+  if (!oktaEnvConfig.oktaBaseUrl && !oktaEnvConfig.clientId) {
+    throw new Error("Invalid oktaEnvConfig variables");
+  }
+
   return {
     oktaAuthConfig: {
       issuer: `${oktaEnvConfig.oktaBaseUrl}/oauth2/default`,

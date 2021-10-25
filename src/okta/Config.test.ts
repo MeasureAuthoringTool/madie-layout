@@ -20,4 +20,14 @@ describe("Config component", () => {
       redirectUri: window.location.origin + "/login/callback",
     });
   });
+
+  it("should throw new Error", async () => {
+    const oktaEnvConfig = {};
+    mockedAxios.get.mockResolvedValue({ data: { ...oktaEnvConfig } });
+    try {
+      await getOktaConfig();
+    } catch (err) {
+      expect(err.message).toEqual("Invalid oktaEnvConfig variables");
+    }
+  });
 });
