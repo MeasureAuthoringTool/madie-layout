@@ -18,12 +18,12 @@ jest.mock("../components/editor/Editor", () => () => {
   return <div data-testid="editor-component-mocked">Editor Component</div>;
 });
 
-xdescribe("Router component", () => {
+describe("Router component", () => {
   const routerProps = {
     props: {
       oktaSignInConfig: {
-        baseUrl: "Example Url",
-        clientId: "Example Client ID",
+        baseUrl: "https://${yourOktaDomain}",
+        clientId: "${clientId}",
         redirectUri: "/login/callback",
       },
     },
