@@ -21,7 +21,7 @@ describe("Config component", () => {
     });
   });
 
-  it("should throw new Error", async () => {
+  it("should throw invalid oktaEnvConfig Error", async () => {
     const oktaEnvConfig = {};
     mockedAxios.get.mockResolvedValue({ data: { ...oktaEnvConfig } });
     try {
