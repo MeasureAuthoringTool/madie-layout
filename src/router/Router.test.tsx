@@ -18,6 +18,10 @@ jest.mock("../components/editor/Editor", () => () => {
   return <div data-testid="editor-component-mocked">Editor Component</div>;
 });
 
+jest.mock("../components/landing/Landing", () => () => {
+  return <div data-testid="landing-component-mocked">Landing Component</div>;
+});
+
 describe("Router component", () => {
   it("should render Home component if authentication is true", async () => {
     const { getByTestId } = render(
