@@ -1,14 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Security } from "@okta/okta-react";
 import { OktaAuth, toRelativeUrl } from "@okta/okta-auth-js";
-import { oktaAuthConfig } from "./Config";
+import { getOktaConfig, OktaConfig } from "./Config";
 import Router from "../router/Router";
-
-const oktaAuth = new OktaAuth(oktaAuthConfig);
 
 function OktaSecurity() {
   const history = useHistory();
+  const [oktaConfig, setOktaConfig] = useState<OktaConfig>();
+  const [oktaConfigErr, setOktaConfigErr] = useState<string>();
 
   const customAuthHandler = () => {
     history.push("/login");
@@ -18,14 +18,44 @@ function OktaSecurity() {
     history.replace(toRelativeUrl(originalUri, window.location.origin));
   };
 
-  return (
-    <Security
-      oktaAuth={oktaAuth}
-      onAuthRequired={customAuthHandler}
-      restoreOriginalUri={restoreOriginalUri}
-    >
-      <Router />
-    </Security>
-  );
+  if (!oktaConfig && !oktaConfigErr) {
+    (async () => {
+      await getOktaConfig()
+        .then((config) => {
+          setOktaConfig(config);
+        })
+        .catch((err) => {
+          console.error(err);
+          setOktaConfigErr(
+            "Unable to load Login page, Please contact administration"
+          );
+        });
+    })();
+  }
+
+  const routerProps = {
+    props: {
+      oktaSignInConfig: oktaConfig?.oktaSignInConfig,
+    },
+  };
+
+  if (!!oktaConfig) {
+    const oktaAuth = new OktaAuth(oktaConfig.oktaAuthConfig);
+    return (
+      <Security
+        oktaAuth={oktaAuth}
+        onAuthRequired={customAuthHandler}
+        restoreOriginalUri={restoreOriginalUri}
+      >
+        <Router {...routerProps} />
+      </Security>
+    );
+  } else {
+    return (
+      <div data-testid="login-page-message">
+        {oktaConfigErr ? oktaConfigErr : "Loading..."}
+      </div>
+    );
+  }
 }
 export default OktaSecurity;

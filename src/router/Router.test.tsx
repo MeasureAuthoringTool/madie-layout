@@ -19,11 +19,21 @@ jest.mock("../components/editor/Editor", () => () => {
 });
 
 describe("Router component", () => {
+  const routerProps = {
+    props: {
+      oktaSignInConfig: {
+        baseUrl: "https://${yourOktaDomain}",
+        clientId: "${clientId}",
+        redirectUri: "/login/callback",
+      },
+    },
+  };
+
   it("should render Home component if authentication is true", async () => {
     const { getByTestId } = render(
       <MemoryRouter initialEntries={["/"]}>
         <Security {...oktaAuthTestProps(true)}>
-          <Router />
+          <Router {...routerProps} />
         </Security>
       </MemoryRouter>
     );
@@ -36,7 +46,7 @@ describe("Router component", () => {
     const { getByTestId } = render(
       <MemoryRouter initialEntries={["/editor"]}>
         <Security {...oktaAuthTestProps(true)}>
-          <Router />
+          <Router {...routerProps} />
         </Security>
       </MemoryRouter>
     );
@@ -48,7 +58,7 @@ describe("Router component", () => {
   it("should render Login component", async () => {
     const { getByTestId } = render(
       <MemoryRouter initialEntries={["/login"]}>
-        <Router />
+        <Router {...routerProps} />
       </MemoryRouter>
     );
     await waitFor(() => {
