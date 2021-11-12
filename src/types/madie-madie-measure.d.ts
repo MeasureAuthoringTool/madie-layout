@@ -4,6 +4,7 @@ declare module "@madie/madie-measure" {
 
   export const MadieMeasure: FC;
   export const NewMeasure: FC;
+  export const EditMeasure: FC;
   export const bootstrap: LifeCycleFn<void>;
   export const mount: LifeCycleFn<void>;
   export const unmount: LifeCycleFn<void>;

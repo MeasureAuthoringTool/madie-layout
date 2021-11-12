@@ -5,7 +5,7 @@ import Home from "../components/home/Home";
 import Login from "../components/login/Login";
 import Editor from "../components/editor/Editor";
 import Measure from "../components/measure/Measure";
-import { NewMeasure } from "@madie/madie-measure";
+import { NewMeasure, EditMeasure } from "@madie/madie-measure";
 
 function Router({ props }) {
   return (
@@ -15,9 +15,12 @@ function Router({ props }) {
         path="/login"
         render={() => <Login config={props.oktaSignInConfig} />}
       />
+
+      <Route path="/measure/:id/edit" component={EditMeasure} />
       <SecureRoute path="/editor" component={Editor} />
       <SecureRoute path="/measure" component={Measure} />
       <SecureRoute path="/create-measure" component={NewMeasure} />
+
       <Route path="/login/callback" component={LoginCallback} />
     </Switch>
   );
