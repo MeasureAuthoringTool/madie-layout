@@ -13,6 +13,12 @@ function Home() {
     <div>
       <div> You are successfully logged in </div>
       <ExtraButton onClick={() => history.push("/editor")}>Editor</ExtraButton>
+      <ExtraButton
+        data-testid="measure-button"
+        onClick={() => history.push("/measure")}
+      >
+        Measures
+      </ExtraButton>
       <ExtraButton onClick={logout}>Logout</ExtraButton>
     </div>
   );
