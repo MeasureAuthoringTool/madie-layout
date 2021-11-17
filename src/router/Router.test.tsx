@@ -18,10 +18,6 @@ jest.mock("../components/editor/Editor", () => () => {
   return <div data-testid="editor-component-mocked">Editor Component</div>;
 });
 
-jest.mock("../components/measure/Measure", () => () => {
-  return <div data-testid="measure-component-mocked">Measure Component</div>;
-});
-
 describe("Router component", () => {
   const routerProps = {
     props: {
@@ -55,7 +51,7 @@ describe("Router component", () => {
       </MemoryRouter>
     );
     await waitFor(() => {
-      expect(getByTestId("measure-component-mocked")).toBeInTheDocument();
+      expect(getByTestId("madie-measure")).toBeInTheDocument();
     });
   });
 

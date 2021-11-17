@@ -21,7 +21,7 @@ interface OktaEnvConfig {
 
 export async function getOktaConfig(): Promise<OktaConfig> {
   const oktaEnvConfig: OktaEnvConfig = (
-    await axios.get<OktaEnvConfig>("env-config/oktaConfig.json")
+    await axios.get<OktaEnvConfig>("/env-config/oktaConfig.json")
   ).data;
 
   if (!oktaEnvConfig.oktaBaseUrl && !oktaEnvConfig.clientId) {
