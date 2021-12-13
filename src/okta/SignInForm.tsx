@@ -18,6 +18,7 @@ const SignInForm = () => {
         // sessionToken is a one-use token, so make sure this is only called once
         oktaAuth.signInWithRedirect({ sessionToken });
       })
+      // eslint-disable-next-line no-console
       .catch((err) => console.log("Found an error", err));
   };
 
