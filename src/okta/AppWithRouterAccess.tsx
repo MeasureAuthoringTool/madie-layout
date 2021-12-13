@@ -11,7 +11,7 @@ const AppWithRouterAccess = () => {
   const history = useHistory();
   const [oktaConfig, setOktaConfig] = useState<OktaConfig>();
   const [oktaConfigErr, setOktaConfigErr] = useState<string>();
-  const onAuthRequired = () => {
+  const customAuthHandler = () => {
     history.push("/login");
   };
 
@@ -37,7 +37,11 @@ const AppWithRouterAccess = () => {
   if (!!oktaConfig) {
     const oktaAuth = new OktaAuth(oktaConfig.oktaAuthConfig);
     return (
-      <Security oktaAuth={oktaAuth} restoreOriginalUri={restoreOriginalUri}>
+      <Security
+        oktaAuth={oktaAuth}
+        onAuthRequired={customAuthHandler}
+        restoreOriginalUri={restoreOriginalUri}
+      >
         <Route path="/" exact={true} component={Home} />
         <SecureRoute path="/protected" component={Protected} />
         <Route path="/login" render={() => <SignIn />} />
