@@ -15,8 +15,8 @@ describe("Config component", () => {
 
     const result = await getOktaConfig();
     expect(result.oktaAuthConfig).toEqual({
-      issuer: `https://dev-Example.okta.com/oauth2/default`,
-      clientId: `0oa1t055g23yx2o5d7`,
+      issuer: `https://cms-dev.okta.com/oauth2/default`,
+      clientId: `0oaaozdfrhUJZPTNk297`,
       redirectUri: window.location.origin + "/login/callback",
     });
   });

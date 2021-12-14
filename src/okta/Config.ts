@@ -31,12 +31,12 @@ export async function getOktaConfig(): Promise<OktaConfig> {
   return {
     oktaAuthConfig: {
       issuer: `https://cms-dev.okta.com/oauth2/default`,
-      clientId: `${oktaEnvConfig.clientId}`,
+      clientId: `0oaaozdfrhUJZPTNk297`,
       redirectUri: window.location.origin + "/login/callback",
     },
     oktaSignInConfig: {
-      baseUrl: `${oktaEnvConfig.oktaBaseUrl}`,
-      clientId: `${oktaEnvConfig.clientId}`,
+      baseUrl: `https://dev.idp.idm.cms.gov`,
+      clientId: `0oaaozdfrhUJZPTNk297`,
       redirectUri: window.location.origin + "/login/callback",
       authParams: {},
     },
