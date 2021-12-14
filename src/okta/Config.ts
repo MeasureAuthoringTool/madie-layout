@@ -36,6 +36,7 @@ export async function getOktaConfig(): Promise<OktaConfig> {
     },
     oktaSignInConfig: {
       baseUrl: `https://dev.idp.idm.cms.gov`,
+      clientId: `0oaaozdfrhUJZPTNk297`,
       redirectUri: window.location.origin + "/login/callback",
       authParams: {},
     },

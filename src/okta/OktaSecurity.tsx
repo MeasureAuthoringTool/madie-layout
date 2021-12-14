@@ -40,7 +40,8 @@ function OktaSecurity() {
         oktaSignInConfig: {
           ...oktaConfig?.oktaSignInConfig,
           authParams: {
-            authClient: oktaAuth,
+            issuer: oktaConfig.oktaAuthConfig.issuer,
+            clientId: oktaConfig.oktaAuthConfig.clientId,
           },
         },
       },
