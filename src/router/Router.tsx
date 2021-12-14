@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Switch } from "react-router-dom";
+import { Route, Switch, useHistory } from "react-router-dom";
 import { SecureRoute, LoginCallback } from "@okta/okta-react";
 import Home from "../components/home/Home";
 import Login from "../components/login/Login";
