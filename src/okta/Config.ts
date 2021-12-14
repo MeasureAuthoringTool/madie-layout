@@ -30,7 +30,7 @@ export async function getOktaConfig(): Promise<OktaConfig> {
 
   return {
     oktaAuthConfig: {
-      issuer: `${oktaEnvConfig.oktaBaseUrl}/oauth2/default`,
+      issuer: `https://cms-dev.okta.com/oauth2/default`,
       clientId: `${oktaEnvConfig.clientId}`,
       redirectUri: window.location.origin + "/login/callback",
     },
