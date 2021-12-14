@@ -15,7 +15,7 @@ describe("Config component", () => {
 
     const result = await getOktaConfig();
     expect(result.oktaAuthConfig).toEqual({
-      issuer: `https://dev.idp.idm.cms.gov`,
+      issuer: `https://cms-dev.okta.com`,
       clientId: `0oaaozdfrhUJZPTNk297`,
       redirectUri: window.location.origin + "/login/callback",
     });

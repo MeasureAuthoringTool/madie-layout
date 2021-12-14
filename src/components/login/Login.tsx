@@ -14,13 +14,11 @@ function Login({ config }) {
       },
       onError: (err) => {
         /* Placeholder to handle error returned from login widget  */
-        console.dir(err);
       },
     },
   };
 
   if (!authState) {
-    console.log("authState is null.");
     return null;
   }
 
