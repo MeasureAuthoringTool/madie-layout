@@ -14,11 +14,15 @@ function Login({ config }) {
       },
       onError: (err) => {
         /* Placeholder to handle error returned from login widget  */
+        console.dir(err);
       },
     },
   };
 
-  if (!authState) return null;
+  if (!authState) {
+    console.log("authState is null.");
+    return null;
+  }
 
   return authState.isAuthenticated ? (
     <Redirect to={{ pathname: "/" }} />
