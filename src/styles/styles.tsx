@@ -1,6 +1,7 @@
 /** @format */
 
 import tw, { styled } from "twin.macro";
+import { Link } from "react-router-dom";
 
 export const Nav = tw.nav`
     relative flex flex-wrap items-center justify-between px-4 py-5 
@@ -18,9 +19,12 @@ export const DropDown = styled.div((props: any) => [
   tw`lg:flex flex-grow items-center`,
 ]);
 
-export const Logo = tw.a`
+export const Logo = tw(Link)`
     leading-relaxed inline-block mr-4 whitespace-nowrap 
 `;
+// export const LogoLink = tw(Link)`
+//   leading-relaxed inline-block mr-4 whitespace-nowrap
+// `;
 export const NavButton = tw.button`
     text-black cursor-pointer text-xl leading-none px-3 py-1 border border-solid 
     border-transparent rounded bg-transparent block lg:hidden outline-none 
@@ -33,7 +37,7 @@ export const DropMenu = tw.ul`
 export const ListItem = tw.li`
     block
 `;
-export const InnerItem = tw.a`
+export const InnerItem = tw(Link)`
     px-3 py-2 flex items-center font-sans font-semibold text-lg tracking-wide 
     text-gray-700 hover:text-gray-900 
 `;

@@ -9,8 +9,8 @@ export default function Root(props) {
   return (
     <>
       <GlobalStyles />
-      <MainNavBar />
       <BrowserRouter>
+        <MainNavBar />
         <OktaSecurity />
       </BrowserRouter>
     </>
