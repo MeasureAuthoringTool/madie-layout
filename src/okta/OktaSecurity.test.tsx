@@ -41,9 +41,9 @@ describe("Config component", () => {
   });
 
   it("should handle get okta config error", async () => {
-    oktaConfig.getOktaConfig = jest.fn().mockImplementation((url: string) =>
-      Promise.reject('Error')
-    );
+    oktaConfig.getOktaConfig = jest
+      .fn()
+      .mockImplementation((url: string) => Promise.reject("Error"));
 
     await waitFor(() => {
       const { getByTestId } = render(<OktaSecurity />);
