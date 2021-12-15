@@ -4,11 +4,7 @@ export interface OktaConfig {
   baseUrl: string;
   clientId: string;
   redirectUri: string;
-  authParams: {
-    issuer: string;
-    clientId: string;
-    redirectUri: string;
-  };
+  issuer: string;
 }
 
 interface OktaEnvConfig {
@@ -26,13 +22,9 @@ export async function getOktaConfig(): Promise<OktaConfig> {
   }
 
   return {
-    baseUrl: `https://dev.idp.idm.cms.gov`,
-    clientId: "0oaaozdfrhUJZPTNk297",
+    baseUrl: "https://dev.idp.idm.cms.gov",
     redirectUri: window.location.origin + "/login/callback",
-    authParams: {
-      issuer: "https://dev.idp.idm.cms.gov/oauth2/ausb10u24pv908noS297",
-      clientId: "0oaaozdfrhUJZPTNk297",
-      redirectUri: window.location.origin + "/login/callback",
-    },
+    issuer: "https://dev.idp.idm.cms.gov/oauth2/ausb10u24pv908noS297",
+    clientId: "0oaaozdfrhUJZPTNk297",
   };
 }

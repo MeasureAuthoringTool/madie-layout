@@ -13,11 +13,7 @@ jest.mock("./Config", () => ({
       baseUrl: `https://dev-Example.okta.com`,
       clientId: "0oa1t055g23yx2o5d7",
       redirectUri: "/login/callback",
-      authParams: {
-        issuer: "https://dev-Example.okta.com/oauth2/default",
-        clientId: "0oa1t055g23yx2o5d7",
-        redirectUri: "/login/callback",
-      },
+      issuer: "https://dev-Example.okta.com/oauth2/default",
     })
   ),
 }));
