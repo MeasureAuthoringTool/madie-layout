@@ -14,7 +14,7 @@ describe("Config component", () => {
     mockedAxios.get.mockResolvedValue({ data: { ...oktaEnvConfig } });
 
     const result = await getOktaConfig();
-    expect(result.oktaAuthConfig).toEqual({
+    expect(result.authParams).toEqual({
       issuer: `https://dev.idp.idm.cms.gov/oauth2/ausb10u24pv908noS297`,
       clientId: `0oaaozdfrhUJZPTNk297`,
       redirectUri: window.location.origin + "/login/callback",

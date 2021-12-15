@@ -33,19 +33,14 @@ function OktaSecurity() {
     })();
   }
 
+  const routerProps = {
+    props: {
+      oktaSignInConfig: oktaConfig,
+    },
+  };
+
   if (!!oktaConfig) {
-    const oktaAuth = new OktaAuth(oktaConfig.oktaAuthConfig);
-    const routerProps = {
-      props: {
-        oktaSignInConfig: {
-          ...oktaConfig?.oktaSignInConfig,
-          authParams: {
-            issuer: oktaConfig.oktaAuthConfig.issuer,
-            clientId: oktaConfig.oktaAuthConfig.clientId,
-          },
-        },
-      },
-    };
+    const oktaAuth = new OktaAuth(oktaConfig?.authParams);
     return (
       <Security
         oktaAuth={oktaAuth}
