@@ -11,6 +11,7 @@ jest.mock("./Config", () => ({
   getOktaConfig: jest.fn(() =>
     Promise.resolve({
       baseUrl: `https://dev-Example.okta.com`,
+      clientId: "0oa1t055g23yx2o5d7",
       redirectUri: "/login/callback",
       authParams: {
         issuer: "https://dev-Example.okta.com/oauth2/default",

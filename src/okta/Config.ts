@@ -2,6 +2,7 @@ import axios from "axios";
 
 export interface OktaConfig {
   baseUrl: string;
+  clientId: string;
   redirectUri: string;
   authParams: {
     issuer: string;
@@ -26,6 +27,7 @@ export async function getOktaConfig(): Promise<OktaConfig> {
 
   return {
     baseUrl: `https://dev.idp.idm.cms.gov`,
+    clientId: "0oaaozdfrhUJZPTNk297",
     redirectUri: window.location.origin + "/login/callback",
     authParams: {
       issuer: "https://dev.idp.idm.cms.gov/oauth2/ausb10u24pv908noS297",
