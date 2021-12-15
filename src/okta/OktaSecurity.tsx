@@ -35,12 +35,17 @@ function OktaSecurity() {
 
   const routerProps = {
     props: {
-      oktaSignInConfig: oktaConfig?.oktaSignInConfig,
+      oktaSignInConfig: {
+        ...oktaConfig,
+        authParams: {
+          ...oktaConfig,
+        },
+      },
     },
   };
 
   if (!!oktaConfig) {
-    const oktaAuth = new OktaAuth(oktaConfig.oktaAuthConfig);
+    const oktaAuth = new OktaAuth(oktaConfig);
     return (
       <Security
         oktaAuth={oktaAuth}
