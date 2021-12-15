@@ -12,7 +12,6 @@ function Home() {
   return (
     <div>
       <div> You are successfully logged in </div>
-      <ExtraButton onClick={() => history.push("/editor")}>Editor</ExtraButton>
       <ExtraButton
         data-testid="measure-button"
         onClick={() => history.push("/measure")}

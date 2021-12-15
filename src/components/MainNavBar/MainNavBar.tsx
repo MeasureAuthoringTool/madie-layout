@@ -20,7 +20,7 @@ const MainNavBar = () => {
     <Nav>
       <InnerNav>
         <InnerMost>
-          <Logo href="/">
+          <Logo to="/">
             <img src={logo} alt="MADiE Logo" />
           </Logo>
           <NavButton type="button">
@@ -34,21 +34,20 @@ const MainNavBar = () => {
         <DropDown>
           <DropMenu>
             <ListItem>
-              <InnerItem href="#" aria-label="Release Notes">
+              <InnerItem to="#" aria-label="Release Notes">
                 Release Notes
               </InnerItem>
             </ListItem>
             <ListItem>
-              <InnerItem href="#" aria-label="Measure">
+              <InnerItem to="/measure" aria-label="Measure">
                 Measure
               </InnerItem>
             </ListItem>
             <ListItem>
-              <InnerItem href="#" aria-label="IDE">
+              <InnerItem to="#" aria-label="IDE">
                 IDE
               </InnerItem>
             </ListItem>
-
             <ExtraButton href="/login">Login</ExtraButton>
           </DropMenu>
         </DropDown>
