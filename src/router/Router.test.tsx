@@ -14,10 +14,6 @@ jest.mock("../components/login/Login", () => () => {
   return <div data-testid="login-component-mocked">Login Component</div>;
 });
 
-jest.mock("../components/editor/Editor", () => () => {
-  return <div data-testid="editor-component-mocked">Editor Component</div>;
-});
-
 describe("Router component", () => {
   const routerProps = {
     props: {
@@ -52,19 +48,6 @@ describe("Router component", () => {
     );
     await waitFor(() => {
       expect(getByTestId("madie-measure")).toBeInTheDocument();
-    });
-  });
-
-  it("should render Editor component if authentication is true", async () => {
-    const { getByTestId } = render(
-      <MemoryRouter initialEntries={["/editor"]}>
-        <Security {...oktaAuthTestProps(true)}>
-          <Router {...routerProps} />
-        </Security>
-      </MemoryRouter>
-    );
-    await waitFor(() => {
-      expect(getByTestId("editor-component-mocked")).toBeInTheDocument();
     });
   });
 

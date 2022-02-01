@@ -1,21 +1,15 @@
 import axios from "axios";
 
 export interface OktaConfig {
-  oktaAuthConfig: {
-    issuer: string;
-    clientId: string;
-    redirectUri: string;
-  };
-  oktaSignInConfig: {
-    baseUrl: string;
-    clientId: string;
-    redirectUri: string;
-    authParams?: object;
-  };
+  baseUrl: string;
+  issuer: string;
+  clientId: string;
+  redirectUri: string;
 }
 
 interface OktaEnvConfig {
-  oktaBaseUrl: string;
+  baseUrl: string;
+  issuerUrl: string;
   clientId: string;
 }
 
@@ -24,21 +18,18 @@ export async function getOktaConfig(): Promise<OktaConfig> {
     await axios.get<OktaEnvConfig>("/env-config/oktaConfig.json")
   ).data;
 
-  if (!oktaEnvConfig.oktaBaseUrl && !oktaEnvConfig.clientId) {
+  if (
+    !oktaEnvConfig.baseUrl ||
+    !oktaEnvConfig.issuerUrl ||
+    !oktaEnvConfig.clientId
+  ) {
     throw new Error("Invalid oktaEnvConfig variables");
   }
 
   return {
-    oktaAuthConfig: {
-      issuer: `${oktaEnvConfig.oktaBaseUrl}/oauth2/default`,
-      clientId: `${oktaEnvConfig.clientId}`,
-      redirectUri: window.location.origin + "/login/callback",
-    },
-    oktaSignInConfig: {
-      baseUrl: `${oktaEnvConfig.oktaBaseUrl}`,
-      clientId: `${oktaEnvConfig.clientId}`,
-      redirectUri: window.location.origin + "/login/callback",
-      authParams: {},
-    },
+    baseUrl: `${oktaEnvConfig.baseUrl}`,
+    issuer: `${oktaEnvConfig.issuerUrl}`,
+    clientId: `${oktaEnvConfig.clientId}`,
+    redirectUri: window.location.origin + "/login/callback",
   };
 }
