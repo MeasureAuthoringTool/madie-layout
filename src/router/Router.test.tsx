@@ -25,7 +25,7 @@ describe("Router component", () => {
     },
   };
 
-  it("should render Home component if authentication is true", async () => {
+  it("should redirect to Home component if authentication is true", async () => {
     const { getByTestId } = render(
       <MemoryRouter initialEntries={["/"]}>
         <Security {...oktaAuthTestProps(true)}>
@@ -38,16 +38,16 @@ describe("Router component", () => {
     });
   });
 
-  it("should render Measure component if authentication is true", async () => {
+  it("should render Home component if authenticated user navigates to /measures", async () => {
     const { getByTestId } = render(
-      <MemoryRouter initialEntries={["/measure"]}>
+      <MemoryRouter initialEntries={["/measures"]}>
         <Security {...oktaAuthTestProps(true)}>
           <Router {...routerProps} />
         </Security>
       </MemoryRouter>
     );
     await waitFor(() => {
-      expect(getByTestId("madie-measure")).toBeInTheDocument();
+      expect(getByTestId("home-component-mocked")).toBeInTheDocument();
     });
   });
 

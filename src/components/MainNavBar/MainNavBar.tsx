@@ -6,30 +6,23 @@ import {
   InnerMost,
   DropDown,
   Logo,
-  NavButton,
   DropMenu,
   ListItem,
   InnerItem,
   ExtraButton,
-  Bars,
-  Bar,
 } from "../../styles/styles";
+import { useOktaAuth } from "@okta/okta-react";
 
 const MainNavBar = () => {
+  const { oktaAuth, authState } = useOktaAuth();
+  const logout = async () => oktaAuth.signOut();
   return (
     <Nav>
       <InnerNav>
         <InnerMost>
-          <Logo to="/">
+          <Logo to="/measures">
             <img src={logo} alt="MADiE Logo" />
           </Logo>
-          <NavButton type="button">
-            <Bars>
-              <Bar />
-              <Bar />
-              <Bar />
-            </Bars>
-          </NavButton>
         </InnerMost>
         <DropDown>
           <DropMenu>
@@ -38,17 +31,21 @@ const MainNavBar = () => {
                 Release Notes
               </InnerItem>
             </ListItem>
-            <ListItem>
-              <InnerItem to="/measure" aria-label="Measure">
-                Measure
-              </InnerItem>
-            </ListItem>
-            <ListItem>
-              <InnerItem to="#" aria-label="IDE">
-                IDE
-              </InnerItem>
-            </ListItem>
-            <ExtraButton href="/login">Login</ExtraButton>
+            {authState.isAuthenticated && (
+              <>
+                <ListItem>
+                  <InnerItem to="/measures" aria-label="Measures">
+                    Measures
+                  </InnerItem>
+                </ListItem>
+                <ListItem>
+                  <InnerItem to="#" aria-label="Libraries">
+                    Libraries
+                  </InnerItem>
+                </ListItem>
+                <ExtraButton onClick={logout}>Logout</ExtraButton>
+              </>
+            )}
           </DropMenu>
         </DropDown>
       </InnerNav>

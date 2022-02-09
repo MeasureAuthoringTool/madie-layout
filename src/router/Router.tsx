@@ -1,9 +1,8 @@
 import React from "react";
-import { Route, Switch } from "react-router-dom";
+import { Redirect, Route, Switch } from "react-router-dom";
 import { SecureRoute, LoginCallback } from "@okta/okta-react";
 import Home from "../components/home/Home";
 import Login from "../components/login/Login";
-import { MadieMeasure } from "@madie/madie-measure";
 
 function Router({ props }) {
   return (
@@ -13,8 +12,10 @@ function Router({ props }) {
         render={() => <Login config={props.oktaSignInConfig} />}
       />
       <Route path="/login/callback" component={LoginCallback} />
-      <SecureRoute path="/" exact={true} component={Home} />
-      <SecureRoute path="/measure" component={MadieMeasure} />
+      <SecureRoute path="/measures" component={Home} />
+      <SecureRoute path="/" exact={true}>
+        <Redirect to="/measures" />
+      </SecureRoute>
     </Switch>
   );
 }
