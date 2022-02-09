@@ -1,24 +1,12 @@
 import React from "react";
-import { useHistory } from "react-router-dom";
-import { useOktaAuth } from "@okta/okta-react";
-import { ExtraButton } from "../../styles/styles";
+import MainNavBar from "../MainNavBar/MainNavBar";
+import { MadieMeasure } from "@madie/madie-measure";
 
 function Home() {
-  const history = useHistory();
-  const { oktaAuth } = useOktaAuth();
-
-  const logout = async () => oktaAuth.signOut();
-
   return (
     <div>
-      <div> You are successfully logged in </div>
-      <ExtraButton
-        data-testid="measure-button"
-        onClick={() => history.push("/measure")}
-      >
-        Measures
-      </ExtraButton>
-      <ExtraButton onClick={logout}>Logout</ExtraButton>
+      <MainNavBar />
+      <MadieMeasure />
     </div>
   );
 }
