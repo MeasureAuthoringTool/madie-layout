@@ -7,7 +7,7 @@ const oktaAuthTestProps = (isAuthenticated?: boolean) => {
   ): AbstractToken & { claims: UserClaims } & any &
     Omit<M, keyof AbstractToken | "claims"> => {
     const {
-      claims = { sub: "test@test.com" },
+      claims = { sub: "test@test.com" }, //nosec
       expiresAt = 999999999,
       authorizeUrl = "",
       scopes = [],
