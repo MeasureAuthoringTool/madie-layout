@@ -76,7 +76,7 @@
   },
   "dependencies": {
     "@okta/okta-auth-js": "^6.1.0",
-    "axios": "^0.23.0",
+    "axios": "^0.26.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "single-spa": "^5.9.3",
