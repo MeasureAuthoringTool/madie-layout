@@ -76,6 +76,7 @@
   },
   "dependencies": {
     "@okta/okta-auth-js": "^6.1.0",
+    "@types/react-router-dom": "^5.3.3",
     "axios": "^0.26.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
