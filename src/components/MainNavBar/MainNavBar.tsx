@@ -31,7 +31,7 @@ const MainNavBar = () => {
                 Release Notes
               </InnerItem>
             </ListItem>
-            {authState.isAuthenticated && (
+            {authState?.isAuthenticated && (
               <>
                 <ListItem>
                   <InnerItem to="/measures" aria-label="Measures">
@@ -39,8 +39,8 @@ const MainNavBar = () => {
                   </InnerItem>
                 </ListItem>
                 <ListItem>
-                  <InnerItem to="#" aria-label="Libraries">
-                    Libraries
+                  <InnerItem to="/cql-libraries" aria-label="CQL Library">
+                    CQL Library
                   </InnerItem>
                 </ListItem>
                 <ExtraButton onClick={logout}>Logout</ExtraButton>

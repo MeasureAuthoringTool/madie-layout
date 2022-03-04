@@ -25,7 +25,6 @@ function Login({ config }) {
     <Redirect to={{ pathname: "/" }} />
   ) : (
     <>
-      <MainNavBar />
       <LoginWidget {...loginConfig} />
     </>
   );
