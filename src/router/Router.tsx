@@ -26,6 +26,6 @@ function Router({ props }) {
         <Redirect to="/404" />
       </Switch>
     </>
-   );
+  );
 }
 export default Router;
