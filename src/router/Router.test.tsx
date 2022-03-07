@@ -30,6 +30,12 @@ jest.mock("../components/MainNavBar/MainNavBar", () => () => {
   return <div data-testid="main-nav-bar-mocked">Main Nav Bar</div>;
 });
 
+jest.mock("../components/notfound/NotFound", () => () => {
+  return (
+    <div data-testid="notfound-component-mocked">404 NotFound Component</div>
+  );
+});
+
 describe("Router component", () => {
   const routerProps = {
     props: {
@@ -75,6 +81,17 @@ describe("Router component", () => {
     );
     await waitFor(() => {
       expect(getByTestId("login-component-mocked")).toBeInTheDocument();
+    });
+  });
+
+  it("should render 404 NotFound component", async () => {
+    const { getByTestId } = render(
+      <MemoryRouter initialEntries={["/test"]}>
+        <Router {...routerProps} />
+      </MemoryRouter>
+    );
+    await waitFor(() => {
+      expect(getByTestId("notfound-component-mocked")).toBeInTheDocument();
     });
   });
 });

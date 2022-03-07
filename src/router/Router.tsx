@@ -5,6 +5,7 @@ import Login from "../components/login/Login";
 import MainNavBar from "../components/MainNavBar/MainNavBar";
 import { MadieMeasure } from "@madie/madie-measure";
 import { MadieCqlLibrary } from "@madie/madie-cql-library";
+import NotFound from "../components/notfound/NotFound";
 
 function Router({ props }) {
   return (
@@ -21,8 +22,10 @@ function Router({ props }) {
         <SecureRoute path="/" exact={true}>
           <Redirect to="/measures" />
         </SecureRoute>
+        <Route path="/404" component={NotFound} />
+        <Redirect to="/404" />
       </Switch>
     </>
-  );
+   );
 }
 export default Router;
