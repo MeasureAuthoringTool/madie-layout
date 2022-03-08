@@ -39,7 +39,11 @@ const MainNavBar = () => {
                   </InnerItem>
                 </ListItem>
                 <ListItem>
-                  <InnerItem to="/cql-libraries" aria-label="CQL Library">
+                  <InnerItem
+                    to="/cql-libraries"
+                    aria-label="CQL Library"
+                    id="cql-library"
+                  >
                     CQL Library
                   </InnerItem>
                 </ListItem>
