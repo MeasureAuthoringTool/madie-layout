@@ -6,12 +6,28 @@ import { Security } from "@okta/okta-react";
 import Router from "./Router";
 import { oktaAuthTestProps } from "./TestAuthProvider";
 
-jest.mock("../components/home/Home", () => () => {
-  return <div data-testid="home-component-mocked">Home Component</div>;
-});
+jest.mock("@madie/madie-measure", () => ({
+  MadieMeasure: () => {
+    return <div data-testid="measure-component-mocked">measure Component</div>;
+  },
+}));
+
+jest.mock("@madie/madie-cql-library", () => ({
+  MadieCqlLibrary: () => {
+    return (
+      <div data-testid="cql-library-component-mocked">
+        Cql Library Component
+      </div>
+    );
+  },
+}));
 
 jest.mock("../components/login/Login", () => () => {
   return <div data-testid="login-component-mocked">Login Component</div>;
+});
+
+jest.mock("../components/MainNavBar/MainNavBar", () => () => {
+  return <div data-testid="main-nav-bar-mocked">Main Nav Bar</div>;
 });
 
 jest.mock("../components/notfound/NotFound", () => () => {
@@ -31,7 +47,7 @@ describe("Router component", () => {
     },
   };
 
-  it("should redirect to Home component if authentication is true", async () => {
+  it("should redirect to measure component if authentication is true", async () => {
     const { getByTestId } = render(
       <MemoryRouter initialEntries={["/"]}>
         <Security {...oktaAuthTestProps(true)}>
@@ -40,11 +56,11 @@ describe("Router component", () => {
       </MemoryRouter>
     );
     await waitFor(() => {
-      expect(getByTestId("home-component-mocked")).toBeInTheDocument();
+      expect(getByTestId("measure-component-mocked")).toBeInTheDocument();
     });
   });
 
-  it("should render Home component if authenticated user navigates to /measures", async () => {
+  it("should render measure component if authenticated user navigates to /measures", async () => {
     const { getByTestId } = render(
       <MemoryRouter initialEntries={["/measures"]}>
         <Security {...oktaAuthTestProps(true)}>
@@ -53,7 +69,7 @@ describe("Router component", () => {
       </MemoryRouter>
     );
     await waitFor(() => {
-      expect(getByTestId("home-component-mocked")).toBeInTheDocument();
+      expect(getByTestId("measure-component-mocked")).toBeInTheDocument();
     });
   });
 
