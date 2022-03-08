@@ -39,8 +39,8 @@ const MainNavBar = () => {
                   </InnerItem>
                 </ListItem>
                 <ListItem>
-                  <InnerItem to="/cql-libraries" aria-label="CQL Library">
-                    CQL Library
+                  <InnerItem to="/cql-libraries" aria-label="CQL Libraries">
+                    CQL Libraries
                   </InnerItem>
                 </ListItem>
                 <ExtraButton onClick={logout}>Logout</ExtraButton>
