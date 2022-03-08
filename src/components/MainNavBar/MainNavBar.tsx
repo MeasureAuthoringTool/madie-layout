@@ -34,12 +34,20 @@ const MainNavBar = () => {
             {authState?.isAuthenticated && (
               <>
                 <ListItem>
-                  <InnerItem to="/measures" aria-label="Measures">
+                  <InnerItem
+                    to="/measures"
+                    aria-label="Measures"
+                    id="measures-main-nav-bar-tab"
+                  >
                     Measures
                   </InnerItem>
                 </ListItem>
                 <ListItem>
-                  <InnerItem to="/cql-libraries" aria-label="CQL Library">
+                  <InnerItem
+                    to="/cql-libraries"
+                    aria-label="CQL Library"
+                    id="cql-library-main-nav-bar-tab"
+                  >
                     CQL Library
                   </InnerItem>
                 </ListItem>
