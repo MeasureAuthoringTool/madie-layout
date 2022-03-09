@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import logo from "../../assets/images/madie_logo.svg";
 import {
   Nav,
@@ -12,10 +12,35 @@ import {
   ExtraButton,
 } from "../../styles/styles";
 import { useOktaAuth } from "@okta/okta-react";
+//MAT-3804
+import { customLog } from "../../custom-hooks/customLog";
 
 const MainNavBar = () => {
   const { oktaAuth, authState } = useOktaAuth();
-  const logout = async () => oktaAuth.signOut();
+  const [logged, setLogged] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
+
+  const logout = async () => {
+    if (
+      !logged &&
+      oktaAuth.token != null &&
+      oktaAuth.token.getUserInfo() != null
+    ) {
+      oktaAuth.token
+        .getUserInfo()
+        .then((info) => {
+          setUserInfo(info);
+          setLogged(true);
+          customLog(info, "info", "http://localhost:8081/api/log/logout");
+        })
+        .catch((error) => {
+          //console.log(error);
+        });
+    }
+    if (logged) {
+      await oktaAuth.signOut();
+    }
+  };
   return (
     <Nav>
       <InnerNav>
