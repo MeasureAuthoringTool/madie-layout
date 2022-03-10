@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Redirect } from "react-router-dom";
 import { LoginWidget } from "@madie/madie-auth";
 import { useOktaAuth } from "@okta/okta-react";
-import MainNavBar from "../MainNavBar/MainNavBar";
 //MAT-3804
-import { customLog } from "../../custom-hooks/customLog";
+import { loginLogger } from "../../custom-hooks/customLog";
 
 function Login({ config }) {
   const { oktaAuth, authState } = useOktaAuth();
@@ -25,7 +24,7 @@ function Login({ config }) {
     oktaAuth.token
       .getUserInfo()
       .then((info) => {
-        customLog(info, "info", "http://localhost:8081/api/log/login");
+        loginLogger(info, "info");
       })
       .catch((error) => {
         //console.log(error);
