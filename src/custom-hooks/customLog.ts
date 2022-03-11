@@ -1,20 +1,16 @@
 //MAT-3804
 import log from "loglevel";
 import remote from "loglevel-plugin-remote";
+import loglevelServerSend from "./loglevel-serverSend";
+import axios from "axios";
+import { ServiceConfig, getServiceConfig } from "./getServiceConfig";
 
-const customLog = (input, level, action) => {
+const customLog = async (input, level, action) => {
   if (input != null) {
-    const customJSON = (log) => ({
-      msg: { input },
-      level: { level },
-    });
+    const config: ServiceConfig = await getServiceConfig();
+    const serviceUrl = config?.loggingService?.baseUrl;
 
-    remote.apply(log, {
-      format: customJSON,
-      url: `http://localhost:8080/api/log/${action}`,
-    });
-    log.enableAll();
-    log.info(input);
+    return axios.post(`${serviceUrl}/log/${action}`, input);
   }
 };
 
