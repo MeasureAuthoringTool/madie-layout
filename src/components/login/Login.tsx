@@ -24,7 +24,7 @@ function Login({ config }) {
     oktaAuth.token
       .getUserInfo()
       .then((info) => {
-        loginLogger(info, "info");
+        loginLogger(info);
       })
       .catch((error) => {
         //console.log(error);

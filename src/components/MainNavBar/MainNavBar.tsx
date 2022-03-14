@@ -26,7 +26,7 @@ const MainNavBar = () => {
       oktaAuth.token
         .getUserInfo()
         .then((info) => {
-          logoutLogger(info, "info");
+          logoutLogger(info);
         })
         .catch((error) => {
           //console.log(error);

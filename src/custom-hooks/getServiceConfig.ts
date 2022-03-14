@@ -13,7 +13,7 @@ export async function getServiceConfig(): Promise<ServiceConfig> {
   if (
     !(serviceConfig?.loggingService && serviceConfig.loggingService.baseUrl)
   ) {
-    throw new Error("Invalid Service Config");
+    throw new Error("Invalid Logging Service Config");
   }
 
   return serviceConfig;

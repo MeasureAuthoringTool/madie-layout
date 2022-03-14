@@ -1,23 +1,25 @@
-//MAT-3804
-import log from "loglevel";
-import remote from "loglevel-plugin-remote";
-import loglevelServerSend from "./loglevel-serverSend";
 import axios from "axios";
 import { ServiceConfig, getServiceConfig } from "./getServiceConfig";
 
-const customLog = async (input, level, action) => {
+const customLog = async (input, action) => {
   if (input != null) {
-    const config: ServiceConfig = await getServiceConfig();
-    const serviceUrl = config?.loggingService?.baseUrl;
+    const serviceUrl = getServiceUrl();
 
     return axios.post(`${serviceUrl}/log/${action}`, input);
   }
 };
 
-export const loginLogger = (content, level) => {
-  customLog(content, level, "login");
+export const getServiceUrl = async () => {
+  const config: ServiceConfig = await getServiceConfig();
+  const serviceUrl: string = config?.loggingService?.baseUrl;
+
+  return serviceUrl;
 };
 
-export const logoutLogger = (content, level) => {
-  customLog(content, level, "logout");
+export const loginLogger = (content) => {
+  customLog(content, "login");
+};
+
+export const logoutLogger = (content) => {
+  customLog(content, "logout");
 };
