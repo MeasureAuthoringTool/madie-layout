@@ -19,7 +19,12 @@ function Login({ config }) {
     },
   };
 
-  if (oktaAuth.token != null && oktaAuth.token.getUserInfo() != null) {
+  if (
+    oktaAuth.token != null &&
+    oktaAuth.getAccessToken() != null &&
+    oktaAuth.getIdToken() != null &&
+    oktaAuth.token.getUserInfo() != null
+  ) {
     oktaAuth.token
       .getUserInfo()
       .then((info) => {

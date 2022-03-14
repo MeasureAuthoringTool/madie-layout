@@ -3,7 +3,7 @@ import { ServiceConfig, getServiceConfig } from "./getServiceConfig";
 
 const customLog = async (input, action) => {
   if (input != null) {
-    const serviceUrl = getServiceUrl();
+    const serviceUrl = await getServiceUrl();
 
     return axios.post(`${serviceUrl}/log/${action}`, input);
   }
