@@ -31,9 +31,7 @@ function Login({ config }) {
   if (!authState) return null;
 
   return authState.isAuthenticated ? (
-    <div>
-      <Redirect to={{ pathname: "/" }} />
-    </div>
+    <Redirect to={{ pathname: "/" }} />
   ) : (
     <>
       <LoginWidget {...loginConfig} />
