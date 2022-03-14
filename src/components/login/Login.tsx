@@ -2,7 +2,6 @@ import React from "react";
 import { Redirect } from "react-router-dom";
 import { LoginWidget } from "@madie/madie-auth";
 import { useOktaAuth } from "@okta/okta-react";
-//MAT-3804
 import { loginLogger } from "../../custom-hooks/customLog";
 
 function Login({ config }) {
@@ -26,9 +25,7 @@ function Login({ config }) {
       .then((info) => {
         loginLogger(info);
       })
-      .catch((error) => {
-        //console.log(error);
-      });
+      .catch((error) => {});
   }
 
   if (!authState) return null;

@@ -12,7 +12,6 @@ import {
   ExtraButton,
 } from "../../styles/styles";
 import { useOktaAuth } from "@okta/okta-react";
-//MAT-3804
 import { logoutLogger } from "../../custom-hooks/customLog";
 
 const MainNavBar = () => {
@@ -28,9 +27,7 @@ const MainNavBar = () => {
         .then((info) => {
           logoutLogger(info);
         })
-        .catch((error) => {
-          //console.log(error);
-        })
+        .catch((error) => {})
         .finally(() => {
           oktaAuth.signOut();
         });
