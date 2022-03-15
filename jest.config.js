@@ -9,7 +9,7 @@ module.exports = {
   moduleNameMapper: {
     "\\.(css)$": "identity-obj-proxy",
     "single-spa-react/parcel": "single-spa-react/lib/cjs/parcel.cjs",
-    "^.+\\.(css|less|scss)$": "babel-jest"
+    "^.+\\.(css|less|scss)$": "babel-jest",
   },
   setupFilesAfterEnv: ["@testing-library/jest-dom", "./jest.setup.js"],
 };
