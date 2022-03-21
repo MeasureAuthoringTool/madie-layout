@@ -12,26 +12,20 @@ function Login({ config }) {
       config: config,
       onSuccess: (tokens) => {
         oktaAuth.handleLoginRedirect(tokens);
+        if (oktaAuth.token != null && oktaAuth.token.getUserInfo() != null) {
+          oktaAuth.token
+            .getUserInfo()
+            .then((info) => {
+              loginLogger(info);
+            })
+            .catch((error) => {});
+        }
       },
       onError: (err) => {
         /* Placeholder to handle error returned from login widget  */
       },
     },
   };
-
-  if (
-    oktaAuth.token != null &&
-    oktaAuth.getAccessToken() != null &&
-    oktaAuth.getIdToken() != null &&
-    oktaAuth.token.getUserInfo() != null
-  ) {
-    oktaAuth.token
-      .getUserInfo()
-      .then((info) => {
-        loginLogger(info);
-      })
-      .catch((error) => {});
-  }
 
   if (!authState) return null;
 

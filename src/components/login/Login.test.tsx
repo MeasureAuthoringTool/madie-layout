@@ -1,12 +1,26 @@
 import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import Login from "./Login";
 import { MemoryRouter } from "react-router";
 import { useOktaAuth } from "@okta/okta-react";
+import userEvent from "@testing-library/user-event";
 
 jest.mock("@okta/okta-react", () => ({
   useOktaAuth: jest.fn(),
 }));
+
+const mockLoginLogger = jest.fn((args) => {
+  Promise.resolve("logged");
+});
+
+jest.mock("../../custom-hooks/customLog", () => {
+  //lazy load the mock otherwise will thorw ReferenceError: Cannot access 'mockLoginLogger' before initialization
+  return {
+    loginLogger: (args) => {
+      return mockLoginLogger(args);
+    },
+  };
+});
 
 describe("Login component", () => {
   it("should return null if authState is undefined", async () => {
@@ -53,5 +67,39 @@ describe("Login component", () => {
       </MemoryRouter>
     );
     expect(queryByTestId("login-testid")).toBeNull();
+  });
+
+  it("Should login successfully with user info logged", async () => {
+    const oktaAuth = { handleLoginRedirect: jest.fn() };
+    const loginProps = {
+      config: {},
+      onSuccess: (tokens) => oktaAuth.handleLoginRedirect(tokens),
+    };
+    const mockHandleLoginRedirect = jest.fn();
+    const mockGetUserInfo = jest.fn().mockImplementation(() => {
+      return Promise.resolve({ user: "testUserId" });
+    });
+    const mockToken = { getUserInfo: mockGetUserInfo };
+    (useOktaAuth as jest.Mock).mockImplementation(() => ({
+      oktaAuth: {
+        token: mockToken,
+        handleLoginRedirect: mockHandleLoginRedirect,
+      },
+      authState: { isAuthenticated: false },
+    }));
+
+    render(
+      <MemoryRouter>
+        <Login {...loginProps} />
+      </MemoryRouter>
+    );
+    screen.debug();
+    const loginButton = screen.getByRole("button", { name: "Login Widget" });
+    userEvent.click(loginButton);
+    screen.debug();
+    expect(mockHandleLoginRedirect).toBeCalled();
+    await waitFor(() =>
+      expect(mockLoginLogger).toHaveBeenCalledWith({ user: "testUserId" })
+    );
   });
 });
