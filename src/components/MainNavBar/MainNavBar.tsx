@@ -12,10 +12,26 @@ import {
   ExtraButton,
 } from "../../styles/styles";
 import { useOktaAuth } from "@okta/okta-react";
+import { logoutLogger } from "../../custom-hooks/customLog";
 
 const MainNavBar = () => {
   const { oktaAuth, authState } = useOktaAuth();
-  const logout = async () => oktaAuth.signOut();
+  const logout = async () => {
+    if (
+      oktaAuth.token != null &&
+      (await oktaAuth.token.getUserInfo()) != null
+    ) {
+      oktaAuth.token
+        .getUserInfo()
+        .then((info) => {
+          logoutLogger(info);
+        })
+        .catch((error) => {})
+        .finally(() => {
+          oktaAuth.signOut();
+        });
+    }
+  };
   return (
     <Nav>
       <InnerNav>
