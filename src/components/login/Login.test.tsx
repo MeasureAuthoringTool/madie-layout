@@ -76,7 +76,7 @@ describe("Login component", () => {
     };
     const mockHandleLoginRedirect = jest.fn();
     const mockGetUserInfo = jest.fn().mockImplementation(() => {
-      return Promise.resolve({ user: "testUserId" });
+      return Promise.resolve();
     });
     const mockToken = { getUserInfo: mockGetUserInfo };
     (useOktaAuth as jest.Mock).mockImplementation(() => ({
@@ -97,8 +97,6 @@ describe("Login component", () => {
     userEvent.click(loginButton);
     screen.debug();
     expect(mockHandleLoginRedirect).toBeCalled();
-    await waitFor(() =>
-      expect(mockLoginLogger).toHaveBeenCalledWith({ user: "testUserId" })
-    );
+    await waitFor(() => expect(mockLoginLogger).toHaveBeenCalled());
   });
 });
