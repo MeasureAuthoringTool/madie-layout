@@ -60,16 +60,16 @@ function UserProfile() {
           </option>
 
           <option
-            key="manage-access"
-            value="ManageAccess"
+            key={`${userFirstName}-"manage-access"`}
+            value={`${userFirstName}-"manage-access"`}
             data-testid="user-profile-manage-access-option"
           >
             Manage Access
           </option>
 
           <option
-            key="Logout"
-            value="Logout"
+            key={`${userFirstName}-"Logout"`}
+            value={`${userFirstName}-"Logout"`}
             data-testid="user-profile-logout-option"
           >
             Sign Out

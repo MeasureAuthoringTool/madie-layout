@@ -43,8 +43,8 @@ const UserAvatar = () => {
         .getUserInfo()
         .then((info) => {
           setUser(info);
-          for (const [key, value] of Object.entries(info)) {
-            if (key === "name") {
+          for (const [mapKey, value] of Object.entries(info)) {
+            if (mapKey === "name") {
               setUserName(value.toString());
             }
           }
