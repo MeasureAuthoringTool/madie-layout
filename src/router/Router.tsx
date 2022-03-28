@@ -6,11 +6,12 @@ import MainNavBar from "../components/MainNavBar/MainNavBar";
 import { MadieMeasure } from "@madie/madie-measure";
 import { MadieCqlLibrary } from "@madie/madie-cql-library";
 import NotFound from "../components/notfound/NotFound";
-import Footer from "../components/Footer";
+import Footer from "../components/Footer/Footer";
+import "../styles/LayoutStyles.scss";
 
 function Router({ props }) {
   return (
-    <div className="flex">
+    <div className="layout-wrapper">
       <MainNavBar />
       <Switch>
         <Route

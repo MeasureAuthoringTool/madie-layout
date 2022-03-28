@@ -1,0 +1,38 @@
+$btn-color-bg: #0073c8;
+$btn-color-bg--hover: #fff;
+
+.footer-section {
+  hr {
+    width: 100vw;
+    position: relative;
+    left: calc(-50vw + 50%);
+  }
+
+  footer {
+    .global-footer-container {
+      .btn {
+        &.btn.btn-subscribe {
+          border-width: 1px;
+          background-color: $btn-color-bg;
+          &:hover {
+            background-color: $btn-color-bg--hover;
+          }
+        }
+      }
+
+      .social-container {
+        svg {
+          display: inline;
+        }
+      }
+
+      .footer-social-newsletter .subscriber-form .form-control {
+        height: 42px;
+      }
+    }
+
+    .qpp-hhs-logo-container {
+      overflow: hidden;
+    }
+  }
+}
