@@ -36,6 +36,7 @@ const UserAvatar = () => {
   const [user, setUser] = useState(null);
   const [userName, setUserName] = useState("");
   const { oktaAuth, authState } = useOktaAuth();
+  const name = "name";
 
   useEffect(() => {
     if (!user && authState?.isAuthenticated) {
@@ -43,8 +44,8 @@ const UserAvatar = () => {
         .getUserInfo()
         .then((info) => {
           setUser(info);
-          for (const [mapKey, value] of Object.entries(info)) {
-            if (mapKey === "name") {
+          for (const [key, value] of Object.entries(info)) {
+            if (key === name) {
               setUserName(value.toString());
             }
           }

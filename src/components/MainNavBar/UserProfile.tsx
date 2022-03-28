@@ -10,6 +10,7 @@ function UserProfile() {
   const { oktaAuth } = useOktaAuth();
   const [userInfo, setUserInfo] = useState(null);
   const [userFirstName, setUserFirstName] = useState("");
+  const givenName = "given_name";
 
   useEffect(() => {
     oktaAuth.token
@@ -17,7 +18,7 @@ function UserProfile() {
       .then((info) => {
         setUserInfo(info);
         for (const [key, value] of Object.entries(info)) {
-          if (key === "given_name") {
+          if (key === givenName) {
             setUserFirstName(value.toString());
           }
         }
