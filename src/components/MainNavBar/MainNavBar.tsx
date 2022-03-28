@@ -9,7 +9,6 @@ import {
   DropMenu,
   ListItem,
   InnerItem,
-  ExtraButton,
 } from "../../styles/styles";
 import { useOktaAuth } from "@okta/okta-react";
 
@@ -17,7 +16,7 @@ import UserProfile from "./UserProfile";
 import UserAvatar from "./UserAvatar";
 
 const MainNavBar = () => {
-  const { oktaAuth, authState } = useOktaAuth();
+  const { authState } = useOktaAuth();
   return (
     <Nav>
       <InnerNav>

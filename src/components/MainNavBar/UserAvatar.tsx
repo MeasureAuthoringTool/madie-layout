@@ -21,7 +21,7 @@ const stringToColor = (input: string) => {
 };
 
 const stringAvatar = (name: string) => {
-  if (name === null || (name !== null && name.trim().length === 0)) {
+  if (name === null || name.trim().length === 0) {
     return {};
   }
   return {
