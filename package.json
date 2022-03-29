@@ -98,5 +98,8 @@
     "twin": {
       "preset": "styled-components"
     }
+  },
+  "overrides": {
+    "glob-parent": "^5.1.2"
   }
 }
