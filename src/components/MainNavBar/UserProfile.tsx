@@ -4,7 +4,7 @@ import { logoutLogger } from "../../custom-hooks/customLog";
 import tw, { styled } from "twin.macro";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 
-const FormControl = styled.section(() => [tw`mb-3`, `margin: 25px 40px;`]);
+const FormControl = styled.section(() => [tw`ml-2`]);
 
 function UserProfile() {
   const { oktaAuth } = useOktaAuth();
