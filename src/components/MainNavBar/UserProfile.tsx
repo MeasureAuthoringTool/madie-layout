@@ -27,10 +27,8 @@ function UserProfile() {
   }, []);
 
   const logout = async () => {
-    try {
-      logoutLogger(userInfo);
-      oktaAuth.signOut();
-    } catch (err) {}
+    logoutLogger(userInfo);
+    oktaAuth.signOut();
   };
 
   const handleChange = (event: SelectChangeEvent) => {

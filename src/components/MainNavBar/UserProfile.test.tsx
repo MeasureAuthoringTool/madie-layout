@@ -88,6 +88,43 @@ describe("UserProfile component", () => {
     );
   });
 
+  it("Should render empty user name", () => {
+    const mockGetUserInfo = jest.fn().mockImplementation(() => {
+      return Promise.reject("user name null");
+    });
+    const mockToken = { getUserInfo: mockGetUserInfo };
+    const MockSignOut = jest.fn().mockImplementation(() => {
+      Promise.resolve();
+    });
+
+    (useOktaAuth as jest.Mock).mockImplementation(() => ({
+      oktaAuth: {
+        token: mockToken,
+        signOut: MockSignOut,
+      },
+      authState: { isAuthenticated: true },
+    }));
+    render(
+      <MemoryRouter>
+        <UserProfile />
+      </MemoryRouter>
+    );
+    expect(screen.getByRole("option", { name: "" }).selected).toBe(true);
+
+    userEvent.selectOptions(
+      screen.getByTestId("user-profile-select"),
+      screen.getByRole("option", { name: "Sign Out" })
+    );
+    expect(screen.getByRole("option", { name: "Sign Out" }).selected).toBe(
+      false
+    );
+
+    const option = screen.getByTestId("user-profile-select");
+    fireEvent.click(option, { target: { value: "Logout" } });
+    waitFor(() => expect(mockLogoutLogger).toHaveBeenCalled());
+    waitFor(() => expect(MockSignOut).not.toHaveBeenCalled());
+  });
+
   it("Should do logging when user chooses Sign Out", () => {
     render(
       <MemoryRouter>
