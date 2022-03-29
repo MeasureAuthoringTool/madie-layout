@@ -1,8 +1,8 @@
 import React from "react";
-import { Footer as QPPFooter } from "@madie/madie-design-system/dist/react";
+import { Footer as MadieFooter } from "@madie/madie-design-system/dist/react";
 import "../../styles/FooterStyles.scss";
 import hhsLogoPath from "../../assets/images/hhs-logo-black.svg";
-import qppLogoPath from "../../assets/images/measure_authoring_logo.svg";
+import madieLogoPath from "../../assets/images/measure_authoring_logo.svg";
 
 const Footer = () => {
   const assets = {
@@ -16,16 +16,16 @@ const Footer = () => {
     ),
     qppLogo: (
       <img
-        alt="qpp logo"
-        className="qpp-logo"
-        data-testid="custom-qpp-logo"
-        src={qppLogoPath}
+        alt="Maddie logo"
+        className="madie-logo"
+        data-testid="custom-madie-logo"
+        src={madieLogoPath}
       />
     ),
   };
   return (
     <section className="footer-section">
-      <QPPFooter isNewFooter={true} assets={assets} />
+      <MadieFooter isNewFooter={true} assets={assets} />
     </section>
   );
 };

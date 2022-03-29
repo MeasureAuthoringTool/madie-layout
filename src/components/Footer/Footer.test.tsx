@@ -5,7 +5,7 @@ import Footer from "./Footer";
 describe("Footer component", () => {
   it("should display custom logos in footer", async () => {
     const { getByTestId } = render(<Footer />);
-    const customHHSLogo = getByTestId("custom-hhs-logo");
+    const customHHSLogo = getByTestId("custom-madie-logo");
     expect(customHHSLogo).toBeTruthy();
   });
 });
