@@ -65,9 +65,6 @@ describe("UserProfile component", () => {
       screen.getByTestId("user-profile-username-option").outerHTML
     ).toContain("test");
     expect(
-      screen.getByTestId("user-profile-manage-access-option")
-    ).toBeInTheDocument();
-    expect(
       screen.getByTestId("user-profile-logout-option")
     ).toBeInTheDocument();
   });
@@ -155,14 +152,12 @@ describe("UserProfile component", () => {
 
     userEvent.selectOptions(
       screen.getByTestId("user-profile-select"),
-      screen.getByRole("option", { name: "Manage Access" })
+      screen.getByRole("option", { name: "" })
     );
-    expect(screen.getByRole("option", { name: "Manage Access" }).selected).toBe(
-      false
-    );
+    expect(screen.getByRole("option", { name: "" }).selected).toBe(true);
 
     const option = screen.getByTestId("user-profile-select");
-    fireEvent.change(option, { target: { value: "ManageAccess" } });
+    fireEvent.change(option, { target: { value: "" } });
     waitFor(() => expect(mockLogoutLogger).not.toHaveBeenCalled());
   });
 });
