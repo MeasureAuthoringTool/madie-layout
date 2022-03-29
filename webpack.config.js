@@ -22,7 +22,7 @@ module.exports = (webpackConfigEnv, argv) => {
       "@madie/madie-auth",
       "@madie/madie-root",
       "@madie/madie-cql-library",
-      "@madie/madie-measure"
+      "@madie/madie-measure",
     ],
   };
   const newCssRule = {
