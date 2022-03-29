@@ -9,12 +9,22 @@ module.exports = (webpackConfigEnv, argv) => {
     orgName: "madie",
     projectName: "madie-layout",
     webpackConfigEnv,
+    orgPackagesAsExternal: false,
     disableHtmlGeneration: true, // false causes multiple assets served as index.html
     argv,
   });
-
+  // const mergeConfig
   // We need to override the css loading rule from the parent configuration
   // so that we can add postcss-loader to the chain
+  const externalsConfig = {
+    externals: [
+      "@madie/madie-editor",
+      "@madie/madie-auth",
+      "@madie/madie-root",
+      "@madie/madie-cql-library",
+      "@madie/madie-measure",
+    ],
+  };
   const newCssRule = {
     module: {
       rules: [
@@ -94,13 +104,6 @@ module.exports = (webpackConfigEnv, argv) => {
           ),
           publicPath: "/madie-auth",
         },
-        {
-          directory: path.join(
-            __dirname,
-            "node_modules/@madie/madie-design-system/"
-          ),
-          publicPath: "/madie-design-system",
-        },
       ],
     },
     plugins: [
@@ -143,5 +146,6 @@ module.exports = (webpackConfigEnv, argv) => {
       },
     },
     plugins: "append",
-  })(defaultConfig, newCssRule, copyConfig);
+    // externals: ["madie-design-system"]
+  })(externalsConfig, defaultConfig, newCssRule, copyConfig);
 };

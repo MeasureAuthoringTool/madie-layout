@@ -6,10 +6,12 @@ import MainNavBar from "../components/MainNavBar/MainNavBar";
 import { MadieMeasure } from "@madie/madie-measure";
 import { MadieCqlLibrary } from "@madie/madie-cql-library";
 import NotFound from "../components/notfound/NotFound";
+import Footer from "../components/Footer/Footer";
+import "../styles/LayoutStyles.scss";
 
 function Router({ props }) {
   return (
-    <>
+    <div className="layout-wrapper">
       <MainNavBar />
       <Switch>
         <Route
@@ -25,7 +27,8 @@ function Router({ props }) {
         <Route path="/404" component={NotFound} />
         <Redirect to="/404" />
       </Switch>
-    </>
+      <Footer />
+    </div>
   );
 }
 export default Router;
