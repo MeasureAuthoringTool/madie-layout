@@ -27,15 +27,15 @@ jest.mock("../../custom-hooks/customLog", () => {
     },
   };
 });
+const MockSignOut = jest.fn().mockImplementation(() => {
+  return Promise.resolve();
+});
 
 beforeEach(() => {
   const mockGetUserInfo = jest.fn().mockImplementation(() => {
     return Promise.resolve({ name: "test name", given_name: "test" });
   });
   const mockToken = { getUserInfo: mockGetUserInfo };
-  const MockSignOut = jest.fn().mockImplementation(() => {
-    return Promise.resolve();
-  });
 
   (useOktaAuth as jest.Mock).mockImplementation(() => ({
     oktaAuth: {
@@ -106,6 +106,7 @@ describe("UserProfile component", () => {
     const option = screen.getByTestId("user-profile-select");
     fireEvent.change(option, { target: { value: "Logout" } });
     waitFor(() => expect(mockLogoutLogger).toHaveBeenCalled());
+    waitFor(() => expect(MockSignOut).toHaveBeenCalled());
   });
 
   it("Should not do logging when user chooses options other than Sign Out", () => {

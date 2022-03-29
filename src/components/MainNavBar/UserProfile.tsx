@@ -62,7 +62,7 @@ function UserProfile() {
 
           <option
             key={`${userFirstName}-"manage-access"`}
-            value={`${userFirstName}-"manage-access"`}
+            value="manage-access"
             data-testid="user-profile-manage-access-option"
           >
             Manage Access
@@ -70,7 +70,7 @@ function UserProfile() {
 
           <option
             key={`${userFirstName}-"Logout"`}
-            value={`${userFirstName}-"Logout"`}
+            value="Logout"
             data-testid="user-profile-logout-option"
           >
             Sign Out
