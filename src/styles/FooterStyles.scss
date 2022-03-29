@@ -16,6 +16,7 @@ $btn-color-bg--hover: #fff;
         &.btn.btn-subscribe {
           border-width: 1px;
           background-color: $btn-color-bg;
+
           &:hover {
             background-color: $btn-color-bg--hover;
           }
