@@ -6,49 +6,68 @@ import {
   InnerMost,
   DropDown,
   Logo,
-  NavButton,
   DropMenu,
   ListItem,
   InnerItem,
-  ExtraButton,
-  Bars,
-  Bar,
 } from "../../styles/styles";
+import { useOktaAuth } from "@okta/okta-react";
+
+import UserProfile from "./UserProfile";
+import UserAvatar from "./UserAvatar";
 
 const MainNavBar = () => {
+  const { authState } = useOktaAuth();
   return (
     <Nav>
       <InnerNav>
         <InnerMost>
-          <Logo to="/">
+          <Logo to="/measures">
             <img src={logo} alt="MADiE Logo" />
           </Logo>
-          <NavButton type="button">
-            <Bars>
-              <Bar />
-              <Bar />
-              <Bar />
-            </Bars>
-          </NavButton>
         </InnerMost>
         <DropDown>
           <DropMenu>
             <ListItem>
-              <InnerItem to="#" aria-label="Release Notes">
+              <InnerItem
+                to="#"
+                aria-label="Release Notes"
+                data-testid="main-nav-bar-release-notes"
+              >
                 Release Notes
               </InnerItem>
             </ListItem>
-            <ListItem>
-              <InnerItem to="/measure" aria-label="Measure">
-                Measure
-              </InnerItem>
-            </ListItem>
-            <ListItem>
-              <InnerItem to="#" aria-label="IDE">
-                IDE
-              </InnerItem>
-            </ListItem>
-            <ExtraButton href="/login">Login</ExtraButton>
+            {authState?.isAuthenticated && (
+              <>
+                <ListItem data-testid="authenticated-links">
+                  <InnerItem
+                    to="/measures"
+                    aria-label="Measures"
+                    id="measures-main-nav-bar-tab"
+                    data-testid="main-nav-bar-measures"
+                  >
+                    Measures
+                  </InnerItem>
+                </ListItem>
+                <ListItem>
+                  <InnerItem
+                    to="/cql-libraries"
+                    aria-label="CQL Library"
+                    id="cql-library-main-nav-bar-tab"
+                    data-testid="main-nav-bar-cql-library"
+                  >
+                    CQL Library
+                  </InnerItem>
+                </ListItem>
+
+                <ListItem id="main-nav-bar-tab-user-avatar">
+                  <UserAvatar />
+                </ListItem>
+
+                <ListItem id="main-nav-bar-tab-user-profile">
+                  <UserProfile />
+                </ListItem>
+              </>
+            )}
           </DropMenu>
         </DropDown>
       </InnerNav>

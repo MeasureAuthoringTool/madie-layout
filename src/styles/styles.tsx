@@ -8,7 +8,7 @@ export const Nav = tw.nav`
     md:px-24 lg:px-8 bg-gray-300
 `;
 export const InnerNav = tw.div`
-    container px-4 mx-auto flex flex-wrap items-center justify-between 
+    w-full px-4 flex flex-wrap items-center justify-between 
 `;
 export const InnerMost = tw.div`
     w-full relative flex justify-between lg:w-auto lg:static lg:block 

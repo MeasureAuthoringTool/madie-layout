@@ -1,4 +1,5 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 const { mergeWithRules } = require("webpack-merge");
 const singleSpaDefaults = require("webpack-config-single-spa-react-ts");
 const path = require("path");
@@ -8,12 +9,22 @@ module.exports = (webpackConfigEnv, argv) => {
     orgName: "madie",
     projectName: "madie-layout",
     webpackConfigEnv,
+    orgPackagesAsExternal: false,
+    disableHtmlGeneration: true, // false causes multiple assets served as index.html
     argv,
-    disableHtmlGeneration: true,
   });
-
+  // const mergeConfig
   // We need to override the css loading rule from the parent configuration
   // so that we can add postcss-loader to the chain
+  const externalsConfig = {
+    externals: [
+      "@madie/madie-editor",
+      "@madie/madie-auth",
+      "@madie/madie-root",
+      "@madie/madie-cql-library",
+      "@madie/madie-measure",
+    ],
+  };
   const newCssRule = {
     module: {
       rules: [
@@ -24,6 +35,44 @@ module.exports = (webpackConfigEnv, argv) => {
             "style-loader",
             "css-loader", // uses modules: true, which I think we want. Parent does not
             "postcss-loader",
+          ],
+        },
+        {
+          test: /\.scss$/,
+          resolve: {
+            extensions: [".scss", ".sass"],
+          },
+          use: [
+            {
+              loader: "style-loader",
+            },
+            {
+              loader: "css-loader",
+              options: { sourceMap: true, importLoaders: 2 },
+            },
+            {
+              loader: "postcss-loader",
+              options: {
+                sourceMap: true,
+              },
+            },
+            {
+              loader: "sass-loader",
+            },
+          ],
+          exclude: /node_modules/,
+        },
+        // teach webpack how to read the binaries
+        {
+          test: /\.(woff(2)?|ttf|otf|eot)(\?v=\d+\.\d+\.\d+)?$/,
+          use: [
+            {
+              loader: "file-loader",
+              options: {
+                name: "[name].[ext]",
+                outputPath: "fonts/",
+              },
+            },
           ],
         },
       ],
@@ -66,6 +115,28 @@ module.exports = (webpackConfigEnv, argv) => {
       }),
     ],
   };
+  // we need to pull out the styles and images, import them with scss.
+  const copyConfig = {
+    resolve: {
+      fallback: {
+        fs: false,
+      },
+    },
+    plugins: [
+      new CopyWebpackPlugin({
+        patterns: [
+          {
+            from: "node_modules/@madie/madie-design-system/fonts/",
+            to: path.resolve("public/fonts"),
+          },
+          {
+            from: "node_modules/@madie/madie-design-system/images/",
+            to: path.resolve("public/images"),
+          },
+        ],
+      }),
+    ],
+  };
 
   return mergeWithRules({
     module: {
@@ -75,5 +146,6 @@ module.exports = (webpackConfigEnv, argv) => {
       },
     },
     plugins: "append",
-  })(defaultConfig, newCssRule);
+    // externals: ["madie-design-system"]
+  })(externalsConfig, defaultConfig, newCssRule, copyConfig);
 };

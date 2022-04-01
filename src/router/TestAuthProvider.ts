@@ -4,12 +4,10 @@ import { AuthState, OktaAuth, UserClaims } from "@okta/okta-auth-js";
 const oktaAuthTestProps = (isAuthenticated?: boolean) => {
   const testToken = <M extends Record<string, any>>(
     more: M
-  ): AbstractToken & { claims: UserClaims } & Omit<
-      M,
-      keyof AbstractToken | "claims"
-    > => {
+  ): AbstractToken & { claims: UserClaims } & any &
+    Omit<M, keyof AbstractToken | "claims"> => {
     const {
-      claims = { sub: "test@test" },
+      claims = { sub: "test@test.com" }, //nosec
       expiresAt = 999999999,
       authorizeUrl = "",
       scopes = [],
@@ -33,8 +31,8 @@ const oktaAuthTestProps = (isAuthenticated?: boolean) => {
     idToken: testToken({
       ...authState?.idToken,
       idToken: "testIDToken",
-      issuer: "https://domain.okta.com/oauth2/default",
-      clientId: "testClientId",
+      issuer: "testIDToken",
+      clientId: "testIDToken",
     }),
     accessToken: testToken({
       ...authState?.accessToken,
@@ -46,8 +44,8 @@ const oktaAuthTestProps = (isAuthenticated?: boolean) => {
 
   const oktaAuth = (isAuthenticated: boolean) =>
     new OktaAuth({
-      issuer: "https://domain.okta.com/oauth2/default",
-      clientId: "testClientId",
+      issuer: "https://dev-234234.okta.com/oauth2/default",
+      clientId: "asdfasdfasdfasdf",
       redirectUri: window.location.origin + "/login/callback",
       transformAuthState: async (ignored: any, authState: AuthState) =>
         loggedInState(authState, isAuthenticated),
