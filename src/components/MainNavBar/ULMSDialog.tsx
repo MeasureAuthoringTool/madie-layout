@@ -157,9 +157,9 @@ const UMLSDialog = (props: UMLSDialogProps) => {
               fontWeight: 400,
               display: "list-item",
               a: {
-                color: "",
-                "&:after": {
-                  display: "none",
+                color: "#0073C8",
+                "&::after": {
+                  display: "none !important",
                 },
               },
             },
