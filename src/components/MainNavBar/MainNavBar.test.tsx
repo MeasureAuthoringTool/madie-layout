@@ -1,7 +1,13 @@
 import "@testing-library/jest-dom";
 
 import React from "react";
-import { render, fireEvent, waitFor, cleanup } from "@testing-library/react";
+import {
+  render,
+  fireEvent,
+  waitFor,
+  cleanup,
+  waitForElementToBeRemoved,
+} from "@testing-library/react";
 import { describe, expect, test } from "@jest/globals";
 import { act } from "react-dom/test-utils";
 import { MemoryRouter } from "react-router";
@@ -136,9 +142,9 @@ describe("UMLS Connection Dialog", () => {
       await waitFor(() => {
         expect(queryByTestId("UMLS-login-success-text")).toBeTruthy();
       });
-      await waitFor(() => {
-        expect(queryByTestId("UMLS-connect-form")).not.toBeInTheDocument();
-      });
+      setTimeout(() => {
+        expect("UMLS-login-success-text").not.toBeInTheDocument();
+      }, 5000);
     });
   });
 
@@ -147,11 +153,12 @@ describe("UMLS Connection Dialog", () => {
       status: 401,
     });
     await act(async () => {
-      const { findByTestId, getByTestId, queryByTestId } = await render(
-        <MemoryRouter>
-          <MainNavBar />
-        </MemoryRouter>
-      );
+      const { findByTestId, getByTestId, queryByTestId, queryByText } =
+        await render(
+          <MemoryRouter>
+            <MainNavBar />
+          </MemoryRouter>
+        );
       const dialogButton = await findByTestId("UMLS-connect-button");
       expect(dialogButton).toBeTruthy();
       fireEvent.click(dialogButton);

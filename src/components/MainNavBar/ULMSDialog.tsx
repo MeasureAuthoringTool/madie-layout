@@ -195,7 +195,7 @@ const UMLSDialog = (props: UMLSDialogProps) => {
             placeholder="Enter UMLS API key"
             required
             label="API key"
-            id="Api Key"
+            id="api-Key"
             data-testid="UMLS-key-text-field"
             inputProps={{ "data-testid": "UMLS-key-input" }}
             helperText={formikErrorHandler("apiKey", true)}
