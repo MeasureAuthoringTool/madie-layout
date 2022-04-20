@@ -61,9 +61,7 @@ const UMLSDialog = (props: UMLSDialogProps) => {
             .getAttribute("action");
           saveTGT(generatedTGT);
           handleToast("success", "UMLS successfully authenticated", true);
-          setTimeout(() => {
-            onClose();
-          }, 3000);
+          onClose();
         } else {
           handleToast("danger", "An unexpected error has ocurred", true);
         }

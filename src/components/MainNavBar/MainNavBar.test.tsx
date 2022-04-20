@@ -1,13 +1,7 @@
 import "@testing-library/jest-dom";
 
 import React from "react";
-import {
-  render,
-  fireEvent,
-  waitFor,
-  cleanup,
-  getByTestId,
-} from "@testing-library/react";
+import { render, fireEvent, waitFor, cleanup } from "@testing-library/react";
 import { describe, expect, test } from "@jest/globals";
 import { act } from "react-dom/test-utils";
 import { MemoryRouter } from "react-router";
@@ -105,6 +99,7 @@ describe("UMLS Connection Dialog", () => {
       expect(helperText).toBeTruthy();
     });
   });
+
   test("Succeeding to login produces a success toast.", async () => {
     mockedAxios.post.mockResolvedValue({
       status: 201,
@@ -140,6 +135,9 @@ describe("UMLS Connection Dialog", () => {
       });
       await waitFor(() => {
         expect(queryByTestId("UMLS-login-success-text")).toBeTruthy();
+      });
+      await waitFor(() => {
+        expect(queryByTestId("UMLS-connect-form")).not.toBeInTheDocument();
       });
     });
   });

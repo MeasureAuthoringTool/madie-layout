@@ -116,7 +116,7 @@ const MainNavBar = () => {
         open={toastOpen}
         message={toastMessage}
         onClose={onToastClose}
-        autoHideDuration={2500000}
+        autoHideDuration={6000}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
       />
     </Nav>
