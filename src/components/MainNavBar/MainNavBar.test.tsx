@@ -1,13 +1,7 @@
 import "@testing-library/jest-dom";
 
 import React from "react";
-import {
-  render,
-  fireEvent,
-  waitFor,
-  cleanup,
-  waitForElementToBeRemoved,
-} from "@testing-library/react";
+import { render, fireEvent, waitFor, cleanup } from "@testing-library/react";
 import { describe, expect, test } from "@jest/globals";
 import { act } from "react-dom/test-utils";
 import { MemoryRouter } from "react-router";
@@ -183,6 +177,52 @@ describe("UMLS Connection Dialog", () => {
       });
       await waitFor(() => {
         expect(queryByTestId("UMLS-login-generic-error-text")).toBeTruthy();
+      });
+    });
+  });
+
+  test("Failed api requests open the danger dialog, and users can close it", async () => {
+    mockedAxios.post.mockResolvedValue(Promise.reject("error failed"));
+    await act(async () => {
+      const { findByTestId, getByTestId, queryByTestId, queryByText } =
+        await render(
+          <MemoryRouter>
+            <MainNavBar />
+          </MemoryRouter>
+        );
+      const dialogButton = await findByTestId("UMLS-connect-button");
+      expect(dialogButton).toBeTruthy();
+      fireEvent.click(dialogButton);
+      const dialog = await findByTestId("UMLS-connect-form");
+      expect(dialog).toBeTruthy();
+
+      const UMLSTextNode = await getByTestId("UMLS-key-input");
+      fireEvent.click(UMLSTextNode);
+      fireEvent.blur(UMLSTextNode);
+      userEvent.type(UMLSTextNode, mockFormikInfo.apiKey);
+      expect(UMLSTextNode.value).toBe(mockFormikInfo.apiKey);
+      const submitButton = await findByTestId("submit-UMLS-key");
+      await waitFor(() => expect(submitButton).not.toBeDisabled(), {
+        timeout: 5000,
+      });
+      fireEvent.click(submitButton);
+      await waitFor(() => {
+        expect(mockedAxios.post).toHaveBeenCalled(),
+          {
+            timeout: 5000,
+          };
+      });
+      await waitFor(() => {
+        expect(queryByText("error failed")).toBeTruthy();
+        fireEvent.keyDown(queryByTestId("UMLS-login-generic-error-text"), {
+          key: "Escape",
+          code: "Escape",
+          keyCode: 27,
+          charCode: 27,
+        });
+      });
+      await waitFor(() => {
+        expect(queryByText("error failed")).not.toBeInTheDocument();
       });
     });
   });
