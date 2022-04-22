@@ -85,7 +85,7 @@ const MainNavBar = () => {
                     data-testid="UMLS-connect-button"
                   >
                     <div className={TGT ? "active" : "inactive"} />
-                    {TGT ? "UMLS Active" : "Connect to UMLMS"}
+                    {TGT ? "UMLS Active" : "Connect to UMLS"}
                   </button>
                 </ListItem>
                 <ListItem id="main-nav-bar-tab-user-avatar">
