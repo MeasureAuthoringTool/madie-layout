@@ -81,13 +81,19 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
+    "@emotion/react": "^11.9.0",
+    "@emotion/styled": "^11.8.1",
+    "@mui/material": "^5.6.2",
     "@okta/okta-auth-js": "^6.1.0",
     "@types/react-router-dom": "^5.3.3",
     "axios": "^0.26.0",
+    "formik": "^2.2.9",
+    "qs": "^6.10.3",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "single-spa": "^5.9.3",
-    "single-spa-react": "^4.4.0"
+    "single-spa-react": "^4.4.0",
+    "yup": "^0.32.11"
   },
   "types": "dist/madie-madie-layout.d.ts",
   "browserslist": [
