@@ -244,7 +244,7 @@ describe("UMLS Connection Dialog", () => {
   test("Should not render ULMSDialog when user has valid TGT", async () => {
     const tgtObj = {
       TGT: "TGT-1037308-xHuHeCAsUcmLdePPfajsIxwxMvbgZYhtDlbGyBtMnZldihebqr-cas",
-      TimeStamp: new Date().getTime(),
+      tgtTimeStamp: new Date().getTime(),
     };
     window.localStorage.setItem("TGT", JSON.stringify(tgtObj));
     await act(async () => {
@@ -268,7 +268,7 @@ describe("UMLS Connection Dialog", () => {
     nowMinus9Hours.setHours(nowMinus9Hours.getHours() - 9);
     const tgtObj = {
       TGT: "TGT-1037308-xHuHeCAsUcmLdePPfajsIxwxMvbgZYhtDlbGyBtMnZldihebqr-cas",
-      TimeStamp: nowMinus9Hours.getTime(),
+      tgtTimeStamp: nowMinus9Hours.getTime(),
     };
     window.localStorage.setItem("TGT", JSON.stringify(tgtObj));
     await act(async () => {

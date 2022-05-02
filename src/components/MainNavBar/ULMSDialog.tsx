@@ -63,7 +63,7 @@ const UMLSDialog = (props: UMLSDialogProps) => {
 
           window.localStorage.removeItem("TGT");
           const TGT = generatedTGT.substring(generatedTGT.indexOf("TGT"));
-          const tgtObj = { TGT: TGT, TimeStamp: new Date().getTime() };
+          const tgtObj = { TGT: TGT, tgtTimeStamp: new Date().getTime() };
           window.localStorage.setItem("TGT", JSON.stringify(tgtObj));
 
           handleToast("success", "UMLS successfully authenticated", true);
