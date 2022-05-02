@@ -27,6 +27,7 @@ const MainNavBar = () => {
   const [toastOpen, setToastOpen] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string>("");
   const [toastType, setToastType] = useState<string>("danger");
+  const tgtTimeStamp = "tgtTimeStamp";
 
   //check if TGT exists or expired, if expired remove it
   const [tgtValueFromStorage, setTgtValueFromStorage] = useLocalStorage(
@@ -38,7 +39,7 @@ const MainNavBar = () => {
     let tgtObjFromLocalStorage = JSON.parse(tgtValueFromStorage);
     let timeStamp = null;
     for (const [key, value] of Object.entries(tgtObjFromLocalStorage)) {
-      if (key === "tgtTimeStamp") {
+      if (key === tgtTimeStamp) {
         timeStamp = value;
       }
     }
