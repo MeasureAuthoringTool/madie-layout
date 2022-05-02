@@ -60,6 +60,12 @@ const UMLSDialog = (props: UMLSDialogProps) => {
             .getElementsByTagName("form")[0]
             .getAttribute("action");
           saveTGT(generatedTGT);
+
+          window.localStorage.removeItem("TGT");
+          const TGT = generatedTGT.substring(generatedTGT.indexOf("TGT"));
+          const tgtObj = { TGT: TGT, TimeStamp: new Date().getTime() };
+          window.localStorage.setItem("TGT", JSON.stringify(tgtObj));
+
           handleToast("success", "UMLS successfully authenticated", true);
           onClose();
         } else {

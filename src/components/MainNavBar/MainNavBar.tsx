@@ -16,6 +16,7 @@ import UserProfile from "./UserProfile";
 import UserAvatar from "./UserAvatar";
 import UMLSDialog from "./ULMSDialog";
 import { Toast } from "@madie/madie-design-system/dist/react";
+import { useLocalStorage } from "../../custom-hooks/useLocalStorage";
 
 import "./MainNavBar.scss";
 
@@ -26,6 +27,30 @@ const MainNavBar = () => {
   const [toastOpen, setToastOpen] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string>("");
   const [toastType, setToastType] = useState<string>("danger");
+
+  //check if TGT exists or expired, if expired remove it
+  const [tgtValueFromStorage, setTgtValueFromStorage] = useLocalStorage(
+    "TGT",
+    ""
+  );
+
+  if (tgtValueFromStorage) {
+    let tgtObjFromLocalStorage = JSON.parse(tgtValueFromStorage);
+    let timeStamp = null;
+    for (const [key, value] of Object.entries(tgtObjFromLocalStorage)) {
+      if (key === "TimeStamp") {
+        timeStamp = value;
+      }
+    }
+    const currentTime = new Date().getTime();
+    const expirationDuration = 1000 * 60 * 60 * 8;
+
+    if (currentTime - timeStamp > expirationDuration) {
+      window.localStorage.removeItem("TGT");
+      setTgtValueFromStorage(null);
+    }
+  }
+
   const onToastClose = () => {
     setToastType(null);
     setToastMessage("");
@@ -81,11 +106,15 @@ const MainNavBar = () => {
                 </ListItem>
                 <ListItem className="activity-button">
                   <button
-                    onClick={() => setDOpen(true)}
+                    onClick={() =>
+                      setDOpen(!tgtValueFromStorage ? true : false)
+                    }
                     data-testid="UMLS-connect-button"
                   >
                     <div className={TGT ? "active" : "inactive"} />
-                    {TGT ? "UMLS Active" : "Connect to UMLS"}
+                    {TGT || tgtValueFromStorage
+                      ? "UMLS Active"
+                      : "Connect to UMLS"}
                   </button>
                 </ListItem>
                 <ListItem id="main-nav-bar-tab-user-avatar">
