@@ -112,7 +112,11 @@ const MainNavBar = () => {
                     }
                     data-testid="UMLS-connect-button"
                   >
-                    <div className={TGT ? "active" : "inactive"} />
+                    <div
+                      className={
+                        TGT || tgtValueFromStorage ? "active" : "inactive"
+                      }
+                    />
                     {TGT || tgtValueFromStorage
                       ? "UMLS Active"
                       : "Connect to UMLS"}
