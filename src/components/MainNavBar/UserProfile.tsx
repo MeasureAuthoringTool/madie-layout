@@ -10,7 +10,7 @@ const FormControl = styled.section(() => [tw`ml-2`]);
 function UserProfile() {
   const { oktaAuth } = useOktaAuth();
   const [userInfo, setUserInfo] = useState(null);
-  const [userFirstName, setUserFirstName] = useState("");
+  const [userFirstName, setUserFirstName] = useState<string>("");
   const givenName = "given_name";
 
   useEffect(() => {
@@ -46,9 +46,8 @@ function UserProfile() {
           data-testid="user-profile-select"
           inputProps={{ "data-testid": "user-profile-input" }}
           sx={{
-            height: "32px", //there's a .13 coming from somewhere.
+            height: "32px",
             borderColor: "transparent",
-            // remove weird line break from legend
             "& .Mui-focused": {
               borderColor: "transparent",
             },

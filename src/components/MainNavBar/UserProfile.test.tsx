@@ -63,12 +63,12 @@ describe("UserProfile component", () => {
       const userInfoSelect = await getByTestId("user-profile-select");
       fireEvent.click(userInfoSelect);
       const userInputSelect = await getByTestId("user-profile-input");
-      fireEvent.select(userInputSelect, { target: { value: "test" } });
+      fireEvent.change(userInputSelect, { target: { value: "test" } });
       expect(userInputSelect.value).toBe("test");
       fireEvent.blur(getByTestId("user-profile-select"));
       fireEvent.click(userInfoSelect);
-      fireEvent.select(userInputSelect, { target: { value: "Logout" } });
-      expect(userInputSelect.value).toBe("Logout");
+      fireEvent.change(userInputSelect, { target: { value: "Logout" } });
+      waitFor(() => expect(mockLogoutLogger).not.toHaveBeenCalled());
     });
   });
 
@@ -98,9 +98,9 @@ describe("UserProfile component", () => {
       fireEvent.click(userInfoSelect);
       const userInputSelect = await getByTestId("user-profile-input");
       fireEvent.click(userInfoSelect);
-      fireEvent.select(userInputSelect, { target: { value: "Logout" } });
-      expect(userInputSelect.value).toBe("Logout");
+      fireEvent.change(userInputSelect, { target: { value: "Logout" } });
       waitFor(() => expect(mockLogoutLogger).toHaveBeenCalled());
+
       waitFor(() => expect(MockSignOut).not.toHaveBeenCalled());
     });
   });
@@ -115,9 +115,8 @@ describe("UserProfile component", () => {
       const userInfoSelect = await getByTestId("user-profile-select");
       fireEvent.click(userInfoSelect);
       const userInputSelect = await getByTestId("user-profile-input");
-      fireEvent.click(userInfoSelect);
-      fireEvent.select(userInputSelect, { target: { value: "Logout" } });
-      expect(userInputSelect.value).toBe("Logout");
+      fireEvent.mouseDown(userInfoSelect);
+      fireEvent.change(userInputSelect, { target: { value: "Logout" } });
       waitFor(() => expect(mockLogoutLogger).toHaveBeenCalled());
       waitFor(() => expect(MockSignOut).toHaveBeenCalled());
     });
@@ -133,7 +132,7 @@ describe("UserProfile component", () => {
       const userInfoSelect = await getByTestId("user-profile-select");
       fireEvent.click(userInfoSelect);
       const userInputSelect = await getByTestId("user-profile-input");
-      fireEvent.select(userInputSelect, { target: { value: "test" } });
+      fireEvent.change(userInputSelect, { target: { value: "test" } });
       expect(userInputSelect.value).toBe("test");
       fireEvent.blur(getByTestId("user-profile-select"));
       waitFor(() => expect(mockLogoutLogger).not.toHaveBeenCalled());
