@@ -241,7 +241,7 @@ describe("UMLS Connection Dialog", () => {
     });
   });
 
-  test("Should not render ULMSDialog when user has valid TGT", async () => {
+  test("Should not render UMLSDialog when user has valid TGT", async () => {
     const tgtObj = {
       TGT: "TGT-1037308-xHuHeCAsUcmLdePPfajsIxwxMvbgZYhtDlbGyBtMnZldihebqr-cas",
       tgtTimeStamp: new Date().getTime(),
