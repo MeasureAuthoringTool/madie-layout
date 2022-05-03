@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  fireEvent,
-  render,
-  waitFor,
-  cleanup,
-} from "@testing-library/react";
+import { fireEvent, render, waitFor, cleanup } from "@testing-library/react";
 import UserProfile from "./UserProfile";
 import { MemoryRouter } from "react-router";
 import { useOktaAuth } from "@okta/okta-react";
