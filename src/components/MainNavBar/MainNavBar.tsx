@@ -78,7 +78,7 @@ const MainNavBar = () => {
             {authState?.isAuthenticated && (
               <>
                 <li
-                  data-testid="authenticated-links"
+                  data-testid="nav-measures-li"
                   className={
                     currentLocation === "/measures"
                       ? "nav-item selected"
@@ -98,6 +98,7 @@ const MainNavBar = () => {
                   </NavLink>
                 </li>
                 <li
+                  data-testid="nav-libraries-li"
                   className={
                     currentLocation === "/cql-libraries"
                       ? "nav-item selected"
@@ -117,6 +118,7 @@ const MainNavBar = () => {
                   </NavLink>
                 </li>
                 <li
+                  data-testid="nav-help-li"
                   className={
                     currentLocation === "/help"
                       ? "nav-item selected"
@@ -129,7 +131,7 @@ const MainNavBar = () => {
                     activeClassName="active"
                     to="/help"
                     aria-label="Release Notes"
-                    data-testid="main-nav-bar-release-notes"
+                    data-testid="main-nav-bar-help"
                   >
                     Help
                   </NavLink>

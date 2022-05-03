@@ -195,6 +195,31 @@ describe("UMLS Connection Dialog", () => {
     });
   });
 
+  test("Selecting different navigation routes, provides elements with classes as expected.", async () => {
+    await act(async () => {
+      const { findByTestId } = await render(
+        <MemoryRouter>
+          <MainNavBar />
+        </MemoryRouter>
+      );
+
+      const measuresLink = await findByTestId("main-nav-bar-measures");
+      fireEvent.click(measuresLink);
+      const measuresLi = await findByTestId("nav-measures-li");
+      expect(measuresLi).toHaveClass("selected");
+
+      const librariesLink = await findByTestId("main-nav-bar-cql-library");
+      fireEvent.click(librariesLink);
+      const librariesLI = await findByTestId("nav-libraries-li");
+      expect(librariesLI).toHaveClass("selected");
+
+      const help = await findByTestId("main-nav-bar-help");
+      fireEvent.click(help);
+      const helpLI = await findByTestId("nav-help-li");
+      expect(helpLI).toHaveClass("selected");
+    });
+  });
+
   test("Failed api requests open the danger dialog, and users can close it", async () => {
     mockedAxios.post.mockResolvedValue(Promise.reject("error failed"));
     await act(async () => {
