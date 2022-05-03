@@ -1,20 +1,114 @@
-.activity-button {
-  > button {
+#logo {
+  width: 137.5px;
+  height: 25px;
+}
+.inner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px 130px;
+  @media screen and (max-width: 760px) {
+    padding-left: 10px;
+  }
+  > div {
     display: flex;
-    flex-direction: row;
+    position: relative;
+    justify-content: space-between;
+    justify-items: flex-start;
     align-items: center;
-    padding: 0 10px;
-    > div {
-      width: 9px;
-      height: 9px;
-      border-radius: 25px;
+    @media screen and (max-width: 1023px) {
+      width: 100%;
+      justify-content: flex-start;
+    }
+    .divider {
+      height: 48px;
+      width: 1px;
+      border-left: solid 1px #dddddd;
       margin: 0 8px;
     }
-    > .active {
-      background-color: #7cb342;
+    .header-info {
+      color: #717171;
+      font-family: Rubik;
+      font-weight: 400;
+      font-size: 16px;
+      margin-bottom: 0px;
+      line-height: 20px;
     }
-    > .inactive {
-      background-color: #d92f2f;
+    ul {
+      .activity-button {
+        > button {
+          font-size: 14px;
+          color: #242424;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          padding: 0 10px;
+          border-color: #dddddd;
+          border-width: 0 1px 0 1px;
+          margin-right: 36px;
+          @media screen and (max-width: 1023px) {
+            margin: 0px;
+          }
+          // border: solid 0 0 1px 1px #515151;
+          > div {
+            width: 9px;
+            height: 9px;
+            border-radius: 25px;
+            margin: 0 8px;
+          }
+          > .active {
+            background-color: #7cb342;
+          }
+          > .inactive {
+            background-color: #d92f2f;
+          }
+        }
+      }
+      .nav-link {
+        font-family: Rubik;
+        font-size: 16px;
+        color: #515151;
+        padding: 0 10px;
+        font-weight: 400;
+        text-decoration: none !important;
+        &:hover {
+          color: #209fa6;
+        }
+        &.active {
+          // color: red !important;
+          text-decoration: none;
+          font-weight: 500;
+          color: #333333;
+        }
+      }
+      li {
+        height: 64px;
+        // border-bottom: solid 1px green;
+        display: flex;
+        align-content: center;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        &.nav-item {
+          min-width: 95px;
+          justify-content: space-around;
+          &.selected {
+            &:after {
+              content: "";
+              height: 6px;
+              width: 100%;
+              position: absolute;
+              bottom: 0px;
+              background-color: #209fa6;
+            }
+          }
+        }
+        .user-avatar {
+          height: 32px;
+          width: 32px;
+        }
+      }
     }
   }
 }
