@@ -26,7 +26,7 @@ const MainNavBar = () => {
     ""
   );
 
-  if (tgtValueFromStorage) {
+  if (tgtValueFromStorage && tgtValueFromStorage !== "null") {
     let tgtObjFromLocalStorage = JSON.parse(tgtValueFromStorage);
     let timeStamp = null;
     for (const [key, value] of Object.entries(tgtObjFromLocalStorage)) {
