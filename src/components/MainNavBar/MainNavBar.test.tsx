@@ -46,6 +46,8 @@ beforeEach(() => {
     },
     authState: { isAuthenticated: true },
   }));
+
+  window.localStorage.removeItem("TGT");
 });
 afterEach(cleanup);
 describe("UMLS Connection Dialog", () => {
@@ -139,6 +141,18 @@ describe("UMLS Connection Dialog", () => {
       setTimeout(() => {
         expect("UMLS-login-success-text").not.toBeInTheDocument();
       }, 5000);
+
+      const tgt = window.localStorage.getItem("TGT");
+      let tgtObjFromLocalStorage = JSON.parse(tgt);
+      let tgtValue = null;
+      for (const [key, value] of Object.entries(tgtObjFromLocalStorage)) {
+        if (key === "TGT") {
+          tgtValue = value.toString();
+        }
+      }
+      expect(tgtValue).toEqual(
+        "TGT-1037308-xHuHeCAsUcmLdePPfajsIxwxMvbgZYhtDlbGyBtMnZldihebqr-cas"
+      );
     });
   });
 
@@ -224,6 +238,54 @@ describe("UMLS Connection Dialog", () => {
       await waitFor(() => {
         expect(queryByText("error failed")).not.toBeInTheDocument();
       });
+    });
+  });
+
+  test("Should not render UMLSDialog when user has valid TGT", async () => {
+    const tgtObj = {
+      TGT: "TGT-1037308-xHuHeCAsUcmLdePPfajsIxwxMvbgZYhtDlbGyBtMnZldihebqr-cas",
+      tgtTimeStamp: new Date().getTime(),
+    };
+    window.localStorage.setItem("TGT", JSON.stringify(tgtObj));
+    await act(async () => {
+      const { findByTestId, queryByTestId, queryByText } = await render(
+        <MemoryRouter>
+          <MainNavBar />
+        </MemoryRouter>
+      );
+      expect(queryByText("UMLS Active")).toBeInTheDocument();
+      expect(queryByText("Connect to UMLS")).not.toBeInTheDocument();
+      const dialogButton = await findByTestId("UMLS-connect-button");
+      expect(dialogButton).toBeTruthy();
+      fireEvent.click(dialogButton);
+      const dialog = await queryByTestId("UMLS-connect-form");
+      expect(dialog).not.toBeTruthy();
+    });
+  });
+
+  test("Should render UMLSDialog when TGT is expired", async () => {
+    const nowMinus9Hours = new Date();
+    nowMinus9Hours.setHours(nowMinus9Hours.getHours() - 9);
+    const tgtObj = {
+      TGT: "TGT-1037308-xHuHeCAsUcmLdePPfajsIxwxMvbgZYhtDlbGyBtMnZldihebqr-cas",
+      tgtTimeStamp: nowMinus9Hours.getTime(),
+    };
+    window.localStorage.setItem("TGT", JSON.stringify(tgtObj));
+    await act(async () => {
+      const { findByTestId, queryByTestId, queryByText, getByText } =
+        await render(
+          <MemoryRouter>
+            <MainNavBar />
+          </MemoryRouter>
+        );
+
+      expect(getByText("Connect to UMLS")).toBeInTheDocument();
+      expect(queryByText("UMLS Active")).not.toBeInTheDocument();
+      const dialogButton = await findByTestId("UMLS-connect-button");
+      expect(dialogButton).toBeTruthy();
+      fireEvent.click(dialogButton);
+      const dialog = await queryByTestId("UMLS-connect-form");
+      expect(dialog).toBeTruthy();
     });
   });
 });
