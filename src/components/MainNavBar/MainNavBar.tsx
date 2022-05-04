@@ -70,7 +70,7 @@ const MainNavBar = () => {
           </NavLink>
           <div className="divider" />
           <h2 className="header-info">
-            Measure Authoring Development <br /> Integrated Development
+            Measure Authoring Development <br /> Integrated Environment
           </h2>
         </div>
         <DropDown>
