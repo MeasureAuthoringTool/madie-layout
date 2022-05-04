@@ -70,6 +70,26 @@ describe("UserProfile component", () => {
     });
   });
 
+  test("Should render user profile dropdown options and allow users to select logout, except done differently to trigger onChange", async () => {
+    await act(async () => {
+      const { getByTestId } = await render(
+        <MemoryRouter>
+          <UserProfile />
+        </MemoryRouter>
+      );
+      const userInfoSelect = await getByTestId("user-profile-select");
+      fireEvent.click(userInfoSelect);
+      const userInputSelect = await getByTestId("user-profile-input");
+      fireEvent.select(userInputSelect, { target: { value: "Logout" } });
+      expect(userInputSelect.value).toBe("Logout");
+      Simulate.change(userInputSelect);
+      fireEvent.click(getByTestId("user-profile-input"));
+      fireEvent.blur(getByTestId("user-profile-input"));
+      fireEvent.click(getByTestId("user-profile-input"));
+      waitFor(() => expect(mockLogoutLogger).toHaveBeenCalled());
+    });
+  });
+
   test("Should render empty user name", async () => {
     const mockGetUserInfo = jest.fn().mockImplementation(() => {
       return Promise.reject("user name null");
