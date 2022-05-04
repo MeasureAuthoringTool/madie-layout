@@ -65,13 +65,13 @@ const MainNavBar = () => {
     <nav>
       <div className="inner">
         <div>
-          <NavLink to="/measures">
+          <NavLink to="/measures" className="logo">
             <img src={logo} alt="MADiE Logo" id="logo" />
+            <div className="divider" />
+            <h2 className="header-info">
+              Measure Authoring Development <br /> Integrated Development
+            </h2>
           </NavLink>
-          <div className="divider" />
-          <h2 className="header-info">
-            Measure Authoring Development <br /> Integrated Environment
-          </h2>
         </div>
         <DropDown>
           <DropMenu>
