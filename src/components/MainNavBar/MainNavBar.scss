@@ -8,7 +8,7 @@
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  padding: 0px 130px;
+  padding: 0 130px;
 
   @media screen and (max-width: 760px) {
     padding-left: 10px;
@@ -33,7 +33,7 @@
     .divider {
       height: 48px;
       width: 1px;
-      border-left: solid 1px #dddddd;
+      border-left: solid 1px #ddd;
       margin: 0 8px;
     }
 
@@ -111,8 +111,7 @@
           justify-content: space-around;
 
           &.selected {
-            
-            &:after {
+            &::after {
               content: "";
               height: 6px;
               width: 100%;
