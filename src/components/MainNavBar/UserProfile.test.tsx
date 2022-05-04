@@ -3,7 +3,7 @@ import { fireEvent, render, waitFor, cleanup } from "@testing-library/react";
 import UserProfile from "./UserProfile";
 import { MemoryRouter } from "react-router";
 import { useOktaAuth } from "@okta/okta-react";
-import { act } from "react-dom/test-utils";
+import { act, Simulate } from "react-dom/test-utils";
 
 jest.mock("@okta/okta-react", () => ({
   useOktaAuth: jest.fn(),
@@ -63,11 +63,9 @@ describe("UserProfile component", () => {
       const userInfoSelect = await getByTestId("user-profile-select");
       fireEvent.click(userInfoSelect);
       const userInputSelect = await getByTestId("user-profile-input");
-      fireEvent.change(userInputSelect, { target: { value: "test" } });
-      expect(userInputSelect.value).toBe("test");
-      fireEvent.blur(getByTestId("user-profile-select"));
-      fireEvent.click(userInfoSelect);
-      fireEvent.change(userInputSelect, { target: { value: "Logout" } });
+      fireEvent.select(userInputSelect, { target: { value: "Logout" } });
+      expect(userInputSelect.value).toBe("Logout");
+      Simulate.change(userInputSelect);
       waitFor(() => expect(mockLogoutLogger).not.toHaveBeenCalled());
     });
   });
