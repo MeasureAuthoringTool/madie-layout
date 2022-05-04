@@ -241,7 +241,7 @@ describe("UMLS Connection Dialog", () => {
     });
   });
 
-  test("Should not render ULMSDialog when user has valid TGT", async () => {
+  test("Should not render UMLSDialog when user has valid TGT", async () => {
     const tgtObj = {
       TGT: "TGT-1037308-xHuHeCAsUcmLdePPfajsIxwxMvbgZYhtDlbGyBtMnZldihebqr-cas",
       tgtTimeStamp: new Date().getTime(),
@@ -263,7 +263,7 @@ describe("UMLS Connection Dialog", () => {
     });
   });
 
-  test("Should render ULMSDialog when TGT is expired", async () => {
+  test("Should render UMLSDialog when TGT is expired", async () => {
     const nowMinus9Hours = new Date();
     nowMinus9Hours.setHours(nowMinus9Hours.getHours() - 9);
     const tgtObj = {

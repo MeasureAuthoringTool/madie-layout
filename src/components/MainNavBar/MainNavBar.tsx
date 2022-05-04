@@ -14,7 +14,7 @@ import { useOktaAuth } from "@okta/okta-react";
 
 import UserProfile from "./UserProfile";
 import UserAvatar from "./UserAvatar";
-import UMLSDialog from "./ULMSDialog";
+import UMLSDialog from "./UMLSDialog";
 import { Toast } from "@madie/madie-design-system/dist/react";
 import { useLocalStorage } from "../../custom-hooks/useLocalStorage";
 
