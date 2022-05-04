@@ -9,6 +9,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 0px 130px;
+
   @media screen and (max-width: 760px) {
     padding-left: 10px;
   }
@@ -24,9 +25,11 @@
       width: 100%;
       justify-content: flex-start;
     }
+
     .logo {
       display: flex;
     }
+
     .divider {
       height: 48px;
       width: 1px;
@@ -36,10 +39,10 @@
 
     .header-info {
       color: #717171;
-      font-family: Rubik;
+      font-family: Rubik, sans-serif;
       font-weight: 400;
       font-size: 16px;
-      margin-bottom: 0px;
+      margin-bottom: 0;
       line-height: 20px;
     }
 
@@ -52,12 +55,12 @@
           flex-direction: row;
           align-items: center;
           padding: 0 10px;
-          border-color: #dddddd;
+          border-color: #ddd;
           border-width: 0 1px 0 1px;
           margin-right: 36px;
 
           @media screen and (max-width: 1023px) {
-            margin: 0px;
+            margin: 0;
           }
 
           > div {
@@ -78,7 +81,7 @@
       }
 
       .nav-link {
-        font-family: Rubik;
+        font-family: Rubik, sans-serif;
         font-size: 16px;
         color: #515151;
         padding: 0 20px;
@@ -92,7 +95,7 @@
         &.active {
           text-decoration: none;
           font-weight: 500;
-          color: #333333;
+          color: #333;
         }
       }
 
@@ -103,16 +106,18 @@
         align-items: center;
         justify-content: center;
         position: relative;
+
         &.nav-item {
           justify-content: space-around;
 
           &.selected {
+            
             &:after {
               content: "";
               height: 6px;
               width: 100%;
               position: absolute;
-              bottom: 0px;
+              bottom: 0;
               background-color: #209fa6;
             }
           }
