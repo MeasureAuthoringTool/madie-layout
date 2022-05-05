@@ -1,16 +1,9 @@
 import React from "react";
-import {
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-  cleanup,
-} from "@testing-library/react";
+import { fireEvent, render, waitFor, cleanup } from "@testing-library/react";
 import UserProfile from "./UserProfile";
 import { MemoryRouter } from "react-router";
 import { useOktaAuth } from "@okta/okta-react";
-import userEvent from "@testing-library/user-event";
-import { act } from "react-dom/test-utils";
+import { act, Simulate } from "react-dom/test-utils";
 
 jest.mock("@okta/okta-react", () => ({
   useOktaAuth: jest.fn(),
@@ -48,44 +41,56 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe("UserProfile component", () => {
-  it("Should render user profile dropdown", async () => {
-    render(
-      <MemoryRouter>
-        <UserProfile />
-      </MemoryRouter>
-    );
-
-    expect(screen.getByTestId("user-profile-form")).toBeInTheDocument();
-    expect(screen.getByTestId("user-profile-select")).toBeInTheDocument();
-
-    expect(
-      screen.getByTestId("user-profile-username-option")
-    ).toBeInTheDocument();
-    expect(
-      screen.getByTestId("user-profile-username-option").outerHTML
-    ).toContain("test");
-    expect(
-      screen.getByTestId("user-profile-logout-option")
-    ).toBeInTheDocument();
+  test("Should render", async () => {
+    await act(async () => {
+      const { getByTestId } = await render(
+        <MemoryRouter>
+          <UserProfile />
+        </MemoryRouter>
+      );
+      expect(getByTestId("user-profile-form")).toBeInTheDocument();
+      expect(getByTestId("user-profile-select")).toBeInTheDocument();
+    });
   });
 
-  it("Should render user profile dropdown options", () => {
-    render(
-      <MemoryRouter>
-        <UserProfile />
-      </MemoryRouter>
-    );
-
-    userEvent.selectOptions(
-      screen.getByTestId("user-profile-select"),
-      screen.getByRole("option", { name: "Sign Out" })
-    );
-    expect(screen.getByRole("option", { name: "Sign Out" }).selected).toBe(
-      false
-    );
+  test("Should render user profile dropdown options and allow users to select logout", async () => {
+    await act(async () => {
+      const { getByTestId } = await render(
+        <MemoryRouter>
+          <UserProfile />
+        </MemoryRouter>
+      );
+      const userInfoSelect = await getByTestId("user-profile-select");
+      fireEvent.click(userInfoSelect);
+      const userInputSelect = await getByTestId("user-profile-input");
+      fireEvent.select(userInputSelect, { target: { value: "Logout" } });
+      expect(userInputSelect.value).toBe("Logout");
+      Simulate.change(userInputSelect);
+      waitFor(() => expect(mockLogoutLogger).not.toHaveBeenCalled());
+    });
   });
 
-  it("Should render empty user name", () => {
+  test("Should render user profile dropdown options and allow users to select logout, except done differently to trigger onChange", async () => {
+    await act(async () => {
+      const { getByTestId } = await render(
+        <MemoryRouter>
+          <UserProfile />
+        </MemoryRouter>
+      );
+      const userInfoSelect = await getByTestId("user-profile-select");
+      fireEvent.click(userInfoSelect);
+      const userInputSelect = await getByTestId("user-profile-input");
+      fireEvent.select(userInputSelect, { target: { value: "Logout" } });
+      expect(userInputSelect.value).toBe("Logout");
+      Simulate.change(userInputSelect);
+      fireEvent.click(getByTestId("user-profile-input"));
+      fireEvent.blur(getByTestId("user-profile-input"));
+      fireEvent.click(getByTestId("user-profile-input"));
+      waitFor(() => expect(mockLogoutLogger).toHaveBeenCalled());
+    });
+  });
+
+  test("Should render empty user name", async () => {
     const mockGetUserInfo = jest.fn().mockImplementation(() => {
       return Promise.reject("user name null");
     });
@@ -101,63 +106,54 @@ describe("UserProfile component", () => {
       },
       authState: { isAuthenticated: true },
     }));
-    render(
-      <MemoryRouter>
-        <UserProfile />
-      </MemoryRouter>
-    );
-    expect(screen.getByRole("option", { name: "" }).selected).toBe(true);
-
-    userEvent.selectOptions(
-      screen.getByTestId("user-profile-select"),
-      screen.getByRole("option", { name: "Sign Out" })
-    );
-    expect(screen.getByRole("option", { name: "Sign Out" }).selected).toBe(
-      false
-    );
-
-    const option = screen.getByTestId("user-profile-select");
-    fireEvent.click(option, { target: { value: "Logout" } });
-    waitFor(() => expect(mockLogoutLogger).toHaveBeenCalled());
-    waitFor(() => expect(MockSignOut).not.toHaveBeenCalled());
+    await act(async () => {
+      const { getByTestId } = await render(
+        <MemoryRouter>
+          <UserProfile />
+        </MemoryRouter>
+      );
+      const userInfoSelect = await getByTestId("user-profile-select");
+      fireEvent.click(userInfoSelect);
+      const userInputSelect = await getByTestId("user-profile-input");
+      fireEvent.click(userInfoSelect);
+      fireEvent.change(userInputSelect, { target: { value: "Logout" } });
+      waitFor(() => expect(mockLogoutLogger).toHaveBeenCalled());
+      waitFor(() => expect(MockSignOut).not.toHaveBeenCalled());
+    });
   });
 
-  it("Should do logging when user chooses Sign Out", () => {
-    render(
-      <MemoryRouter>
-        <UserProfile />
-      </MemoryRouter>
-    );
+  it("Should do logging when user chooses Sign Out", async () => {
+    await act(async () => {
+      const { getByTestId } = await render(
+        <MemoryRouter>
+          <UserProfile />
+        </MemoryRouter>
+      );
 
-    userEvent.selectOptions(
-      screen.getByTestId("user-profile-select"),
-      screen.getByRole("option", { name: "Sign Out" })
-    );
-    expect(screen.getByRole("option", { name: "Sign Out" }).selected).toBe(
-      false
-    );
-
-    const option = screen.getByTestId("user-profile-select");
-    fireEvent.change(option, { target: { value: "Logout" } });
-    waitFor(() => expect(mockLogoutLogger).toHaveBeenCalled());
-    waitFor(() => expect(MockSignOut).toHaveBeenCalled());
+      const userInfoSelect = await getByTestId("user-profile-select");
+      fireEvent.click(userInfoSelect);
+      const userInputSelect = await getByTestId("user-profile-input");
+      fireEvent.change(userInputSelect, { target: { value: "Logout" } });
+      fireEvent.blur(getByTestId("user-profile-select"));
+      waitFor(() => expect(mockLogoutLogger).toHaveBeenCalled());
+      waitFor(() => expect(mockSignout).toHaveBeenCalled());
+    });
   });
 
-  it("Should not do logging when user chooses options other than Sign Out", () => {
-    render(
-      <MemoryRouter>
-        <UserProfile />
-      </MemoryRouter>
-    );
-
-    userEvent.selectOptions(
-      screen.getByTestId("user-profile-select"),
-      screen.getByRole("option", { name: "" })
-    );
-    expect(screen.getByRole("option", { name: "" }).selected).toBe(true);
-
-    const option = screen.getByTestId("user-profile-select");
-    fireEvent.change(option, { target: { value: "" } });
-    waitFor(() => expect(mockLogoutLogger).not.toHaveBeenCalled());
+  test("Should not do logging when user chooses options other than Sign Out", async () => {
+    await act(async () => {
+      const { getByTestId } = await render(
+        <MemoryRouter>
+          <UserProfile />
+        </MemoryRouter>
+      );
+      const userInfoSelect = await getByTestId("user-profile-select");
+      fireEvent.click(userInfoSelect);
+      const userInputSelect = await getByTestId("user-profile-input");
+      fireEvent.change(userInputSelect, { target: { value: "test" } });
+      expect(userInputSelect.value).toBe("test");
+      fireEvent.blur(getByTestId("user-profile-select"));
+      waitFor(() => expect(mockLogoutLogger).not.toHaveBeenCalled());
+    });
   });
 });

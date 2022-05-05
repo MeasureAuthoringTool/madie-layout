@@ -3,13 +3,14 @@ import { useOktaAuth } from "@okta/okta-react";
 import { logoutLogger } from "../../custom-hooks/customLog";
 import tw, { styled } from "twin.macro";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
-
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { MenuItem } from "@mui/material";
 const FormControl = styled.section(() => [tw`ml-2`]);
 
 function UserProfile() {
   const { oktaAuth } = useOktaAuth();
   const [userInfo, setUserInfo] = useState(null);
-  const [userFirstName, setUserFirstName] = useState("");
+  const [userFirstName, setUserFirstName] = useState<string>("");
   const givenName = "given_name";
 
   useEffect(() => {
@@ -41,30 +42,61 @@ function UserProfile() {
     <div>
       <FormControl data-testid="user-profile-form">
         <Select
-          native
           id="user-profile-select"
-          inputProps={{
-            "data-testid": "user-profile-select",
+          data-testid="user-profile-select"
+          inputProps={{ "data-testid": "user-profile-input" }}
+          sx={{
+            height: "32px",
+            borderColor: "transparent",
+            "& .Mui-focused": {
+              borderColor: "transparent",
+            },
+            "& .Mui-icon": {
+              fontSize: "3px",
+            },
+            "& .MuiOutlinedInput-notchedOutline": {
+              borderColor: "transparent",
+              "& legend": {
+                width: 0,
+              },
+            },
+            "& .MuiInputBase-input": {
+              fontFamily: "Rubik",
+              fontSize: 16,
+              fontWeight: 400,
+              color: "#515151",
+              borderColor: "transparent",
+              borderRadius: "3px",
+              padding: "9px 14px",
+              "&::placeholder": {
+                opacity: 0.6,
+              },
+            },
+            "& .MuiSelect-icon": {
+              color: "#515151",
+              fontSize: "large",
+            },
           }}
+          IconComponent={ExpandMoreIcon}
           name="user-profile-select"
           value={userFirstName}
           onChange={handleChange}
         >
-          <option
+          <MenuItem
             key={userFirstName}
             value={userFirstName}
             data-testid="user-profile-username-option"
           >
             {userFirstName}
-          </option>
+          </MenuItem>
 
-          <option
+          <MenuItem
             key={`${userFirstName}-"Logout"`}
             value="Logout"
             data-testid="user-profile-logout-option"
           >
             Sign Out
-          </option>
+          </MenuItem>
         </Select>
       </FormControl>
     </div>

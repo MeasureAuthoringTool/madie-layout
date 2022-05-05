@@ -59,6 +59,12 @@ const UserAvatar = () => {
       <Avatar
         data-testid="main-nav-bar-user-profile"
         {...stringAvatar(userName)}
+        sx={{
+          height: "32px",
+          width: "32px",
+          fontSize: "15px",
+          backgroundColor: "#EA5F92",
+        }}
       />
     </span>
   );

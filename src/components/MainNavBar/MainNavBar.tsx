@@ -1,17 +1,8 @@
-import React, { useState } from "react";
-import logo from "../../assets/images/madie_logo.svg";
-import {
-  Nav,
-  InnerNav,
-  InnerMost,
-  DropDown,
-  Logo,
-  DropMenu,
-  ListItem,
-  InnerItem,
-} from "../../styles/styles";
+import React, { useEffect, useState } from "react";
+import logo from "../../assets/images/Logo.svg";
+import { DropDown, DropMenu } from "../../styles/styles";
 import { useOktaAuth } from "@okta/okta-react";
-
+import { NavLink, useHistory } from "react-router-dom";
 import UserProfile from "./UserProfile";
 import UserAvatar from "./UserAvatar";
 import UMLSDialog from "./UMLSDialog";
@@ -35,7 +26,7 @@ const MainNavBar = () => {
     ""
   );
 
-  if (tgtValueFromStorage) {
+  if (tgtValueFromStorage && tgtValueFromStorage !== "null") {
     let tgtObjFromLocalStorage = JSON.parse(tgtValueFromStorage);
     let timeStamp = null;
     for (const [key, value] of Object.entries(tgtObjFromLocalStorage)) {
@@ -52,6 +43,12 @@ const MainNavBar = () => {
     }
   }
 
+  const { location } = useHistory();
+  const { pathname } = location;
+  const [currentLocation, setCurrentLocation] = useState<string>("/measures");
+  useEffect(() => {
+    setCurrentLocation(pathname);
+  }, []);
   const onToastClose = () => {
     setToastType(null);
     setToastMessage("");
@@ -65,47 +62,81 @@ const MainNavBar = () => {
 
   const { authState } = useOktaAuth();
   return (
-    <Nav>
-      <InnerNav>
-        <InnerMost>
-          <Logo to="/measures">
-            <img src={logo} alt="MADiE Logo" />
-          </Logo>
-        </InnerMost>
+    <nav>
+      <div className="inner">
+        <div>
+          <NavLink to="/measures" className="logo">
+            <img src={logo} alt="MADiE Logo" id="logo" />
+            <div className="divider" />
+            <h2 className="header-info">
+              Measure Authoring Development <br /> Integrated Environment
+            </h2>
+          </NavLink>
+        </div>
         <DropDown>
           <DropMenu>
-            <ListItem>
-              <InnerItem
-                to="#"
-                aria-label="Release Notes"
-                data-testid="main-nav-bar-release-notes"
-              >
-                Release Notes
-              </InnerItem>
-            </ListItem>
             {authState?.isAuthenticated && (
               <>
-                <ListItem data-testid="authenticated-links">
-                  <InnerItem
+                <li
+                  data-testid="nav-measures-li"
+                  className={
+                    currentLocation === "/measures"
+                      ? "nav-item selected"
+                      : "nav-item"
+                  }
+                >
+                  <NavLink
+                    onClick={() => setCurrentLocation("/measures")}
+                    activeClassName="active"
+                    className="nav-link"
                     to="/measures"
                     aria-label="Measures"
                     id="measures-main-nav-bar-tab"
                     data-testid="main-nav-bar-measures"
                   >
                     Measures
-                  </InnerItem>
-                </ListItem>
-                <ListItem>
-                  <InnerItem
+                  </NavLink>
+                </li>
+                <li
+                  data-testid="nav-libraries-li"
+                  className={
+                    currentLocation === "/cql-libraries"
+                      ? "nav-item selected"
+                      : "nav-item"
+                  }
+                >
+                  <NavLink
+                    onClick={() => setCurrentLocation("/cql-libraries")}
+                    className="nav-link"
+                    activeClassName="active"
                     to="/cql-libraries"
                     aria-label="CQL Library"
                     id="cql-library-main-nav-bar-tab"
                     data-testid="main-nav-bar-cql-library"
                   >
-                    CQL Library
-                  </InnerItem>
-                </ListItem>
-                <ListItem className="activity-button">
+                    Libraries
+                  </NavLink>
+                </li>
+                <li
+                  data-testid="nav-help-li"
+                  className={
+                    currentLocation === "/help"
+                      ? "nav-item selected"
+                      : "nav-item"
+                  }
+                >
+                  <NavLink
+                    onClick={() => setCurrentLocation("/help")}
+                    className="nav-link"
+                    activeClassName="active"
+                    to="/help"
+                    aria-label="Release Notes"
+                    data-testid="main-nav-bar-help"
+                  >
+                    Help
+                  </NavLink>
+                </li>
+                <li className="activity-button">
                   <button
                     onClick={() =>
                       setDOpen(!tgtValueFromStorage ? true : false)
@@ -121,18 +152,18 @@ const MainNavBar = () => {
                       ? "UMLS Active"
                       : "Connect to UMLS"}
                   </button>
-                </ListItem>
-                <ListItem id="main-nav-bar-tab-user-avatar">
+                </li>
+                <li id="main-nav-bar-tab-user-avatar">
                   <UserAvatar />
-                </ListItem>
-                <ListItem id="main-nav-bar-tab-user-profile">
+                </li>
+                <li id="main-nav-bar-tab-user-profile">
                   <UserProfile />
-                </ListItem>
+                </li>
               </>
             )}
           </DropMenu>
         </DropDown>
-      </InnerNav>
+      </div>
       <UMLSDialog
         open={dOpen}
         saveTGT={(tgt) => setTGT(tgt)}
@@ -153,7 +184,7 @@ const MainNavBar = () => {
         autoHideDuration={4000}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
       />
-    </Nav>
+    </nav>
   );
 };
 
