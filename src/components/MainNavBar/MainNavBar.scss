@@ -28,6 +28,11 @@
 
     .logo {
       display: flex;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
     }
 
     .divider {
