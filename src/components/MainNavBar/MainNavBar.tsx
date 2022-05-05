@@ -39,7 +39,7 @@ const MainNavBar = () => {
 
     if (currentTime - timeStamp > expirationDuration) {
       window.localStorage.removeItem("TGT");
-      setTgtValueFromStorage(null);
+      setTgtValueFromStorage("");
     }
   }
 
