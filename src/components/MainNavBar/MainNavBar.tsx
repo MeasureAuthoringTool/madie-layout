@@ -69,7 +69,7 @@ const MainNavBar = () => {
             <img src={logo} alt="MADiE Logo" id="logo" />
             <div className="divider" />
             <h2 className="header-info">
-              Measure Authoring Development <br /> Integrated Development
+              Measure Authoring Development <br /> Integrated Environment
             </h2>
           </NavLink>
         </div>
