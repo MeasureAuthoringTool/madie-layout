@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useOktaAuth } from "@okta/okta-react";
 import { logoutLogger } from "../../custom-hooks/customLog";
+import { useLocalStorage } from "../../custom-hooks/useLocalStorage";
 import tw, { styled } from "twin.macro";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -14,6 +15,7 @@ function UserProfile() {
   const givenName = "given_name";
 
   useEffect(() => {
+    window.localStorage.removeItem("givenName");
     oktaAuth.token
       .getUserInfo()
       .then((info) => {
@@ -21,6 +23,7 @@ function UserProfile() {
         for (const [key, value] of Object.entries(info)) {
           if (key === givenName) {
             setUserFirstName(value.toString());
+            window.localStorage.setItem("givenName", value.toString());
           }
         }
       })

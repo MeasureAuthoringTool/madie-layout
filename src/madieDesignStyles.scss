@@ -3,3 +3,8 @@ $font-path: "/public/fonts/";
 @import "@madie/madie-design-system/styles/third-party/legacy-bootstrap";
 @import "@madie/madie-design-system/styles/qpp-style";
 @import "@madie/madie-design-system/styles/qppds";
+
+@font-face {
+    font-family: Rubik;
+    src: url(./styles/Rubik-VariableFont_wght.ttf);
+}
