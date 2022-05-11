@@ -205,18 +205,18 @@ describe("UMLS Connection Dialog", () => {
 
       const measuresLink = await findByTestId("main-nav-bar-measures");
       fireEvent.click(measuresLink);
-      const measuresLi = await findByTestId("nav-measures-li");
-      expect(measuresLi).toHaveClass("selected");
+      const measuresLi = await findByTestId("main-nav-bar-measures");
+      expect(measuresLi).toHaveClass("active");
 
       const librariesLink = await findByTestId("main-nav-bar-cql-library");
       fireEvent.click(librariesLink);
-      const librariesLI = await findByTestId("nav-libraries-li");
-      expect(librariesLI).toHaveClass("selected");
+      const librariesLI = await findByTestId("main-nav-bar-cql-library");
+      expect(librariesLI).toHaveClass("active");
 
       const help = await findByTestId("main-nav-bar-help");
       fireEvent.click(help);
-      const helpLI = await findByTestId("nav-help-li");
-      expect(helpLI).toHaveClass("selected");
+      const helpLI = await findByTestId("main-nav-bar-help");
+      expect(helpLI).toHaveClass("active");
     });
   });
 

@@ -43,12 +43,6 @@ const MainNavBar = () => {
     }
   }
 
-  const { location } = useHistory();
-  const { pathname } = location;
-  const [currentLocation, setCurrentLocation] = useState<string>("/measures");
-  useEffect(() => {
-    setCurrentLocation(pathname);
-  }, []);
   const onToastClose = () => {
     setToastType(null);
     setToastMessage("");
@@ -77,16 +71,8 @@ const MainNavBar = () => {
           <DropMenu>
             {authState?.isAuthenticated && (
               <>
-                <li
-                  data-testid="nav-measures-li"
-                  className={
-                    currentLocation === "/measures"
-                      ? "nav-item selected"
-                      : "nav-item"
-                  }
-                >
+                <li data-testid="nav-measures-li" className="nav-item">
                   <NavLink
-                    onClick={() => setCurrentLocation("/measures")}
                     activeClassName="active"
                     className="nav-link"
                     to="/measures"
@@ -97,16 +83,8 @@ const MainNavBar = () => {
                     Measures
                   </NavLink>
                 </li>
-                <li
-                  data-testid="nav-libraries-li"
-                  className={
-                    currentLocation === "/cql-libraries"
-                      ? "nav-item selected"
-                      : "nav-item"
-                  }
-                >
+                <li data-testid="nav-libraries-li" className="nav-item">
                   <NavLink
-                    onClick={() => setCurrentLocation("/cql-libraries")}
                     className="nav-link"
                     activeClassName="active"
                     to="/cql-libraries"
@@ -117,16 +95,8 @@ const MainNavBar = () => {
                     Libraries
                   </NavLink>
                 </li>
-                <li
-                  data-testid="nav-help-li"
-                  className={
-                    currentLocation === "/help"
-                      ? "nav-item selected"
-                      : "nav-item"
-                  }
-                >
+                <li data-testid="nav-help-li" className="nav-item">
                   <NavLink
-                    onClick={() => setCurrentLocation("/help")}
                     className="nav-link"
                     activeClassName="active"
                     to="/help"
