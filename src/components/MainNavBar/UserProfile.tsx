@@ -12,7 +12,6 @@ function UserProfile() {
   const { oktaAuth } = useOktaAuth();
   const [userInfo, setUserInfo] = useState(null);
   const [userFirstName, setUserFirstName] = useState<string>("");
-  const givenName = "given_name";
 
   useEffect(() => {
     window.localStorage.removeItem("givenName");
@@ -20,12 +19,8 @@ function UserProfile() {
       .getUserInfo()
       .then((info) => {
         setUserInfo(info);
-        for (const [key, value] of Object.entries(info)) {
-          if (key === givenName) {
-            setUserFirstName(value.toString());
-            window.localStorage.setItem("givenName", value.toString());
-          }
-        }
+        setUserFirstName(info.given_name);
+        window.localStorage.setItem("givenName", info.given_name);
       })
       .catch((error) => {});
   }, []);
