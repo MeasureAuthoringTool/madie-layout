@@ -200,6 +200,7 @@ const UMLSDialog = (props: UMLSDialogProps) => {
           <TextField
             placeholder="Enter UMLS API key"
             required
+            type="password"
             label="API key"
             id="api-Key"
             data-testid="UMLS-key-text-field"
