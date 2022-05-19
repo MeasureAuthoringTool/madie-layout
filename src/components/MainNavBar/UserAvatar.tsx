@@ -36,22 +36,15 @@ const UserAvatar = () => {
   const [user, setUser] = useState(null);
   const [userName, setUserName] = useState("");
   const { oktaAuth, authState } = useOktaAuth();
-  const name = "name";
 
   useEffect(() => {
-    if (!user && authState?.isAuthenticated) {
-      oktaAuth.token
-        .getUserInfo()
-        .then((info) => {
-          setUser(info);
-          for (const [key, value] of Object.entries(info)) {
-            if (key === name) {
-              setUserName(value.toString());
-            }
-          }
-        })
-        .catch((error) => {});
-    }
+    oktaAuth.token
+      .getUserInfo()
+      .then((info) => {
+        setUser(info);
+        setUserName(info.name);
+      })
+      .catch((error) => {});
   }, []);
 
   return (
