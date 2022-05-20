@@ -4,22 +4,12 @@ import "@testing-library/jest-dom";
 import * as React from "react";
 import { render, fireEvent, waitFor, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
-import { ServiceConfig } from "../../api/ServiceContext";
 import { act, Simulate } from "react-dom/test-utils";
 import { describe, expect, test } from "@jest/globals";
 import userEvent from "@testing-library/user-event";
 import { mockLibraryName, mockMeasureName } from "./bulkCreate";
 import axios from "axios";
 import PageHeader from "../PageHeader/PageHeader";
-
-const serviceConfig: ServiceConfig = {
-  measureService: {
-    baseUrl: "example-service-url",
-  },
-  elmTranslationService: {
-    baseUrl: "test-elm-service",
-  },
-};
 
 const mockLib = mockLibraryName();
 const mockName = mockMeasureName();
