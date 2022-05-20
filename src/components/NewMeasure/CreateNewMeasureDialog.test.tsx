@@ -38,6 +38,10 @@ jest.mock("@madie/madie-util", () => ({
     },
     unsubscribe: () => null,
   },
+  useOktaTokens: () => ({
+    getAccessToken: () => "test.jwt",
+    getUserName: () => "TestUser@example.com",
+  }),
 }));
 
 jest.mock("axios");
@@ -46,10 +50,6 @@ let postData: object = { status: 201 };
 let getData: object = { status: 200 };
 mockedAxios.post.mockResolvedValueOnce(postData);
 mockedAxios.get.mockResolvedValueOnce(getData);
-jest.mock("../../hooks/useOktaTokens", () => () => ({
-  getAccessToken: () => "test.jwt",
-  getUserName: () => "TestUser@example.com",
-}));
 
 describe("Measures Create Dialog", () => {
   afterEach(() => {

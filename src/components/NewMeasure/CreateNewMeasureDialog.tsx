@@ -13,7 +13,11 @@ import {
 } from "@madie/madie-design-system/dist/react";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import { getServiceConfig, ServiceConfig } from "@madie/madie-util";
+import {
+  getServiceConfig,
+  ServiceConfig,
+  useOktaTokens,
+} from "@madie/madie-util";
 import axios from "axios";
 import {
   Dialog,
@@ -30,7 +34,6 @@ import {
 } from "@mui/material";
 import { useFormik } from "formik";
 import classNames from "classnames";
-import useOktaTokens from "../../hooks/useOktaTokens";
 import Checkbox from "./CheckBox";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import DesktopDatePicker from "@mui/lab/DesktopDatePicker";
