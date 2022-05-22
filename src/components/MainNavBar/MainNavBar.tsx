@@ -27,13 +27,9 @@ const MainNavBar = () => {
   );
 
   if (tgtValueFromStorage && tgtValueFromStorage !== "null") {
-    let tgtObjFromLocalStorage = JSON.parse(tgtValueFromStorage);
-    let timeStamp = null;
-    for (const [key, value] of Object.entries(tgtObjFromLocalStorage)) {
-      if (key === tgtTimeStamp) {
-        timeStamp = value;
-      }
-    }
+    const tgtObjFromLocalStorage = JSON.parse(tgtValueFromStorage);
+    const timeStamp = tgtObjFromLocalStorage.tgtTimeStamp;
+
     const currentTime = new Date().getTime();
     const expirationDuration = 1000 * 60 * 60 * 8;
 
