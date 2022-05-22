@@ -2,7 +2,7 @@ import "@testing-library/jest-dom";
 
 import * as React from "react";
 import OktaSecurity, { transformAuthState } from "./OktaSecurity";
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { act, render } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { describe, expect, test } from "@jest/globals";
 import oktaConfig from "./Config";
@@ -25,6 +25,7 @@ jest.mock("./Config", () => ({
 jest.mock("@okta/okta-react", () => ({
   Security: (props) => {
     const FakeSecurity = "very-fake-security";
+    // @ts-ignore
     return <FakeSecurity {...props} />;
   },
 }));
