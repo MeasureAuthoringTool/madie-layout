@@ -5,6 +5,16 @@ import { OktaAuth, toRelativeUrl } from "@okta/okta-auth-js";
 import { getOktaConfig, OktaConfig } from "./Config";
 import Router from "../router/Router";
 
+export const transformAuthState = async (oktaAuth, authState) => {
+  // verifies unexpired tokens are available from the tokenManager (default behavior)
+  if (!authState.isAuthenticated) {
+    return authState;
+  }
+  // extra requirement:  user must have valid Okta session
+  authState.isAuthenticated = await oktaAuth.session.exists();
+  return authState;
+};
+
 function OktaSecurity() {
   const history = useHistory();
   const [oktaConfig, setOktaConfig] = useState<OktaConfig>();
@@ -45,7 +55,10 @@ function OktaSecurity() {
   };
 
   if (!!oktaConfig) {
-    const oktaAuth = new OktaAuth(oktaConfig);
+    const oktaAuth = new OktaAuth({
+      ...oktaConfig, // other config
+      transformAuthState,
+    });
     return (
       <Security
         oktaAuth={oktaAuth}

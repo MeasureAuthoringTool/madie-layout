@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import Login from "./Login";
 import { MemoryRouter } from "react-router";
@@ -95,7 +95,6 @@ describe("Login component", () => {
 
     const loginButton = screen.getByRole("button", { name: "Login Widget" });
     userEvent.click(loginButton);
-    screen.debug();
     expect(mockHandleLoginRedirect).toBeCalled();
     await waitFor(() => expect(mockLoginLogger).toHaveBeenCalled());
   });
