@@ -265,7 +265,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
           <DialogTitle className={classes.title}>Create Measure</DialogTitle>
           <div>
             <IconButton onClick={onClose}>
-              <CloseIcon className={classes.close} />
+              <CloseIcon className={classes.close} data-testid="close-button" />
             </IconButton>
           </div>
         </div>
