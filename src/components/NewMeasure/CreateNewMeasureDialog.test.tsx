@@ -40,7 +40,7 @@ jest.mock("@madie/madie-util", () => ({
   },
   useOktaTokens: () => ({
     getAccessToken: () => "test.jwt",
-    getUserName: () => "TestUser@example.com", //nosec
+    getUserName: () => "nosec@example.com", //#nosec
   }),
 }));
 
