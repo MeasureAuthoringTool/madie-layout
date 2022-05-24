@@ -1,6 +1,6 @@
 import React from "react";
 import { Redirect, BrowserRouter, Route, Switch } from "react-router-dom";
-import { SecureRoute, LoginCallback } from "@okta/okta-react";
+import { SecureRoute, LoginCallback, useOktaAuth } from "@okta/okta-react";
 import Login from "../components/login/Login";
 import MainNavBar from "../components/MainNavBar/MainNavBar";
 import { MadieMeasure } from "@madie/madie-measure";
@@ -9,10 +9,13 @@ import NotFound from "../components/notfound/NotFound";
 import Footer from "../components/Footer/Footer";
 import PageHeader from "../components/PageHeader/PageHeader";
 import "../styles/LayoutStyles.scss";
+import TimeoutHandler from "../components/timeoutHandler/TimeoutHandler";
 
 function Router({ props }) {
+  const { authState, oktaAuth } = useOktaAuth();
   return (
     <div className="layout-wrapper">
+      {authState?.isAuthenticated && <TimeoutHandler timeLeft={2 * 1000} />}
       <BrowserRouter>
         <MainNavBar />
         <PageHeader />

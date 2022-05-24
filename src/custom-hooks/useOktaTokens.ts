@@ -1,0 +1,42 @@
+const getField = (storageKey, field) => {
+  const storageStr = window.localStorage.getItem(storageKey);
+  if (storageStr) {
+    try {
+      const storage = JSON.parse(storageStr);
+      if (storage && storage[field]) {
+        return storage[field];
+      }
+    } catch (error) {
+      console.error(
+        "An error occurred while trying to read the okta-token-storage object",
+        error
+      );
+    }
+  }
+  return null;
+};
+
+const getAccessTokenObj = (storageKey) => {
+  return getField(storageKey, "accessToken");
+};
+
+const getIdTokenObj = (storageKey) => {
+  return getField(storageKey, "idToken");
+};
+
+const removeTokens = (storageKey) => {
+  window.localStorage.removeItem(storageKey);
+};
+
+const useOktaTokens = (storageKey = "okta-token-storage") => {
+  return {
+    getAccessToken: () => getAccessTokenObj(storageKey)?.accessToken,
+    getAccessTokenObj: () => getAccessTokenObj(storageKey),
+    getUserName: () => getAccessTokenObj(storageKey).claims.sub,
+    getIdToken: () => getIdTokenObj(storageKey)?.idToken,
+    getIdTokenObj: () => getIdTokenObj(storageKey),
+    removeTokens: () => removeTokens(storageKey),
+  };
+};
+
+export default useOktaTokens;
