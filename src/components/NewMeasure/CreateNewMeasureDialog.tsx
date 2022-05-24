@@ -377,7 +377,6 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
                         datatestId: "auto-generate-checkbox-input",
                       }}
                       // onChange={(e) => {
-                      //   console.log('e is', e)
                       //   const val = e.target.checked;
                       //   if (val && manualId) {
                       //     setManualId(false);
@@ -399,7 +398,6 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
                         datatestId: "manual-generate-checkbox-input",
                       }}
                       // onChange={(e) => {
-                      //   console.log('e', e)
                       //   const val = e.target.checked;
                       //   if (val && autoGenerate) {
                       //     setAutoGenerate(false);
