@@ -143,14 +143,18 @@ describe("Measures Create Dialog", () => {
               key: "1fewtg",
             },
           ]}
-        ></MemoryRouter>
+        >
+          <PageHeader />
+        </MemoryRouter>
       );
       const dialogButton = await findByTestId("create-new-measure-button");
       expect(dialogButton).toBeTruthy();
       fireEvent.click(dialogButton);
       const manualCheck = await findByTestId("manual-generate-checkbox");
+      expect(manualCheck).toBeInTheDocument();
       fireEvent.click(manualCheck);
-      expect(queryByTestId("CMSID-text-field")).toBeVisible();
+      const autoCheck = await findByTestId("auto-generate-checkbox");
+      expect(autoCheck).toBeInTheDocument();
     });
   });
 
@@ -351,6 +355,11 @@ describe("Measures Create Dialog", () => {
     });
     await waitFor(() => {
       expect(queryByTestId("server-error-alerts")).toBeInTheDocument();
+    });
+    expect(getByTestId("close-error-button")).toBeInTheDocument();
+    fireEvent.click(getByTestId("close-error-button"));
+    await waitFor(() => {
+      expect(queryByTestId("server-error-alerts")).not.toBeInTheDocument();
     });
   }, 20000);
 

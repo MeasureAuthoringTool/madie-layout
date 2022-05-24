@@ -152,8 +152,9 @@ const useStyles = makeStyles({
 const CreateNewMeasureDialog = ({ open, onClose }) => {
   const { getAccessToken } = useOktaTokens();
   const [serverError, setServerError] = useState<string>("");
-  const [manualId, setManualId] = useState<boolean>(false);
-  const [autoGenerate, setAutoGenerate] = useState<boolean>(false);
+  // to be uncommented when needed so it doesn't hamper test coverage.
+  // const [manualId, setManualId] = useState<boolean>(false);
+  // const [autoGenerate, setAutoGenerate] = useState<boolean>(false);
   const formik = useFormik({
     initialValues: {
       measureName: "",
@@ -183,8 +184,8 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
         if (status === 201) {
           onClose(true);
           formik.resetForm();
-          setManualId(false);
-          setAutoGenerate(false);
+          // setManualId(false);
+          // setAutoGenerate(false);
           setServerError("");
           const event = new Event("create");
           window.dispatchEvent(event);
@@ -220,9 +221,13 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
   const formRow = classNames(classes.row, classes.spaced);
   const formRowGapped = classNames(formRow, classes.gap);
   const alertClass = classNames(classes.row, classes.alert);
+  // const hiddenField = classNames({
+  //   [classes.expanded]: manualId,
+  //   [classes.hidden]: !manualId,
+  // });
   const hiddenField = classNames({
-    [classes.expanded]: manualId,
-    [classes.hidden]: !manualId,
+    [classes.expanded]: false,
+    [classes.hidden]: true,
   });
   return (
     <Dialog
@@ -249,7 +254,10 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
               {serverError}
             </Typography>
             <div>
-              <IconButton onClick={() => setServerError("")}>
+              <IconButton
+                onClick={() => setServerError("")}
+                data-testid="close-error-button"
+              >
                 <CloseIcon className={classes.close} />
               </IconButton>
             </div>
@@ -362,16 +370,20 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
                   control={
                     <Checkbox
                       disabled
-                      checked={autoGenerate}
+                      checked={false}
                       id="auto-generate"
                       data-testid="auto-generate-checkbox"
-                      onChange={(e) => {
-                        const val = e.target.checked;
-                        if (val && manualId) {
-                          setManualId(false);
-                        }
-                        setAutoGenerate(e.target.checked);
+                      inputProps={{
+                        datatestId: "auto-generate-checkbox-input",
                       }}
+                      // onChange={(e) => {
+                      //   console.log('e is', e)
+                      //   const val = e.target.checked;
+                      //   if (val && manualId) {
+                      //     setManualId(false);
+                      //   }
+                      //   setAutoGenerate(e.target.checked);
+                      // }}
                     />
                   }
                   label="Automatically Generate A CMS ID"
@@ -380,16 +392,20 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
                   control={
                     <Checkbox
                       disabled
-                      checked={manualId}
+                      checked={false}
                       id="manual-generate"
                       data-testid="manual-generate-checkbox"
-                      onChange={(e) => {
-                        const val = e.target.checked;
-                        if (val && autoGenerate) {
-                          setAutoGenerate(false);
-                        }
-                        setManualId(e.target.checked);
+                      inputProps={{
+                        datatestId: "manual-generate-checkbox-input",
                       }}
+                      // onChange={(e) => {
+                      //   console.log('e', e)
+                      //   const val = e.target.checked;
+                      //   if (val && autoGenerate) {
+                      //     setAutoGenerate(false);
+                      //   }
+                      //   setManualId(e.target.checked);
+                      // }}
                     />
                   }
                   label="Manually Generate A CMS ID"
@@ -397,7 +413,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
               </FormGroup>
               {/* avoid slide over rest of screen */}
               <div style={{ overflow: "hidden" }}>
-                <Slide in={manualId}>
+                <Slide in={false}>
                   <div className={hiddenField}>
                     <TextField
                       disabled
