@@ -25,7 +25,7 @@ const PageHeader = () => {
     setCreateOpen(true);
   };
   const [userFirstName] = useLocalStorage("givenName", "");
-  const handleClose = (status = false) => {
+  const handleClose = () => {
     setCreateOpen(false);
   };
   const readablePeriodStart = measureState
