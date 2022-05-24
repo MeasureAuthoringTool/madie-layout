@@ -272,7 +272,7 @@ describe("Measures Create Dialog", () => {
             search: "",
             hash: "",
             state: undefined,
-            key: "1fewtg",
+            key: "asdfasdfasdf",
           },
         ]}
       >
