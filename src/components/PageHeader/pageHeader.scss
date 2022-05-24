@@ -75,16 +75,18 @@
       }
     }
   }
-  // measures end, everybody else
+
   .measure-details {
     padding: 32px 32px 18px 32px;
     display: flex;
     flex-direction: column;
-    font-family: Rubik;
+    font-family: Rubik, sans-serif;
+
     > div {
       display: flex;
       flex-direction: row;
       color: #fff;
+
       > .division {
         font-size: 14px;
         font-weight: 400;
@@ -92,9 +94,11 @@
         opacity: 0.3;
         margin-left: 8px;
       }
+
       > p {
         font-size: 16px;
-        font-family: Rubik;
+        font-family: Rubik, sans-serif;
+
         &.measure-name {
           margin-top: 8px;
           margin-bottom: 26px;
@@ -102,6 +106,7 @@
           font-weight: 400;
           font-size: 24px;
         }
+        
         > .active {
           padding-top: 3px;
           background-color: #7cb342;
