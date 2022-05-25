@@ -14,7 +14,6 @@ const PageHeader = () => {
   // homepage stuff
   const [createOpen, setCreateOpen] = useState<boolean>(false);
   const [measureState, setMeasureState] = useState<any>(measureStore.state);
-  //
   useEffect(() => {
     const subscription = measureStore.subscribe(setMeasureState);
     return () => {
