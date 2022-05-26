@@ -23,6 +23,7 @@ module.exports = (webpackConfigEnv, argv) => {
       "@madie/madie-root",
       "@madie/madie-cql-library",
       "@madie/madie-measure",
+      "@madie/madie-util",
     ],
   };
   const newCssRule = {
@@ -146,6 +147,5 @@ module.exports = (webpackConfigEnv, argv) => {
       },
     },
     plugins: "append",
-    // externals: ["madie-design-system"]
   })(externalsConfig, defaultConfig, newCssRule, copyConfig);
 };
