@@ -7,6 +7,7 @@ import { MadieMeasure } from "@madie/madie-measure";
 import { MadieCqlLibrary } from "@madie/madie-cql-library";
 import NotFound from "../components/notfound/NotFound";
 import Footer from "../components/Footer/Footer";
+import PageHeader from "../components/PageHeader/PageHeader";
 import "../styles/LayoutStyles.scss";
 
 function Router({ props }) {
@@ -14,20 +15,23 @@ function Router({ props }) {
     <div className="layout-wrapper">
       <BrowserRouter>
         <MainNavBar />
-        <Switch>
-          <Route
-            path="/login"
-            render={() => <Login config={props.oktaSignInConfig} />}
-          />
-          <Route path="/login/callback" component={LoginCallback} />
-          <SecureRoute path="/measures" component={MadieMeasure} />
-          <SecureRoute path="/cql-libraries" component={MadieCqlLibrary} />
-          <SecureRoute path="/" exact={true}>
-            <Redirect to="/measures" />
-          </SecureRoute>
-          <Route path="/404" component={NotFound} />
-          <Redirect to="/404" />
-        </Switch>
+        <PageHeader />
+        <div id="page-content">
+          <Switch>
+            <Route
+              path="/login"
+              render={() => <Login config={props.oktaSignInConfig} />}
+            />
+            <Route path="/login/callback" component={LoginCallback} />
+            <SecureRoute path="/measures" component={MadieMeasure} />
+            <SecureRoute path="/cql-libraries" component={MadieCqlLibrary} />
+            <SecureRoute path="/" exact={true}>
+              <Redirect to="/measures" />
+            </SecureRoute>
+            <Route path="/404" component={NotFound} />
+            <Redirect to="/404" />
+          </Switch>
+        </div>
       </BrowserRouter>
       <Footer />
     </div>
