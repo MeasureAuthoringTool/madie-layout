@@ -4,6 +4,9 @@ export interface ServiceConfig {
   loggingService: {
     baseUrl: string;
   };
+  terminologyService: {
+    baseUrl: string;
+  };
 }
 
 export async function getServiceConfig(): Promise<ServiceConfig> {
@@ -14,6 +17,15 @@ export async function getServiceConfig(): Promise<ServiceConfig> {
     !(serviceConfig?.loggingService && serviceConfig.loggingService.baseUrl)
   ) {
     throw new Error("Invalid Logging Service Config");
+  }
+
+  if (
+    !(
+      serviceConfig?.terminologyService &&
+      serviceConfig.terminologyService.baseUrl
+    )
+  ) {
+    throw new Error("Invalid Terminology Service Config");
   }
 
   return serviceConfig;

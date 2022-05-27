@@ -11,13 +11,11 @@ import {
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { useFormik } from "formik";
 import { APISchemaValidator } from "./APISchemaValidator";
-import axios from "axios";
-import qs from "qs";
+import useTerminologyServiceApi from "../../api/useTerminologyServiceApi";
 
 export interface UMLSDialogProps {
   open: boolean;
   handleClose: Function;
-  saveTGT: Function;
   handleToast: Function;
 }
 
@@ -26,7 +24,8 @@ export interface KeyConfig {
 }
 
 const UMLSDialog = (props: UMLSDialogProps) => {
-  const { open, handleClose, handleToast, saveTGT } = props;
+  const { open, handleClose, handleToast } = props;
+  const terminologyServiceApi = useTerminologyServiceApi();
   // blank, close.
   const onClose = () => {
     handleClose();
@@ -37,43 +36,22 @@ const UMLSDialog = (props: UMLSDialogProps) => {
     /cas/v1/tickets/{TGT}	Retrieves a single-use Service Ticket
 */
   const login = async (values: KeyConfig) => {
-    const url = "https://utslogin.nlm.nih.gov/cas/v1/api-key";
-    const data = { apikey: values.apiKey };
-    await axios
-      .post<KeyConfig>(url, qs.stringify(data), {
-        headers: {
-          Accept: "*/*",
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
+    terminologyServiceApi
+      .loginUMLS(values.apiKey.valueOf())
+      .then(() => {
+        handleToast("success", "UMLS successfully authenticated", true);
+        onClose();
       })
-      .then((res) => {
-        const { data } = res;
-        if (res.status === 201) {
-          // returned response is an html string we should convert and parse for an attribute
-          const stringToHTML = function (str) {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(str, "text/html");
-            return doc.body;
-          };
-          const parsed = stringToHTML(data);
-          const generatedTGT = parsed
-            .getElementsByTagName("form")[0]
-            .getAttribute("action");
-          saveTGT(generatedTGT);
-
-          window.localStorage.removeItem("TGT");
-          const TGT = generatedTGT.substring(generatedTGT.indexOf("TGT"));
-          const tgtObj = { TGT: TGT, tgtTimeStamp: new Date().getTime() };
-          window.localStorage.setItem("TGT", JSON.stringify(tgtObj));
-
-          handleToast("success", "UMLS successfully authenticated", true);
-          onClose();
+      .catch((err) => {
+        if (err?.message?.includes("400")) {
+          handleToast(
+            "danger",
+            "Invalid UMLS Key. Please re-enter a valid UMLS Key.",
+            true
+          );
         } else {
           handleToast("danger", "An unexpected error has ocurred", true);
         }
-      })
-      .catch((e) => {
-        handleToast("danger", e.toString(), true);
       });
   };
   function formikErrorHandler(name: string, isError: boolean) {

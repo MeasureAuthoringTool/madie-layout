@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import logo from "../../assets/images/Logo.svg";
 import { DropDown, DropMenu } from "../../styles/styles";
 import { useOktaAuth } from "@okta/okta-react";
@@ -7,37 +7,26 @@ import UserProfile from "./UserProfile";
 import UserAvatar from "./UserAvatar";
 import UMLSDialog from "./UMLSDialog";
 import { Toast } from "@madie/madie-design-system/dist/react";
-import { useLocalStorage } from "../../custom-hooks/useLocalStorage";
+import useTerminologyServiceApi from "../../api/useTerminologyServiceApi";
 
 import "./MainNavBar.scss";
 
 const MainNavBar = () => {
-  // dialog and toast utilities
-  const [TGT, setTGT] = useState<string>(""); //logged in url used to make requests
   const [dOpen, setDOpen] = useState<boolean>(false);
   const [toastOpen, setToastOpen] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string>("");
   const [toastType, setToastType] = useState<string>("danger");
-  const tgtTimeStamp = "tgtTimeStamp";
+  const terminologyServiceApi = useTerminologyServiceApi();
+  const [isLoggedInToUMLS, setIsLoggedInToUMLS] = useState<boolean>(false);
 
-  //check if TGT exists or expired, if expired remove it
-  const [tgtValueFromStorage, setTgtValueFromStorage] = useLocalStorage(
-    "TGT",
-    ""
-  );
-
-  if (tgtValueFromStorage && tgtValueFromStorage !== "null") {
-    const tgtObjFromLocalStorage = JSON.parse(tgtValueFromStorage);
-    const timeStamp = tgtObjFromLocalStorage.tgtTimeStamp;
-
-    const currentTime = new Date().getTime();
-    const expirationDuration = 1000 * 60 * 60 * 8;
-
-    if (currentTime - timeStamp > expirationDuration) {
-      window.localStorage.removeItem("TGT");
-      setTgtValueFromStorage("");
-    }
-  }
+  useEffect(() => {
+    terminologyServiceApi
+      .checkLogin()
+      .then((value) => {
+        setIsLoggedInToUMLS(true);
+      })
+      .catch((err) => {});
+  }, []);
 
   const onToastClose = () => {
     setToastType(null);
@@ -104,19 +93,11 @@ const MainNavBar = () => {
                 </li>
                 <li className="activity-button">
                   <button
-                    onClick={() =>
-                      setDOpen(!tgtValueFromStorage ? true : false)
-                    }
+                    onClick={() => setDOpen(!isLoggedInToUMLS ? true : false)}
                     data-testid="UMLS-connect-button"
                   >
-                    <div
-                      className={
-                        TGT || tgtValueFromStorage ? "active" : "inactive"
-                      }
-                    />
-                    {TGT || tgtValueFromStorage
-                      ? "UMLS Active"
-                      : "Connect to UMLS"}
+                    <div className={isLoggedInToUMLS ? "active" : "inactive"} />
+                    {isLoggedInToUMLS ? "UMLS Active" : "Connect to UMLS"}
                   </button>
                 </li>
                 <li id="main-nav-bar-tab-user-avatar">
@@ -132,7 +113,6 @@ const MainNavBar = () => {
       </div>
       <UMLSDialog
         open={dOpen}
-        saveTGT={(tgt) => setTGT(tgt)}
         handleClose={() => setDOpen(false)}
         handleToast={handleToast}
       />

@@ -1,7 +1,13 @@
 import "@testing-library/jest-dom";
 
 import React from "react";
-import { render, fireEvent, waitFor, cleanup } from "@testing-library/react";
+import {
+  render,
+  fireEvent,
+  waitFor,
+  cleanup,
+  screen,
+} from "@testing-library/react";
 import { describe, expect, test } from "@jest/globals";
 import { act } from "react-dom/test-utils";
 import { MemoryRouter } from "react-router";
@@ -10,10 +16,12 @@ import { useOktaAuth } from "@okta/okta-react";
 import MainNavBar from "./MainNavBar";
 import userEvent from "@testing-library/user-event";
 import axios from "axios";
+import useTerminologyServiceApi, {
+  TerminologyServiceApi,
+} from "../../api/useTerminologyServiceApi";
 
 jest.mock("axios");
 const mockedAxios = axios as jest.Mocked<typeof axios>;
-const responseString = `<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\"><html><head><title>201 Created</title></head><body><h1>TGT Created</h1><form action="https://utslogin.nlm.nih.gov/cas/v1/api-key/TGT-1037308-xHuHeCAsUcmLdePPfajsIxwxMvbgZYhtDlbGyBtMnZldihebqr-cas" method="POST">Service:<input type="text" name="service" value=""><br><input type="submit" value="Submit"></form></body></html>`;
 
 jest.mock("@okta/okta-react", () => ({
   useOktaAuth: jest.fn(),
@@ -33,6 +41,18 @@ jest.mock("../../custom-hooks/customLog", () => {
 const MockSignOut = jest.fn().mockImplementation(() => {
   return Promise.resolve();
 });
+
+jest.mock("../../api/useTerminologyServiceApi");
+const useTerminologyServiceApiMock =
+  useTerminologyServiceApi as jest.Mock<TerminologyServiceApi>;
+const serviceApiMock = {
+  checkLogin: jest.fn(),
+  loginUMLS: jest.fn(),
+} as unknown as TerminologyServiceApi;
+useTerminologyServiceApiMock.mockImplementation(() => {
+  return serviceApiMock;
+});
+
 beforeEach(() => {
   const mockGetUserInfo = jest.fn().mockImplementation(() => {
     return Promise.resolve({ name: "test name", given_name: "test" });
@@ -47,7 +67,17 @@ beforeEach(() => {
     authState: { isAuthenticated: true },
   }));
 
-  window.localStorage.removeItem("TGT");
+  const serviceApiMock = {
+    checkLogin: jest.fn().mockRejectedValueOnce({ status: 404, data: false }),
+    loginUMLS: jest.fn().mockRejectedValueOnce({
+      status: 404,
+      data: "failure",
+      error: { message: "error" },
+    }),
+  } as unknown as TerminologyServiceApi;
+  useTerminologyServiceApiMock.mockImplementation(() => {
+    return serviceApiMock;
+  });
 });
 afterEach(cleanup);
 describe("UMLS Connection Dialog", () => {
@@ -103,10 +133,16 @@ describe("UMLS Connection Dialog", () => {
   });
 
   test("Succeeding to login produces a success toast.", async () => {
-    mockedAxios.post.mockResolvedValue({
-      status: 201,
-      data: responseString,
+    const serviceApiMock = {
+      checkLogin: jest.fn().mockRejectedValueOnce({ status: 404, data: false }),
+      loginUMLS: jest
+        .fn()
+        .mockResolvedValueOnce({ status: 200, data: "success" }),
+    } as unknown as TerminologyServiceApi;
+    useTerminologyServiceApiMock.mockImplementation(() => {
+      return serviceApiMock;
     });
+
     await act(async () => {
       const { findByTestId, getByTestId, queryByTestId } = await render(
         <MemoryRouter>
@@ -130,36 +166,15 @@ describe("UMLS Connection Dialog", () => {
       });
       fireEvent.click(submitButton);
       await waitFor(() => {
-        expect(mockedAxios.post).toHaveBeenCalled(),
-          {
-            timeout: 5000,
-          };
-      });
-      await waitFor(() => {
         expect(queryByTestId("UMLS-login-success-text")).toBeTruthy();
       });
       setTimeout(() => {
         expect("UMLS-login-success-text").not.toBeInTheDocument();
       }, 5000);
-
-      const tgt = window.localStorage.getItem("TGT");
-      let tgtObjFromLocalStorage = JSON.parse(tgt);
-      let tgtValue = null;
-      for (const [key, value] of Object.entries(tgtObjFromLocalStorage)) {
-        if (key === "TGT") {
-          tgtValue = value.toString();
-        }
-      }
-      expect(tgtValue).toEqual(
-        "TGT-1037308-xHuHeCAsUcmLdePPfajsIxwxMvbgZYhtDlbGyBtMnZldihebqr-cas"
-      );
     });
   });
 
   test("Failing to login produces a danger toast.", async () => {
-    mockedAxios.post.mockResolvedValue({
-      status: 401,
-    });
     await act(async () => {
       const { findByTestId, getByTestId, queryByTestId, queryByText } =
         await render(
@@ -183,12 +198,6 @@ describe("UMLS Connection Dialog", () => {
         timeout: 5000,
       });
       fireEvent.click(submitButton);
-      await waitFor(() => {
-        expect(mockedAxios.post).toHaveBeenCalled(),
-          {
-            timeout: 5000,
-          };
-      });
       await waitFor(() => {
         expect(queryByTestId("UMLS-login-generic-error-text")).toBeTruthy();
       });
@@ -221,7 +230,18 @@ describe("UMLS Connection Dialog", () => {
   });
 
   test("Failed api requests open the danger dialog, and users can close it", async () => {
-    mockedAxios.post.mockResolvedValue(Promise.reject("error failed"));
+    const serviceApiMock = {
+      checkLogin: jest.fn().mockRejectedValueOnce({ status: 404, data: false }),
+      loginUMLS: jest.fn().mockRejectedValueOnce({
+        status: 400,
+        data: "failure",
+        error: { message: "error" },
+      }),
+    } as unknown as TerminologyServiceApi;
+    useTerminologyServiceApiMock.mockImplementation(() => {
+      return serviceApiMock;
+    });
+
     await act(async () => {
       const { findByTestId, getByTestId, queryByTestId, queryByText } =
         await render(
@@ -246,13 +266,6 @@ describe("UMLS Connection Dialog", () => {
       });
       fireEvent.click(submitButton);
       await waitFor(() => {
-        expect(mockedAxios.post).toHaveBeenCalled(),
-          {
-            timeout: 5000,
-          };
-      });
-      await waitFor(() => {
-        expect(queryByText("error failed")).toBeTruthy();
         fireEvent.keyDown(queryByTestId("UMLS-login-generic-error-text"), {
           key: "Escape",
           code: "Escape",
@@ -260,53 +273,46 @@ describe("UMLS Connection Dialog", () => {
           charCode: 27,
         });
       });
+      screen.debug();
       await waitFor(() => {
-        expect(queryByText("error failed")).not.toBeInTheDocument();
+        expect(
+          queryByText("Invalid UMLS Key. Please re-enter a valid UMLS Key.")
+        ).not.toBeInTheDocument();
       });
     });
   });
 
   test("Should not render UMLSDialog when user has valid TGT", async () => {
-    const tgtObj = {
-      TGT: "TGT-1037308-xHuHeCAsUcmLdePPfajsIxwxMvbgZYhtDlbGyBtMnZldihebqr-cas",
-      tgtTimeStamp: new Date().getTime(),
-    };
-    window.localStorage.setItem("TGT", JSON.stringify(tgtObj));
+    const serviceApiMock = {
+      checkLogin: jest.fn().mockResolvedValue({ status: 200, data: true }),
+    } as unknown as TerminologyServiceApi;
+    useTerminologyServiceApiMock.mockImplementation(() => {
+      return serviceApiMock;
+    });
+    await render(
+      <MemoryRouter>
+        <MainNavBar />
+      </MemoryRouter>
+    );
+    expect(screen.queryByText("UMLS Active")).toBeInTheDocument();
+    expect(screen.queryByText("Connect to UMLS")).not.toBeInTheDocument();
+    const dialogButton = await screen.findByTestId("UMLS-connect-button");
+    expect(dialogButton).toBeTruthy();
+    fireEvent.click(dialogButton);
+    const dialog = await screen.queryByTestId("UMLS-connect-form");
+    expect(dialog).not.toBeTruthy();
+  });
+
+  test("Should render UMLSDialog when valid TGT is not found", async () => {
     await act(async () => {
-      const { findByTestId, queryByTestId, queryByText } = await render(
+      const { queryByTestId, queryByText, getByText } = await render(
         <MemoryRouter>
           <MainNavBar />
         </MemoryRouter>
       );
-      expect(queryByText("UMLS Active")).toBeInTheDocument();
-      expect(queryByText("Connect to UMLS")).not.toBeInTheDocument();
-      const dialogButton = await findByTestId("UMLS-connect-button");
-      expect(dialogButton).toBeTruthy();
-      fireEvent.click(dialogButton);
-      const dialog = await queryByTestId("UMLS-connect-form");
-      expect(dialog).not.toBeTruthy();
-    });
-  });
-
-  test("Should render UMLSDialog when TGT is expired", async () => {
-    const nowMinus9Hours = new Date();
-    nowMinus9Hours.setHours(nowMinus9Hours.getHours() - 9);
-    const tgtObj = {
-      TGT: "TGT-1037308-xHuHeCAsUcmLdePPfajsIxwxMvbgZYhtDlbGyBtMnZldihebqr-cas",
-      tgtTimeStamp: nowMinus9Hours.getTime(),
-    };
-    window.localStorage.setItem("TGT", JSON.stringify(tgtObj));
-    await act(async () => {
-      const { findByTestId, queryByTestId, queryByText, getByText } =
-        await render(
-          <MemoryRouter>
-            <MainNavBar />
-          </MemoryRouter>
-        );
-
       expect(getByText("Connect to UMLS")).toBeInTheDocument();
       expect(queryByText("UMLS Active")).not.toBeInTheDocument();
-      const dialogButton = await findByTestId("UMLS-connect-button");
+      const dialogButton = await screen.findByTestId("UMLS-connect-button");
       expect(dialogButton).toBeTruthy();
       fireEvent.click(dialogButton);
       const dialog = await queryByTestId("UMLS-connect-form");
