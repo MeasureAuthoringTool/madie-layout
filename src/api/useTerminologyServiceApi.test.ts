@@ -28,7 +28,7 @@ jest.mock("../custom-hooks/getServiceConfig", () => {
   };
 });
 
-describe("Custom Log", () => {
+describe("useTerminologyServiceApi", () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
