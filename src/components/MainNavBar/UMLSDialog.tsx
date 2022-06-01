@@ -43,7 +43,7 @@ const UMLSDialog = (props: UMLSDialogProps) => {
         onClose();
       })
       .catch((err) => {
-        if (err?.message?.includes("400")) {
+        if (err?.message?.includes("401")) {
           handleToast(
             "danger",
             "Invalid UMLS Key. Please re-enter a valid UMLS Key.",
