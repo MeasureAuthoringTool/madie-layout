@@ -34,7 +34,7 @@
     "@okta/okta-react": "^6.4.3",
     "@tailwindcss/forms": "^0.5.0",
     "@testing-library/jest-dom": "^5.14.1",
-    "@testing-library/react": "^12.1.2",
+    "@testing-library/react": "^13.2.0",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.4.1",
     "@types/react": "^17.0.19",
