@@ -1,8 +1,14 @@
 import * as React from "react";
 import { render, screen } from "@testing-library/react";
 import TimeoutHandler from "./TimeoutHandler";
+import userEvent from "@testing-library/user-event";
+import { useOktaAuth } from "@okta/okta-react";
 
-describe("Measure Groups Page", () => {
+jest.mock("@okta/okta-react", () => ({
+  useOktaAuth: jest.fn(),
+}));
+
+describe("Timeout Handler", () => {
   const renderTimeoutHandler = () => {
     return render(
       <div id="main">
@@ -11,6 +17,10 @@ describe("Measure Groups Page", () => {
     );
   };
   beforeEach(() => {
+    (useOktaAuth as jest.Mock).mockImplementation(() => ({
+      oktaAuth: {},
+      authState: { isAuthenticated: false },
+    }));
     renderTimeoutHandler();
   });
 
@@ -41,8 +51,9 @@ describe("Measure Groups Page", () => {
   test("Timeout handler renders after 10 seconds, disappears on outer click", async () => {
     setTimeout(() => {
       expect(screen.getByTestId("warn-timeout-title")).toBeTruthy();
+      const alertTitle = screen.queryByText("Session Expiration Warning");
       const outerDiv = screen.getAllByTestId("sentinelStart");
-      outerDiv.click();
+      userEvent.click(outerDiv[0]);
       expect(alertTitle).toBeNull();
     }, 10000);
   });

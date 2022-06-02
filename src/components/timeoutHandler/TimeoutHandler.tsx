@@ -6,75 +6,23 @@ import {
   DialogContent,
   DialogContentText,
 } from "@mui/material";
-import axios from "axios";
-import queryString from "query-string";
-import { getOktaConfig, OktaConfig } from "../../okta/Config";
-import useOktaTokens from "../../custom-hooks/useOktaTokens";
+import { useOktaAuth } from "@okta/okta-react";
 
 export interface timeoutPropTypes {
   timeLeft: number;
 }
 
-const revoke = async (token: string): Promise<void> => {
-  const oktaConfig: OktaConfig = await getOktaConfig();
-  try {
-    await axios.post(
-      `${oktaConfig.issuer}/v1/revoke`,
-      queryString.stringify({
-        token_type_hint: "access_token",
-        token,
-        client_id: `${oktaConfig.clientId}`,
-      })
-    );
-  } catch (err) {
-    const message = `Unable to revoke token.`;
-    console.error(message);
-    console.error(err);
-    throw new Error(err);
-  }
-};
-
 const TimeoutHandler = ({ timeLeft = 10000 }) => {
   const inactivityTimeoutRef = useRef<any>(null);
   const logoutTimeoutRef = useRef<any>(null);
   const [timingOut, setTimingOut] = useState<boolean>(false);
-  const [oktaConfig, setOktaConfig] = useState<OktaConfig>();
-  const [oktaConfigErr, setOktaConfigErr] = useState<string>();
-  const oktaTokens = useOktaTokens();
-
-  if (!oktaConfig && !oktaConfigErr) {
-    (async () => {
-      await getOktaConfig()
-        .then((config) => {
-          setOktaConfig(config);
-        })
-        .catch((err) => {
-          console.error(err);
-          setOktaConfigErr(
-            "Unable to load Login page, Please contact administration"
-          );
-        });
-    })();
-  }
-
-  async function logout() {
-    const logoutUrl = `${window.location.origin}`;
-    const oktaConfig: OktaConfig = await getOktaConfig();
-    const accessToken = oktaTokens.getAccessToken();
-    const idToken = oktaTokens.getIdToken();
-    oktaTokens.removeTokens();
-    await revoke(accessToken);
-
-    window.location.replace(
-      `${oktaConfig.issuer}/v1/logout?id_token_hint=${idToken}&post_logout_redirect_uri=${logoutUrl}`
-    );
-  }
+  const { oktaAuth } = useOktaAuth();
 
   const timeoutCallBack = () => {
     setTimingOut(true);
     logoutTimeoutRef.current = setTimeout(async () => {
-      logout();
-    }, 2 * 1000);
+      await oktaAuth.signOut();
+    }, 5 * 60 * 1000);
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
