@@ -4,6 +4,7 @@
     "@madie/madie-layout": "//localhost:8500/madie-madie-layout.js",
     "@madie/madie-editor": "//localhost:8501/madie-madie-editor.js",
     "@madie/madie-auth": "//localhost:8502/madie-madie-auth.js",
-    "@madie/madie-cql-library": "//localhost:8507/madie-cql-library.js"
+    "@madie/madie-cql-library": "//localhost:8507/madie-cql-library.js",
+    "@madie/madie-madie-util": "//localhost:8508/madie-madie-util.js"
   }
 }
