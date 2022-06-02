@@ -15,7 +15,9 @@ function Router({ props }) {
   const { authState, oktaAuth } = useOktaAuth();
   return (
     <div className="layout-wrapper">
-      {authState?.isAuthenticated && <TimeoutHandler timeLeft={2 * 1000} />}
+      {authState?.isAuthenticated && (
+        <TimeoutHandler timeLeft={25 * 60 * 1000} />
+      )}
       <BrowserRouter>
         <MainNavBar />
         <PageHeader />
