@@ -16,7 +16,7 @@ function Router({ props }) {
   return (
     <div className="layout-wrapper">
       {authState?.isAuthenticated && (
-        <TimeoutHandler timeLeft={25 * 60 * 1000} />
+        <TimeoutHandler timeLeft={25 * 60 * 1000} warningTime={5 * 60 * 1000} />
       )}
       <BrowserRouter>
         <MainNavBar />

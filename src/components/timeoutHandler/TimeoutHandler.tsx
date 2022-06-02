@@ -12,7 +12,7 @@ export interface timeoutPropTypes {
   timeLeft: number;
 }
 
-const TimeoutHandler = ({ timeLeft = 10000 }) => {
+const TimeoutHandler = ({ timeLeft = 10000, warningTime = 5000 }) => {
   const inactivityTimeoutRef = useRef<any>(null);
   const logoutTimeoutRef = useRef<any>(null);
   const [timingOut, setTimingOut] = useState<boolean>(false);
@@ -22,7 +22,7 @@ const TimeoutHandler = ({ timeLeft = 10000 }) => {
     setTimingOut(true);
     logoutTimeoutRef.current = setTimeout(async () => {
       await oktaAuth.signOut();
-    }, 5 * 60 * 1000);
+    }, warningTime);
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
