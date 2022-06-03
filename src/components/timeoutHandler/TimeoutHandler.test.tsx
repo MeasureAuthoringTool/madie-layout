@@ -33,7 +33,18 @@ describe("Timeout Handler", () => {
   });
   afterEach(cleanup);
 
-  test("Timeout Handler does not render initially", async () => {
+  test("Timeout Handler can be called without supplying props", async () => {
+    const DefaultProps = render(
+      <div id="main">
+        <TimeoutHandler />
+      </div>
+    );
+    const alertTitle = DefaultProps.queryByText("Session Expiration Warning");
+    expect(alertTitle).not.toBeInTheDocument();
+    expect(useOktaAuth().oktaAuth.signOut).not.toHaveBeenCalled();
+  });
+
+  test("Timeout Handler will not render initially", async () => {
     const alertTitle = screen.queryByText("Session Expiration Warning");
     expect(alertTitle).not.toBeInTheDocument();
     expect(useOktaAuth().oktaAuth.signOut).not.toHaveBeenCalled();
