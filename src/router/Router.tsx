@@ -12,7 +12,7 @@ import "../styles/LayoutStyles.scss";
 import TimeoutHandler from "../components/timeoutHandler/TimeoutHandler";
 
 function Router({ props }) {
-  const { authState, oktaAuth } = useOktaAuth();
+  const { authState } = useOktaAuth();
   return (
     <div className="layout-wrapper">
       {authState?.isAuthenticated && (
