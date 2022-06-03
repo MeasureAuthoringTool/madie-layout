@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useRef, useLayoutEffect } from "react";
+import React, {
+  useState,
+  useCallback,
+  useRef,
+  useEffect,
+  useLayoutEffect,
+} from "react";
 import { throttle } from "lodash";
 import {
   Dialog,
@@ -13,16 +19,26 @@ export interface timeoutPropTypes {
 }
 
 const TimeoutHandler = ({ timeLeft = 10000, warningTime = 5000 }) => {
+  // check if component is mounted before memory leak
+  const mounted = useRef(false);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+
   const inactivityTimeoutRef = useRef<any>(null);
   const logoutTimeoutRef = useRef<any>(null);
   const [timingOut, setTimingOut] = useState<boolean>(false);
   const { oktaAuth } = useOktaAuth();
-
   const timeoutCallBack = () => {
-    setTimingOut(true);
-    logoutTimeoutRef.current = setTimeout(async () => {
-      await oktaAuth.signOut();
-    }, warningTime);
+    if (mounted.current) {
+      setTimingOut(true);
+      logoutTimeoutRef.current = setTimeout(async () => {
+        await oktaAuth.signOut();
+      }, warningTime);
+    }
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -54,8 +70,11 @@ const TimeoutHandler = ({ timeLeft = 10000, warningTime = 5000 }) => {
       rootNode.removeEventListener("click", resetTimeout);
       rootNode.removeEventListener("mouseMove", resetTimeout);
       clearTimeout(inactivityTimeoutRef.current);
+      clearTimeout(logoutTimeoutRef.current);
+      inactivityTimeoutRef.current = null;
+      logoutTimeoutRef.current = null;
     };
-  }, [resetTimeout, inactivityTimeoutRef, timeLeft]);
+  }, [resetTimeout, logoutTimeoutRef, inactivityTimeoutRef, timeLeft]);
   return (
     <Dialog
       open={timingOut}

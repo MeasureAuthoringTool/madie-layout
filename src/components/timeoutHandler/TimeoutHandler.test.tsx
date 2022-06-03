@@ -4,9 +4,11 @@ import {
   screen,
   waitFor,
   waitForElementToBeRemoved,
+  cleanup,
 } from "@testing-library/react";
 import TimeoutHandler from "./TimeoutHandler";
 import userEvent from "@testing-library/user-event";
+import { describe, expect, test } from "@jest/globals";
 import { useOktaAuth } from "@okta/okta-react";
 
 jest.mock("@okta/okta-react");
@@ -20,17 +22,21 @@ describe("Timeout Handler", () => {
     );
   };
   beforeEach(() => {
+    const MockSignOut = jest.fn().mockImplementation(() => {
+      return Promise.resolve();
+    });
     (useOktaAuth as jest.Mock).mockImplementation(() => ({
-      oktaAuth: { signOut: () => jest.fn() },
+      oktaAuth: { signOut: MockSignOut },
       authState: { isAuthenticated: false },
     }));
     renderTimeoutHandler();
   });
+  afterEach(cleanup);
 
   test("Timeout Handler does not render initially", async () => {
     const alertTitle = screen.queryByText("Session Expiration Warning");
     expect(alertTitle).not.toBeInTheDocument();
-    expect(useOktaAuth().oktaAuth.signOut()).not.toHaveBeenCalled();
+    expect(useOktaAuth().oktaAuth.signOut).not.toHaveBeenCalled();
   });
 
   test("Timeout handler renders, then disappears on keypress escape", async () => {
@@ -40,7 +46,7 @@ describe("Timeout Handler", () => {
     await waitForElementToBeRemoved(() =>
       screen.queryByText("Session Expiration Warning")
     );
-    expect(useOktaAuth().oktaAuth.signOut()).not.toHaveBeenCalled();
+    expect(useOktaAuth().oktaAuth.signOut).not.toHaveBeenCalled();
   });
 
   test("Timeout handler renders, then disappears on alert click", async () => {
@@ -50,19 +56,18 @@ describe("Timeout Handler", () => {
     await waitForElementToBeRemoved(() =>
       screen.queryByText("Session Expiration Warning")
     );
-    expect(useOktaAuth().oktaAuth.signOut()).not.toHaveBeenCalled();
+    expect(useOktaAuth().oktaAuth.signOut).not.toHaveBeenCalled();
   });
 
-  test.skip("Timeout handler renders, then disappears after outer click", async () => {
+  test("Timeout handler renders, then disappears after outer click", async () => {
     const warning = await screen.findByText("Session Expiration Warning");
     expect(warning).toBeInTheDocument();
-    userEvent.click(
-      await screen.findByRole("presentation", { name: "sentinelStart" })
-    );
+    // this is how mui/core testing does it
+    userEvent.click(await screen.getByRole("dialog").parentElement);
     await waitForElementToBeRemoved(() =>
       screen.queryByText("Session Expiration Warning")
     );
-    expect(useOktaAuth().oktaAuth.signOut()).not.toHaveBeenCalled();
+    expect(useOktaAuth().oktaAuth.signOut).not.toHaveBeenCalled();
   });
 
   test("Timeout handler renders, then disappears on mouse move", async () => {
@@ -72,14 +77,14 @@ describe("Timeout Handler", () => {
     await waitForElementToBeRemoved(() =>
       screen.queryByText("Session Expiration Warning")
     );
-    expect(useOktaAuth().oktaAuth.signOut()).not.toHaveBeenCalled();
+    expect(useOktaAuth().oktaAuth.signOut).not.toHaveBeenCalled();
   });
 
-  test.skip("Timeout handler renders, then signs out user after warning time expires", async () => {
+  test("Timeout handler renders, then signs out user after warning time expires", async () => {
     const warning = await screen.findByText("Session Expiration Warning");
     expect(warning).toBeInTheDocument();
     await waitFor(() => {
-      expect(useOktaAuth().oktaAuth.signOut()).toHaveBeenCalled();
+      expect(useOktaAuth().oktaAuth.signOut).toHaveBeenCalled();
     });
   });
 });
