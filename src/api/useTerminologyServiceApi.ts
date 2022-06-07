@@ -11,7 +11,7 @@ export class TerminologyServiceApi {
   async checkLogin(): Promise<Boolean> {
     const baseUrl = await getServiceUrl();
     const resp = await axios
-      .get(`${baseUrl}/vsac/checkLogin`, {
+      .get(`${baseUrl}/vsac/umls-credentials/status`, {
         headers: {
           Authorization: `Bearer ${this.getAccessToken()}`,
           "Content-Type": "text/plain",
@@ -32,7 +32,7 @@ export class TerminologyServiceApi {
   async loginUMLS(apiKey: string): Promise<String> {
     const baseUrl = await getServiceUrl();
     const resp = await axios
-      .post(`${baseUrl}/vsac/umlsLogin`, null, {
+      .post(`${baseUrl}/vsac/umls-credentials`, null, {
         headers: {
           Authorization: `Bearer ${this.getAccessToken()}`,
           "Content-Type": "text/plain",
