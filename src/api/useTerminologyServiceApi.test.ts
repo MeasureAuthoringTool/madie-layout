@@ -16,11 +16,11 @@ const mockConfig: ServiceConfig = {
   },
 };
 
-jest.mock("../custom-hooks/useOktaTokens", () =>
-  jest.fn(() => ({
-    getAccessToken: () => "test.jwt",
-  }))
-);
+jest.mock("@madie/madie-util", () => ({
+  useOktaTokens: jest.fn(() => ({
+    getAccessToken: jest.fn(() => "test.jwt"),
+  })),
+}));
 
 jest.mock("../custom-hooks/getServiceConfig", () => {
   return {

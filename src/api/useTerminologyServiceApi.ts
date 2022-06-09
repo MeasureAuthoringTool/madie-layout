@@ -3,7 +3,8 @@ import {
   ServiceConfig,
   getServiceConfig,
 } from "../custom-hooks/getServiceConfig";
-import useOktaTokens from "../custom-hooks/useOktaTokens";
+
+import { useOktaTokens } from "@madie/madie-util";
 
 export class TerminologyServiceApi {
   constructor(private getAccessToken: () => string) {}
