@@ -266,6 +266,12 @@ describe("UMLS Connection Dialog", () => {
       });
       fireEvent.click(submitButton);
       await waitFor(() => {
+        expect(queryByTestId("UMLS-login-generic-error-text")).toBeTruthy();
+        expect(
+          queryByText("An unexpected error has ocurred")
+        ).toBeInTheDocument();
+      });
+      await waitFor(() => {
         fireEvent.keyDown(queryByTestId("UMLS-login-generic-error-text"), {
           key: "Escape",
           code: "Escape",
@@ -273,10 +279,9 @@ describe("UMLS Connection Dialog", () => {
           charCode: 27,
         });
       });
-      screen.debug();
       await waitFor(() => {
         expect(
-          queryByText("Invalid UMLS Key. Please re-enter a valid UMLS Key.")
+          queryByText("An unexpected error has ocurred")
         ).not.toBeInTheDocument();
       });
     });
@@ -317,6 +322,64 @@ describe("UMLS Connection Dialog", () => {
       fireEvent.click(dialogButton);
       const dialog = await queryByTestId("UMLS-connect-form");
       expect(dialog).toBeTruthy();
+    });
+  });
+
+  test("Failed api with 401 requests open the danger dialog with custom error message, and users can close it", async () => {
+    const serviceApiMock = {
+      checkLogin: jest.fn().mockRejectedValueOnce({ status: 404, data: false }),
+      loginUMLS: jest.fn().mockRejectedValueOnce({
+        status: 401,
+        data: "failure",
+        error: { message: "error" },
+      }),
+    } as unknown as TerminologyServiceApi;
+    useTerminologyServiceApiMock.mockImplementation(() => {
+      return serviceApiMock;
+    });
+
+    await act(async () => {
+      const { findByTestId, getByTestId, queryByTestId, queryByText } =
+        await render(
+          <MemoryRouter>
+            <MainNavBar />
+          </MemoryRouter>
+        );
+      const dialogButton = await findByTestId("UMLS-connect-button");
+      expect(dialogButton).toBeTruthy();
+      fireEvent.click(dialogButton);
+      const dialog = await findByTestId("UMLS-connect-form");
+      expect(dialog).toBeTruthy();
+
+      const UMLSTextNode = await getByTestId("UMLS-key-input");
+      fireEvent.click(UMLSTextNode);
+      fireEvent.blur(UMLSTextNode);
+      userEvent.type(UMLSTextNode, mockFormikInfo.apiKey);
+      expect(UMLSTextNode.value).toBe(mockFormikInfo.apiKey);
+      const submitButton = await findByTestId("submit-UMLS-key");
+      await waitFor(() => expect(submitButton).not.toBeDisabled(), {
+        timeout: 5000,
+      });
+      fireEvent.click(submitButton);
+      await waitFor(() => {
+        expect(queryByTestId("UMLS-login-generic-error-text")).toBeTruthy();
+        expect(
+          queryByText("Invalid UMLS Key. Please re-enter a valid UMLS Key.")
+        ).toBeInTheDocument();
+      });
+      await waitFor(() => {
+        fireEvent.keyDown(queryByTestId("UMLS-login-generic-error-text"), {
+          key: "Escape",
+          code: "Escape",
+          keyCode: 27,
+          charCode: 27,
+        });
+      });
+      await waitFor(() => {
+        expect(
+          queryByText("Invalid UMLS Key. Please re-enter a valid UMLS Key.")
+        ).not.toBeInTheDocument();
+      });
     });
   });
 });
