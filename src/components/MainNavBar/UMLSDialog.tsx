@@ -11,7 +11,7 @@ import {
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { useFormik } from "formik";
 import { APISchemaValidator } from "./APISchemaValidator";
-import useTerminologyServiceApi from "../../api/useTerminologyServiceApi";
+import { useTerminologyServiceApi } from "@madie/madie-util";
 
 export interface UMLSDialogProps {
   open: boolean;

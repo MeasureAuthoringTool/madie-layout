@@ -7,7 +7,7 @@ import UserProfile from "./UserProfile";
 import UserAvatar from "./UserAvatar";
 import UMLSDialog from "./UMLSDialog";
 import { Toast } from "@madie/madie-design-system/dist/react";
-import useTerminologyServiceApi from "../../api/useTerminologyServiceApi";
+import { useTerminologyServiceApi } from "@madie/madie-util";
 
 import "./MainNavBar.scss";
 

@@ -16,9 +16,10 @@ import { useOktaAuth } from "@okta/okta-react";
 import MainNavBar from "./MainNavBar";
 import userEvent from "@testing-library/user-event";
 import axios from "axios";
-import useTerminologyServiceApi, {
+import {
+  useTerminologyServiceApi,
   TerminologyServiceApi,
-} from "../../api/useTerminologyServiceApi";
+} from "@madie/madie-util";
 
 jest.mock("axios");
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -42,16 +43,9 @@ const MockSignOut = jest.fn().mockImplementation(() => {
   return Promise.resolve();
 });
 
-jest.mock("../../api/useTerminologyServiceApi");
-const useTerminologyServiceApiMock =
-  useTerminologyServiceApi as jest.Mock<TerminologyServiceApi>;
-const serviceApiMock = {
-  checkLogin: jest.fn(),
-  loginUMLS: jest.fn(),
-} as unknown as TerminologyServiceApi;
-useTerminologyServiceApiMock.mockImplementation(() => {
-  return serviceApiMock;
-});
+jest.mock("@madie/madie-util", () => ({
+  useTerminologyServiceApi: jest.fn(),
+}));
 
 beforeEach(() => {
   const mockGetUserInfo = jest.fn().mockImplementation(() => {
@@ -67,16 +61,15 @@ beforeEach(() => {
     authState: { isAuthenticated: true },
   }));
 
-  const serviceApiMock = {
-    checkLogin: jest.fn().mockRejectedValueOnce({ status: 404, data: false }),
-    loginUMLS: jest.fn().mockRejectedValueOnce({
-      status: 404,
-      data: "failure",
-      error: { message: "error" },
-    }),
-  } as unknown as TerminologyServiceApi;
-  useTerminologyServiceApiMock.mockImplementation(() => {
-    return serviceApiMock;
+  (useTerminologyServiceApi as jest.Mock).mockImplementation(() => {
+    return {
+      checkLogin: jest.fn().mockRejectedValueOnce({ status: 404, data: false }),
+      loginUMLS: jest.fn().mockRejectedValueOnce({
+        status: 404,
+        data: "failure",
+        error: { message: "error" },
+      }),
+    } as unknown as TerminologyServiceApi;
   });
 });
 afterEach(cleanup);
@@ -133,14 +126,16 @@ describe("UMLS Connection Dialog", () => {
   });
 
   test("Succeeding to login produces a success toast.", async () => {
-    const serviceApiMock = {
-      checkLogin: jest.fn().mockRejectedValueOnce({ status: 404, data: false }),
-      loginUMLS: jest
-        .fn()
-        .mockResolvedValueOnce({ status: 200, data: "success" }),
-    } as unknown as TerminologyServiceApi;
-    useTerminologyServiceApiMock.mockImplementation(() => {
-      return serviceApiMock;
+    (useTerminologyServiceApi as jest.Mock).mockImplementation(() => {
+      return {
+        checkLogin: jest
+          .fn()
+          .mockRejectedValueOnce({ status: 404, data: false }),
+        loginUMLS: jest.fn().mockResolvedValueOnce({
+          status: 200,
+          data: "success",
+        }),
+      } as unknown as TerminologyServiceApi;
     });
 
     await act(async () => {
@@ -230,16 +225,17 @@ describe("UMLS Connection Dialog", () => {
   });
 
   test("Failed api requests open the danger dialog, and users can close it", async () => {
-    const serviceApiMock = {
-      checkLogin: jest.fn().mockRejectedValueOnce({ status: 404, data: false }),
-      loginUMLS: jest.fn().mockRejectedValueOnce({
-        status: 400,
-        data: "failure",
-        error: { message: "error" },
-      }),
-    } as unknown as TerminologyServiceApi;
-    useTerminologyServiceApiMock.mockImplementation(() => {
-      return serviceApiMock;
+    (useTerminologyServiceApi as jest.Mock).mockImplementation(() => {
+      return {
+        checkLogin: jest
+          .fn()
+          .mockRejectedValueOnce({ status: 404, data: false }),
+        loginUMLS: jest.fn().mockRejectedValueOnce({
+          status: 400,
+          data: "failure",
+          error: { message: "error" },
+        }),
+      } as unknown as TerminologyServiceApi;
     });
 
     await act(async () => {
@@ -288,12 +284,12 @@ describe("UMLS Connection Dialog", () => {
   });
 
   test("Should not render UMLSDialog when user has valid TGT", async () => {
-    const serviceApiMock = {
-      checkLogin: jest.fn().mockResolvedValue({ status: 200, data: true }),
-    } as unknown as TerminologyServiceApi;
-    useTerminologyServiceApiMock.mockImplementation(() => {
-      return serviceApiMock;
+    (useTerminologyServiceApi as jest.Mock).mockImplementation(() => {
+      return {
+        checkLogin: jest.fn().mockResolvedValue({ status: 200, data: true }),
+      } as unknown as TerminologyServiceApi;
     });
+
     await render(
       <MemoryRouter>
         <MainNavBar />
@@ -326,16 +322,17 @@ describe("UMLS Connection Dialog", () => {
   });
 
   test("Failed api with 401 requests open the danger dialog with custom error message, and users can close it", async () => {
-    const serviceApiMock = {
-      checkLogin: jest.fn().mockRejectedValueOnce({ status: 404, data: false }),
-      loginUMLS: jest.fn().mockRejectedValueOnce({
-        status: 401,
-        data: "failure",
-        error: { message: "error" },
-      }),
-    } as unknown as TerminologyServiceApi;
-    useTerminologyServiceApiMock.mockImplementation(() => {
-      return serviceApiMock;
+    (useTerminologyServiceApi as jest.Mock).mockImplementation(() => {
+      return {
+        checkLogin: jest
+          .fn()
+          .mockRejectedValueOnce({ status: 404, data: false }),
+        loginUMLS: jest.fn().mockRejectedValueOnce({
+          status: 401,
+          data: "failure",
+          error: { message: "error" },
+        }),
+      } as unknown as TerminologyServiceApi;
     });
 
     await act(async () => {

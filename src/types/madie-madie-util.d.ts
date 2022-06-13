@@ -16,6 +16,9 @@ declare module "@madie/madie-util" {
     elmTranslationService: {
       baseUrl: string;
     };
+    terminologyService: {
+      baseUrl: string;
+    };
   }
 
   export const measureStore: {
@@ -38,6 +41,13 @@ declare module "@madie/madie-util" {
     getIdTokenObj: () => any;
   };
   export function useOnClickOutside(ref: any, handler: any): void;
+
+  export class TerminologyServiceApi {
+    constructor(baseUrl: string, getAccessToken: () => string);
+    checkLogin(): Promise<Boolean>;
+    loginUMLS(apiKey: string): Promise<string>;
+  }
+  export function useTerminologyServiceApi(): TerminologyServiceApi;
 
   export const bootstrap: LifeCycleFn<void>;
   export const mount: LifeCycleFn<void>;
