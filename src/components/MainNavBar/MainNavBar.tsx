@@ -19,18 +19,15 @@ const MainNavBar = () => {
   const terminologyServiceApi = useTerminologyServiceApi();
   const [isLoggedInToUMLS, setIsLoggedInToUMLS] = useState<boolean>(undefined);
 
-  const checkLoginToUMLS = async () => {
-    const loginStatus = await Promise.resolve(
-      terminologyServiceApi.checkLogin().then((value) => {
-        setIsLoggedInToUMLS(true);
-      })
-    );
-    return loginStatus;
-  };
   const { authState } = useOktaAuth();
   useEffect(() => {
     if (authState?.isAuthenticated && !isLoggedInToUMLS) {
-      checkLoginToUMLS().catch((err) => {});
+      terminologyServiceApi
+        .checkLogin()
+        .then((value) => {
+          setIsLoggedInToUMLS(true);
+        })
+        .catch((err) => {});
     }
   }, [authState?.isAuthenticated, isLoggedInToUMLS]);
 

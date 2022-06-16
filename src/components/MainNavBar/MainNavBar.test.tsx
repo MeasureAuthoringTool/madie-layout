@@ -355,7 +355,7 @@ describe("UMLS Connection Dialog", () => {
       expect(UMLSTextNode.value).toBe(mockFormikInfo.apiKey);
       const submitButton = await findByTestId("submit-UMLS-key");
       await waitFor(() => expect(submitButton).not.toBeDisabled(), {
-        timeout: 6000,
+        timeout: 8000,
       });
       fireEvent.click(submitButton);
       await waitFor(() => {
