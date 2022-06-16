@@ -19,13 +19,17 @@ const MainNavBar = () => {
   const terminologyServiceApi = useTerminologyServiceApi();
   const [isLoggedInToUMLS, setIsLoggedInToUMLS] = useState<boolean>(false);
 
-  useEffect(() => {
-    terminologyServiceApi
-      .checkLogin()
-      .then((value) => {
+  const checkLoginToUMLS = async () => {
+    const loginStatus = await Promise.resolve(
+      terminologyServiceApi.checkLogin().then((value) => {
         setIsLoggedInToUMLS(true);
       })
-      .catch((err) => {});
+    );
+    return loginStatus;
+  };
+
+  useEffect(() => {
+    checkLoginToUMLS().catch((err) => {});
   }, []);
 
   const onToastClose = () => {
@@ -40,6 +44,9 @@ const MainNavBar = () => {
   };
 
   const { authState } = useOktaAuth();
+  if (authState?.isAuthenticated) {
+    checkLoginToUMLS().catch((err) => {});
+  }
   return (
     <nav>
       <div className="inner">

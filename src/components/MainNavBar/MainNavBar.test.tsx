@@ -380,3 +380,31 @@ describe("UMLS Connection Dialog", () => {
     });
   });
 });
+
+test("Navigation routes are not available when user is not authenticated", async () => {
+  (useOktaAuth as jest.Mock).mockImplementation(() => ({
+    oktaAuth: {
+      signOut: MockSignOut,
+    },
+    authState: { isAuthenticated: false },
+  }));
+  await act(async () => {
+    const { queryByText } = await render(
+      <MemoryRouter>
+        <MainNavBar />
+      </MemoryRouter>
+    );
+
+    const measuresLink = await queryByText("main-nav-bar-measures");
+    expect(measuresLink).not.toBeInTheDocument();
+
+    const librariesLink = await queryByText("main-nav-bar-cql-library");
+    expect(librariesLink).not.toBeInTheDocument();
+
+    const help = await queryByText("main-nav-bar-help");
+    expect(help).not.toBeInTheDocument();
+
+    expect(queryByText("UMLS Active")).not.toBeInTheDocument();
+    expect(queryByText("Connect to UMLS")).not.toBeInTheDocument();
+  });
+});
