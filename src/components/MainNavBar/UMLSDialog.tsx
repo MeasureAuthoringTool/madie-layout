@@ -17,6 +17,7 @@ export interface UMLSDialogProps {
   open: boolean;
   handleClose: Function;
   handleToast: Function;
+  setIsLoggedInToUMLS: Function;
 }
 
 export interface KeyConfig {
@@ -24,7 +25,7 @@ export interface KeyConfig {
 }
 
 const UMLSDialog = (props: UMLSDialogProps) => {
-  const { open, handleClose, handleToast } = props;
+  const { open, handleClose, handleToast, setIsLoggedInToUMLS } = props;
   const terminologyServiceApi = useTerminologyServiceApi();
   // blank, close.
   const onClose = () => {
@@ -40,6 +41,7 @@ const UMLSDialog = (props: UMLSDialogProps) => {
       .loginUMLS(values.apiKey.valueOf())
       .then(() => {
         handleToast("success", "UMLS successfully authenticated", true);
+        setIsLoggedInToUMLS(true);
         onClose();
       })
       .catch((err) => {
@@ -52,6 +54,7 @@ const UMLSDialog = (props: UMLSDialogProps) => {
         } else {
           handleToast("danger", "An unexpected error has ocurred", true);
         }
+        setIsLoggedInToUMLS(false);
       });
   };
   function formikErrorHandler(name: string, isError: boolean) {

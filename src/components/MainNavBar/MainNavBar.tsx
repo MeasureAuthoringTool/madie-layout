@@ -17,7 +17,7 @@ const MainNavBar = () => {
   const [toastMessage, setToastMessage] = useState<string>("");
   const [toastType, setToastType] = useState<string>("danger");
   const terminologyServiceApi = useTerminologyServiceApi();
-  const [isLoggedInToUMLS, setIsLoggedInToUMLS] = useState<boolean>(false);
+  const [isLoggedInToUMLS, setIsLoggedInToUMLS] = useState<boolean>(undefined);
 
   const checkLoginToUMLS = async () => {
     const loginStatus = await Promise.resolve(
@@ -27,10 +27,12 @@ const MainNavBar = () => {
     );
     return loginStatus;
   };
-
+  const { authState } = useOktaAuth();
   useEffect(() => {
-    checkLoginToUMLS().catch((err) => {});
-  }, []);
+    if (authState?.isAuthenticated && !isLoggedInToUMLS) {
+      checkLoginToUMLS().catch((err) => {});
+    }
+  }, [authState?.isAuthenticated, isLoggedInToUMLS]);
 
   const onToastClose = () => {
     setToastType(null);
@@ -43,10 +45,6 @@ const MainNavBar = () => {
     setToastOpen(open);
   };
 
-  const { authState } = useOktaAuth();
-  if (authState?.isAuthenticated) {
-    checkLoginToUMLS().catch((err) => {});
-  }
   return (
     <nav>
       <div className="inner">
@@ -122,6 +120,7 @@ const MainNavBar = () => {
         open={dOpen}
         handleClose={() => setDOpen(false)}
         handleToast={handleToast}
+        setIsLoggedInToUMLS={setIsLoggedInToUMLS}
       />
       <Toast
         toastKey="UMLS-login-toast"

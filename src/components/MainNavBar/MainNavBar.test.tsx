@@ -157,7 +157,7 @@ describe("UMLS Connection Dialog", () => {
       expect(UMLSTextNode.value).toBe(mockFormikInfo.apiKey);
       const submitButton = await findByTestId("submit-UMLS-key");
       await waitFor(() => expect(submitButton).not.toBeDisabled(), {
-        timeout: 5000,
+        timeout: 10000,
       });
       fireEvent.click(submitButton);
       await waitFor(() => {
@@ -165,7 +165,7 @@ describe("UMLS Connection Dialog", () => {
       });
       setTimeout(() => {
         expect("UMLS-login-success-text").not.toBeInTheDocument();
-      }, 5000);
+      }, 10000);
     });
   });
 
@@ -258,7 +258,7 @@ describe("UMLS Connection Dialog", () => {
       expect(UMLSTextNode.value).toBe(mockFormikInfo.apiKey);
       const submitButton = await findByTestId("submit-UMLS-key");
       await waitFor(() => expect(submitButton).not.toBeDisabled(), {
-        timeout: 5000,
+        timeout: 6000,
       });
       fireEvent.click(submitButton);
       await waitFor(() => {
@@ -355,7 +355,7 @@ describe("UMLS Connection Dialog", () => {
       expect(UMLSTextNode.value).toBe(mockFormikInfo.apiKey);
       const submitButton = await findByTestId("submit-UMLS-key");
       await waitFor(() => expect(submitButton).not.toBeDisabled(), {
-        timeout: 5000,
+        timeout: 6000,
       });
       fireEvent.click(submitButton);
       await waitFor(() => {
