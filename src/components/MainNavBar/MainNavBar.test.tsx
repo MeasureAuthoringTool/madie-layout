@@ -408,3 +408,24 @@ test("Navigation routes are not available when user is not authenticated", async
     expect(queryByText("Connect to UMLS")).not.toBeInTheDocument();
   });
 });
+
+test("Should display reminder login failed toast when use is not logged in UMLS", async () => {
+  (useTerminologyServiceApi as jest.Mock).mockImplementation(() => {
+    return {
+      checkLogin: jest.fn().mockRejectedValueOnce({ status: 404, data: false }),
+    } as unknown as TerminologyServiceApi;
+  });
+  await act(async () => {
+    const { queryByText } = await render(
+      <MemoryRouter>
+        <MainNavBar />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(
+        queryByText("Login Failed. Please sign in again.")
+      ).toBeInTheDocument();
+    });
+  });
+});
