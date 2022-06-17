@@ -27,7 +27,9 @@ const MainNavBar = () => {
         .then((value) => {
           setIsLoggedInToUMLS(true);
         })
-        .catch((err) => {});
+        .catch((err) => {
+          handleToast("danger", "Login Failed. Please sign in again.", true);
+        });
     }
   }, [authState?.isAuthenticated, isLoggedInToUMLS]);
 
