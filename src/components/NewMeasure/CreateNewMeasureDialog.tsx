@@ -3,13 +3,11 @@ import { makeStyles } from "@mui/styles";
 import CloseIcon from "@mui/icons-material/Close";
 import { Measure } from "@madie/madie-models/dist/Measure";
 import { Model } from "@madie/madie-models/dist/Model";
-import { MeasureScoring } from "@madie/madie-models/dist/MeasureScoring";
 import { MeasureSchemaValidator } from "../../models/MeasureSchemaValidator";
 import {
   Button,
   Select,
   TextField,
-  FormControlLabel,
 } from "@madie/madie-design-system/dist/react";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
@@ -25,16 +23,13 @@ import {
   DialogActions,
   DialogTitle,
   Divider,
-  FormGroup,
   FormHelperText,
-  Slide,
   IconButton,
   MenuItem,
   Typography,
 } from "@mui/material";
 import { useFormik } from "formik";
 import classNames from "classnames";
-import Checkbox from "./CheckBox";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import DesktopDatePicker from "@mui/lab/DesktopDatePicker";
 import DateAdapter from "@mui/lab/AdapterDateFns";
@@ -153,14 +148,11 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
   const { getAccessToken } = useOktaTokens();
   const [serverError, setServerError] = useState<string>("");
   // to be uncommented when needed so it doesn't hamper test coverage.
-  // const [manualId, setManualId] = useState<boolean>(false);
-  // const [autoGenerate, setAutoGenerate] = useState<boolean>(false);
   const formik = useFormik({
     initialValues: {
       measureName: "",
       model: "",
       cqlLibraryName: "",
-      measureScoring: "",
       active: true,
       measurementPeriodStart: null,
       measurementPeriodEnd: null,
@@ -184,8 +176,6 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
         if (status === 201) {
           onClose(true);
           formik.resetForm();
-          // setManualId(false);
-          // setAutoGenerate(false);
           setServerError("");
           const event = new Event("create");
           window.dispatchEvent(event);
@@ -221,14 +211,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
   const formRow = classNames(classes.row, classes.spaced);
   const formRowGapped = classNames(formRow, classes.gap);
   const alertClass = classNames(classes.row, classes.alert);
-  // const hiddenField = classNames({
-  //   [classes.expanded]: manualId,
-  //   [classes.hidden]: !manualId,
-  // });
-  const hiddenField = classNames({
-    [classes.expanded]: false,
-    [classes.hidden]: true,
-  });
+
   return (
     <Dialog
       open={open}
@@ -363,99 +346,6 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
               data-testid="eqcm-text-field"
               label="ECQM Abbreviated Title"
               size="small"
-            />
-            <div>
-              <FormGroup>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      disabled
-                      checked={false}
-                      id="auto-generate"
-                      data-testid="auto-generate-checkbox"
-                      inputProps={{
-                        datatestId: "auto-generate-checkbox-input",
-                      }}
-                      // onChange={(e) => {
-                      //   const val = e.target.checked;
-                      //   if (val && manualId) {
-                      //     setManualId(false);
-                      //   }
-                      //   setAutoGenerate(e.target.checked);
-                      // }}
-                    />
-                  }
-                  label="Automatically Generate A CMS ID"
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      disabled
-                      checked={false}
-                      id="manual-generate"
-                      data-testid="manual-generate-checkbox"
-                      inputProps={{
-                        datatestId: "manual-generate-checkbox-input",
-                      }}
-                      // onChange={(e) => {
-                      //   const val = e.target.checked;
-                      //   if (val && autoGenerate) {
-                      //     setAutoGenerate(false);
-                      //   }
-                      //   setManualId(e.target.checked);
-                      // }}
-                    />
-                  }
-                  label="Manually Generate A CMS ID"
-                />
-              </FormGroup>
-              {/* avoid slide over rest of screen */}
-              <div style={{ overflow: "hidden" }}>
-                <Slide in={false}>
-                  <div className={hiddenField}>
-                    <TextField
-                      disabled
-                      id="CMSID"
-                      data-testid="CMSID-text-field"
-                      required
-                      placeholder="CMS ID"
-                      label="CMS ID"
-                      size="small"
-                    />
-                  </div>
-                </Slide>
-              </div>
-            </div>
-          </div>
-
-          <div className={formRowGapped}>
-            <Select
-              required
-              placeHolder={{ name: "Select", value: "" }}
-              label="Scoring"
-              inputProps={{ "data-testid": "measure-scoring-input" }}
-              size="small"
-              id="measureScoring"
-              data-testid="measure-scoring-select-field"
-              {...formik.getFieldProps("measureScoring")}
-              error={
-                formik.touched.measureScoring &&
-                Boolean(formik.errors.measureScoring)
-              }
-              helperText={
-                formik.touched.measureScoring && formik.errors.measureScoring
-              }
-              options={Object.keys(MeasureScoring).map((scoringKey) => {
-                return (
-                  <MenuItem
-                    key={scoringKey}
-                    value={MeasureScoring[scoringKey]}
-                    data-testid={`measure-scoring-option-${MeasureScoring[scoringKey]}`}
-                  >
-                    {MeasureScoring[scoringKey]}
-                  </MenuItem>
-                );
-              })}
             />
             <Select
               required
