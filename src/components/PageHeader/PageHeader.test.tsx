@@ -24,7 +24,6 @@ const mockFormikInfo = {
   measureName: mockName,
   model: "QI-Core",
   cqlLibraryName: mockLib,
-  measureScoring: "Cohort",
   measurementPeriodStart: "01/05/2022",
   measurementPeriodEnd: "03/07/2022",
   active: true,
@@ -114,18 +113,10 @@ describe("Measures Create Dialog", () => {
       expect(await findByTestId("model-version-select")).toBeInTheDocument();
       expect(await findByTestId("cql-library-name")).toBeInTheDocument();
       expect(await findByTestId("eqcm-text-field")).toBeInTheDocument();
-      expect(await findByTestId("auto-generate-checkbox")).toBeInTheDocument();
-      expect(
-        await findByTestId("manual-generate-checkbox")
-      ).toBeInTheDocument();
-      expect(
-        await findByTestId("measure-scoring-select-field")
-      ).toBeInTheDocument();
       expect(await findByTestId("subject-select")).toBeInTheDocument();
       expect(
         await findByTestId("create-new-measure-save-button")
       ).toBeInTheDocument();
-      expect(queryByTestId("CMSID-text-field")).not.toBeVisible();
     });
   });
 
@@ -200,15 +191,6 @@ describe("Measures Create Dialog", () => {
       fireEvent.select(modelNode, { target: { value: mockFormikInfo.model } });
       expect(modelNode.value).toBe(mockFormikInfo.model);
       Simulate.change(modelNode);
-
-      const scoringSelect = await getByTestId("measure-scoring-select-field");
-      fireEvent.click(scoringSelect);
-      const scoringNode = await getByTestId("measure-scoring-input");
-      fireEvent.select(scoringNode, {
-        target: { value: mockFormikInfo.measureScoring },
-      });
-      expect(scoringNode.value).toBe(mockFormikInfo.measureScoring);
-      Simulate.change(scoringNode);
 
       const measurementPeriodStartNode = getByTestId(
         "measurement-period-start"
@@ -309,15 +291,6 @@ describe("Measures Create Dialog", () => {
     expect(modelNode.value).toBe(mockFormikInfo.model);
     Simulate.change(modelNode);
 
-    const scoringSelect = await getByTestId("measure-scoring-select-field");
-    fireEvent.click(scoringSelect);
-    const scoringNode = await getByTestId("measure-scoring-input");
-    fireEvent.select(scoringNode, {
-      target: { value: mockFormikInfo.measureScoring },
-    });
-    expect(scoringNode.value).toBe(mockFormikInfo.measureScoring);
-    Simulate.change(scoringNode);
-
     const measurementPeriodStartNode = getByTestId("measurement-period-start");
     const measurementPeriodStartInput = within(
       measurementPeriodStartNode
@@ -413,15 +386,6 @@ describe("Measures Create Dialog", () => {
       fireEvent.select(modelNode, { target: { value: mockFormikInfo.model } });
       expect(modelNode.value).toBe(mockFormikInfo.model);
       Simulate.change(modelNode);
-
-      const scoringSelect = await getByTestId("measure-scoring-select-field");
-      fireEvent.click(scoringSelect);
-      const scoringNode = await getByTestId("measure-scoring-input");
-      fireEvent.select(scoringNode, {
-        target: { value: mockFormikInfo.measureScoring },
-      });
-      expect(scoringNode.value).toBe(mockFormikInfo.measureScoring);
-      Simulate.change(scoringNode);
 
       const measurementPeriodStartNode = getByTestId(
         "measurement-period-start"

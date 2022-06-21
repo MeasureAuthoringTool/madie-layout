@@ -1,6 +1,5 @@
 import * as Yup from "yup";
 import { Model } from "@madie/madie-models/dist/Model";
-import { MeasureScoring } from "@madie/madie-models/dist/MeasureScoring";
 import { isWithinInterval } from "date-fns";
 
 export const MeasureSchemaValidator = Yup.object().shape({
@@ -22,9 +21,6 @@ export const MeasureSchemaValidator = Yup.object().shape({
       /^[A-Z][a-zA-Z0-9]*$/,
       "Measure Library name must start with an upper case letter, followed by alpha-numeric character(s) and must not contain spaces or other special characters."
     ),
-  measureScoring: Yup.string()
-    .oneOf(Object.values(MeasureScoring))
-    .required("Measure Scoring is required."),
 
   measurementPeriodStart: Yup.date()
     .required("Measurement period start date is required")

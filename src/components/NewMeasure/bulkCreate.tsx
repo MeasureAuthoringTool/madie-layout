@@ -1,4 +1,3 @@
-import { MeasureScoring } from "@madie/madie-models/dist/MeasureScoring";
 import { Measure } from "@madie/madie-models/dist/Measure";
 import { Model } from "@madie/madie-models/dist/Model";
 // This is some frontend logic for adding a bunch of measures
@@ -24,31 +23,22 @@ export const mockMeasureName = () => {
 };
 
 const bulkCreate = (count: number) => {
-  const randomMeasure = () =>
-    MeasureScoring[
-      Object.keys(MeasureScoring)[
-        Math.floor(Math.random() * Object.keys(MeasureScoring).length)
-      ]
-    ];
   const mockModel: Model = Model[Object.keys(Model)[0]];
 
   const measureInput = {
     measureName: "",
     model: "",
     cqlLibraryName: "",
-    measureScoring: "",
   } as Measure;
 
   const measures = [];
   for (let i = 0; i < count; i++) {
     const newMeasure = Object.assign({}, measureInput);
     // build it
-    const mockMeasureScoring: MeasureScoring = randomMeasure();
 
     newMeasure.measureName = mockMeasureName();
     newMeasure.model = mockModel;
     newMeasure.cqlLibraryName = mockLibraryName();
-    newMeasure.measureScoring = mockMeasureScoring;
     measures.push(newMeasure);
   }
   return measures;
