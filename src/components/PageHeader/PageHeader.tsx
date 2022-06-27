@@ -109,7 +109,7 @@ const PageHeader = () => {
         <div className="measures">
           <div>
             <div className="left-col">
-              <h1 style={{ textDecoration: "underline" }}> Libraries </h1>
+              <h1> Libraries </h1>
               <h4>
                 {" "}
                 Welcome,{" "}

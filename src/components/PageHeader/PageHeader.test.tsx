@@ -9,7 +9,7 @@ import {
   waitFor,
   within,
 } from "@testing-library/react";
-import { MemoryRouter } from "react-router";
+import { MemoryRouter, Route } from "react-router";
 import { act, Simulate } from "react-dom/test-utils";
 import { describe, expect, test } from "@jest/globals";
 import userEvent from "@testing-library/user-event";
@@ -82,6 +82,39 @@ describe("Page Header and Dialogs", () => {
       );
       const dialogButton = await findByTestId("create-new-cql-library-button");
       expect(dialogButton).toBeTruthy();
+    });
+  });
+
+  test("Clicking on new library button routes to library page", () => {
+    let testHistory, testLocation;
+    render(
+      <MemoryRouter
+        initialEntries={[
+          {
+            pathname: "/cql-libraries",
+            search: "",
+            hash: "",
+            state: undefined,
+            key: "1fewtg",
+          },
+        ]}
+      >
+        <PageHeader />
+        <Route
+          path="*"
+          render={({ history, location }) => {
+            testHistory = history;
+            testLocation = location;
+            return null;
+          }}
+        />
+      </MemoryRouter>
+    );
+    act(async () => {
+      const libraryButton = await findByTestId("create-new-cql-library-button");
+      expect(libraryButton).toBeTruthy();
+      fireEvent.click(libraryButton);
+      expect(testLocation.pathname).toBe("/cql-libraries/create");
     });
   });
 
