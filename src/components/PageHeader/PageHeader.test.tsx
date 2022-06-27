@@ -9,7 +9,7 @@ import {
   waitFor,
   within,
 } from "@testing-library/react";
-import { MemoryRouter } from "react-router";
+import { MemoryRouter, Route } from "react-router";
 import { act, Simulate } from "react-dom/test-utils";
 import { describe, expect, test } from "@jest/globals";
 import userEvent from "@testing-library/user-event";
@@ -58,9 +58,64 @@ mockedAxios.post.mockResolvedValueOnce(postData);
 mockedAxios.get.mockResolvedValueOnce(getData);
 const { findByTestId, queryByTestId, getByTestId } = screen;
 
-describe("Measures Create Dialog", () => {
+describe("Page Header and Dialogs", () => {
   afterEach(() => {
     jest.clearAllMocks();
+  });
+
+  test("Navigating to the cql-libraries page presents us with a library specific header", async () => {
+    await act(async () => {
+      render(
+        <MemoryRouter
+          initialEntries={[
+            {
+              pathname: "/cql-libraries",
+              search: "",
+              hash: "",
+              state: undefined,
+              key: "1fewtg",
+            },
+          ]}
+        >
+          <PageHeader />
+        </MemoryRouter>
+      );
+      const dialogButton = await findByTestId("create-new-cql-library-button");
+      expect(dialogButton).toBeTruthy();
+    });
+  });
+
+  test("Clicking on new library button routes to library page", () => {
+    let testHistory, testLocation;
+    render(
+      <MemoryRouter
+        initialEntries={[
+          {
+            pathname: "/cql-libraries",
+            search: "",
+            hash: "",
+            state: undefined,
+            key: "1fewtg",
+          },
+        ]}
+      >
+        <PageHeader />
+        <Route
+          path="*"
+          render={({ history, location }) => {
+            testHistory = history;
+            testLocation = location;
+            return null;
+          }}
+        />
+      </MemoryRouter>
+    );
+    act(async () => {
+      const libraryButton = await findByTestId("create-new-cql-library-button");
+      expect(libraryButton).toBeTruthy();
+      fireEvent.click(libraryButton);
+      expect(testLocation.pathname).toBe("/cql-libraries/create");
+    });
   });
 
   test("Clicking on create opens up the create dialog", async () => {
@@ -457,7 +512,7 @@ describe("Measures Create Dialog", () => {
     });
   });
 
-  test("On edit page measureState is updated and links are rendered, ", async () => {
+  test("On measure edit page measureState is updated and links are rendered, ", async () => {
     jest.mock("@madie/madie-util", () => ({
       getServiceConfig: () => ({
         measureService: {
@@ -483,7 +538,7 @@ describe("Measures Create Dialog", () => {
       <MemoryRouter
         initialEntries={[
           {
-            pathname: "/edit",
+            pathname: "/measures/62a7ab0e4fb904343c4f1f79/edit/details",
             search: "",
             hash: "",
             state: undefined,

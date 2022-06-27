@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useHistory } from "react-router-dom";
 import { useLocalStorage } from "../../custom-hooks/useLocalStorage";
 import AddIcon from "@mui/icons-material/Add";
 import { Fade, Breadcrumbs } from "@mui/material";
@@ -11,6 +11,7 @@ import "./pageHeader.scss";
 
 const PageHeader = () => {
   const { pathname } = useLocation();
+  const history = useHistory();
   // homepage stuff
   const [createOpen, setCreateOpen] = useState<boolean>(false);
   const [measureState, setMeasureState] = useState<any>(measureStore.state);
@@ -37,7 +38,7 @@ const PageHeader = () => {
   return (
     <div className="page-header">
       {/* state 1 */}
-      {pathname.includes("edit") && (
+      {pathname.includes("edit") && pathname.includes("measures") && (
         <Fade in={measureState?.measureName !== undefined}>
           <div className="measure-details">
             <div>
@@ -77,7 +78,7 @@ const PageHeader = () => {
         </Fade>
       )}
       {/* state 2 */}
-      {(pathname === "/measures" || pathname === "/cql-libraries") && (
+      {pathname === "/measures" && (
         <div className="measures">
           <CreateNewMeasureDialog open={createOpen} onClose={handleClose} />
           <div>
@@ -99,6 +100,32 @@ const PageHeader = () => {
               >
                 <AddIcon className="add-icon" fontSize="small" />
                 <div>New Measure</div>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {pathname.includes("cql-libraries") && (
+        <div className="measures">
+          <div>
+            <div className="left-col">
+              <h1> Libraries </h1>
+              <h4>
+                {" "}
+                Welcome,{" "}
+                <Fade in={userFirstName !== ""}>
+                  <span>{userFirstName}</span>
+                </Fade>
+              </h4>
+            </div>
+            <div className="right-col">
+              <button
+                className="new-measure"
+                data-testid="create-new-cql-library-button"
+                onClick={() => history.push("/cql-libraries/create")}
+              >
+                <AddIcon className="add-icon" fontSize="small" />
+                <div>New Library</div>
               </button>
             </div>
           </div>
