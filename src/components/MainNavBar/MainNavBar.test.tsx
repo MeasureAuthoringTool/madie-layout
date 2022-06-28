@@ -264,7 +264,7 @@ describe("UMLS Connection Dialog", () => {
       await waitFor(() => {
         expect(queryByTestId("UMLS-login-generic-error-text")).toBeTruthy();
         expect(
-          queryByText("An unexpected error has ocurred")
+          queryByText("An unexpected error has occurred")
         ).toBeInTheDocument();
       });
       await waitFor(() => {
@@ -277,7 +277,7 @@ describe("UMLS Connection Dialog", () => {
       });
       await waitFor(() => {
         expect(
-          queryByText("An unexpected error has ocurred")
+          queryByText("An unexpected error has occurred")
         ).not.toBeInTheDocument();
       });
     });
@@ -423,9 +423,7 @@ test("Should display reminder login failed toast when use is not logged in UMLS"
     );
 
     await waitFor(() => {
-      expect(
-        queryByText("Login Failed. Please sign in again.")
-      ).toBeInTheDocument();
+      expect(queryByText("Please sign in to UMLS.")).toBeInTheDocument();
     });
   });
 });

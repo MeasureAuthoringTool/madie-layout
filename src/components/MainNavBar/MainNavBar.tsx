@@ -28,10 +28,10 @@ const MainNavBar = () => {
           setIsLoggedInToUMLS(true);
         })
         .catch((err) => {
-          handleToast("danger", "Login Failed. Please sign in again.", true);
+          handleToast("danger", "Please sign in to UMLS.", true);
         });
     }
-  }, [authState?.isAuthenticated, isLoggedInToUMLS]);
+  }, [authState?.isAuthenticated]);
 
   const onToastClose = () => {
     setToastType(null);
@@ -97,7 +97,7 @@ const MainNavBar = () => {
                 </li>
                 <li className="activity-button">
                   <button
-                    onClick={() => setDOpen(!isLoggedInToUMLS ? true : false)}
+                    onClick={() => setDOpen(!isLoggedInToUMLS)}
                     data-testid="UMLS-connect-button"
                   >
                     <div className={isLoggedInToUMLS ? "active" : "inactive"} />

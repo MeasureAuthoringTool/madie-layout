@@ -52,7 +52,7 @@ const UMLSDialog = (props: UMLSDialogProps) => {
             true
           );
         } else {
-          handleToast("danger", "An unexpected error has ocurred", true);
+          handleToast("danger", "An unexpected error has occurred", true);
         }
         setIsLoggedInToUMLS(false);
       });
