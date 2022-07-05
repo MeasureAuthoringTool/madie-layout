@@ -30,10 +30,10 @@ export const MeasureSchemaValidator = Yup.object().shape({
       "measurementPeriodStart",
       "Start date should be between the years 1900 and 2099.",
       (measurementPeriodStart) => {
-        return isWithinInterval(
-          Number(measurementPeriodStart?.getFullYear().toString().slice(0, 4)),
-          { start: 1900, end: 2099 }
-        );
+        return isWithinInterval(measurementPeriodStart?.getFullYear(), {
+          start: 1900,
+          end: 2099,
+        });
       }
     ),
   measurementPeriodEnd: Yup.date()
@@ -44,10 +44,10 @@ export const MeasureSchemaValidator = Yup.object().shape({
       "measurementPeriodStart",
       "End date should be between the years 1900 and 2099.",
       (measurementPeriodEnd) => {
-        return isWithinInterval(
-          Number(measurementPeriodEnd?.getFullYear().toString().slice(0, 4)),
-          { start: 1900, end: 2099 }
-        );
+        return isWithinInterval(measurementPeriodEnd?.getFullYear(), {
+          start: 1900,
+          end: 2099,
+        });
       }
     )
     .when("measurementPeriodStart", (measurementPeriodStart, schema) => {
