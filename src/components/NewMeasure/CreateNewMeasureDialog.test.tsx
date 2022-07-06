@@ -233,7 +233,7 @@ describe("Measures Create Dialog", () => {
     });
   }, 20000);
 
-  test("checking if error text is displayed when measurement periods are not provided", async () => {
+  test("checking if error text is displayed when measurement periods are not between the years 1900 and 2100", async () => {
     await act(async () => {
       await render(<CreateNewMeasureDialog open={true} onClose={undefined} />);
 
