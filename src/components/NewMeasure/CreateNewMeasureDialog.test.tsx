@@ -2,7 +2,13 @@ import "@testing-library/jest-dom";
 // NOTE: jest-dom adds handy assertions to Jest and is recommended, but not required
 
 import * as React from "react";
-import { render, fireEvent, waitFor, within } from "@testing-library/react";
+import {
+  render,
+  fireEvent,
+  waitFor,
+  within,
+  screen,
+} from "@testing-library/react";
 import { act, Simulate } from "react-dom/test-utils";
 import { describe, expect, test } from "@jest/globals";
 import userEvent from "@testing-library/user-event";
@@ -86,9 +92,6 @@ describe("Measures Create Dialog", () => {
       expect(nameNode.value).toBe(mockFormikInfo.measureName);
       Simulate.change(nameNode);
 
-      fireEvent.click(getByTestId("measure-name-text-field"));
-      fireEvent.blur(getByTestId("measure-name-text-field"));
-
       const libraryNode = await getByTestId("cql-library-name-input");
       userEvent.type(libraryNode, mockFormikInfo.cqlLibraryName);
       expect(libraryNode.value).toBe(mockFormikInfo.cqlLibraryName);
@@ -134,6 +137,146 @@ describe("Measures Create Dialog", () => {
       fireEvent.click(submitButton);
       await waitFor(() => {
         expect(queryByTestId("server-error-alerts")).not.toBeInTheDocument();
+      });
+    });
+  }, 20000);
+
+  test("checking if error text is displayed for invalid dates", async () => {
+    await act(async () => {
+      await render(<CreateNewMeasureDialog open={true} onClose={undefined} />);
+
+      const measurementPeriodStartNode = screen.getByTestId(
+        "measurement-period-start"
+      );
+      const measurementPeriodStartInput = within(
+        measurementPeriodStartNode
+      ).getByRole("textbox");
+      userEvent.type(measurementPeriodStartInput, "12/33");
+
+      const measurementPeriodEndNode = screen.getByTestId(
+        "measurement-period-end"
+      );
+      const measurementPeriodEndInput = within(
+        measurementPeriodEndNode
+      ).getByRole("textbox");
+      userEvent.type(
+        measurementPeriodEndInput,
+        mockFormikInfo.measurementPeriodEnd
+      );
+
+      expect(measurementPeriodEndInput.value).toBe(
+        mockFormikInfo.measurementPeriodEnd
+      );
+
+      fireEvent.click(measurementPeriodStartNode);
+      await waitFor(() => {
+        expect(
+          screen.getByTestId("measurementPeriodStart-helper-text")
+        ).not.toBe(null);
+        expect(
+          screen.getByTestId("measurementPeriodStart-helper-text")
+        ).toHaveTextContent("Invalid date format. (mm/dd/yyyy)");
+      });
+
+      const submitButton = await screen.getByTestId(
+        "create-new-measure-save-button"
+      );
+      await waitFor(() => expect(submitButton).toBeDisabled(), {
+        timeout: 3000,
+      });
+    });
+  }, 20000);
+
+  test("checking if error text is displayed when measurement periods are not provided", async () => {
+    await act(async () => {
+      await render(<CreateNewMeasureDialog open={true} onClose={undefined} />);
+
+      const measurementPeriodStartNode = screen.getByTestId(
+        "measurement-period-start"
+      );
+      const measurementPeriodStartInput = within(
+        measurementPeriodStartNode
+      ).getByRole("textbox");
+      userEvent.type(measurementPeriodStartInput, "");
+
+      const measurementPeriodEndNode = screen.getByTestId(
+        "measurement-period-end"
+      );
+      const measurementPeriodEndInput = within(
+        measurementPeriodEndNode
+      ).getByRole("textbox");
+      userEvent.type(
+        measurementPeriodEndInput,
+        mockFormikInfo.measurementPeriodEnd
+      );
+
+      expect(measurementPeriodEndInput.value).toBe(
+        mockFormikInfo.measurementPeriodEnd
+      );
+
+      fireEvent.click(measurementPeriodStartNode);
+      await waitFor(() => {
+        expect(
+          screen.getByTestId("measurementPeriodStart-helper-text")
+        ).not.toBe(null);
+        expect(
+          screen.getByTestId("measurementPeriodStart-helper-text")
+        ).toHaveTextContent("Measurement period start date is required");
+      });
+
+      const submitButton = await screen.getByTestId(
+        "create-new-measure-save-button"
+      );
+      await waitFor(() => expect(submitButton).toBeDisabled(), {
+        timeout: 3000,
+      });
+    });
+  }, 20000);
+
+  test("checking if error text is displayed when measurement periods are not provided", async () => {
+    await act(async () => {
+      await render(<CreateNewMeasureDialog open={true} onClose={undefined} />);
+
+      const measurementPeriodStartNode = screen.getByTestId(
+        "measurement-period-start"
+      );
+      const measurementPeriodStartInput = within(
+        measurementPeriodStartNode
+      ).getByRole("textbox");
+      userEvent.type(measurementPeriodStartInput, "12/22/2100");
+
+      const measurementPeriodEndNode = screen.getByTestId(
+        "measurement-period-end"
+      );
+      const measurementPeriodEndInput = within(
+        measurementPeriodEndNode
+      ).getByRole("textbox");
+      userEvent.type(
+        measurementPeriodEndInput,
+        mockFormikInfo.measurementPeriodEnd
+      );
+
+      expect(measurementPeriodEndInput.value).toBe(
+        mockFormikInfo.measurementPeriodEnd
+      );
+
+      fireEvent.click(measurementPeriodStartNode);
+      await waitFor(() => {
+        expect(
+          screen.getByTestId("measurementPeriodStart-helper-text")
+        ).not.toBe(null);
+        expect(
+          screen.getByTestId("measurementPeriodStart-helper-text")
+        ).toHaveTextContent(
+          "Start date should be between the years 1900 and 2099"
+        );
+      });
+
+      const submitButton = await screen.getByTestId(
+        "create-new-measure-save-button"
+      );
+      await waitFor(() => expect(submitButton).toBeDisabled(), {
+        timeout: 3000,
       });
     });
   }, 20000);
