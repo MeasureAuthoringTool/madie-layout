@@ -10,7 +10,6 @@ import {
   screen,
 } from "@testing-library/react";
 import { act, Simulate } from "react-dom/test-utils";
-import { describe, expect, test } from "@jest/globals";
 import userEvent from "@testing-library/user-event";
 import CreateNewMeasureDialog from "./CreateNewMeasureDialog";
 
@@ -272,7 +271,7 @@ describe("Measures Create Dialog", () => {
 
   test("checking if error text is displayed when measurement periods end date is before start date", async () => {
     const { getByTestId } = render(
-      <CreateNewMeasureDialog open={true} onClose={() => {}} />
+      <CreateNewMeasureDialog open={true} onClose={undefined} />
     );
     const measurementPeriodStartNode = getByTestId("measurement-period-start");
     const measurementPeriodStartInput = within(
