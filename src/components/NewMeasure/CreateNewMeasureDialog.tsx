@@ -369,22 +369,22 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
                 onChange={(startDate) => {
                   formik.setFieldValue("measurementPeriodStart", startDate);
                 }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    required
-                    helperText={formikErrorHandler(
-                      "measurementPeriodStart",
-                      true
-                    )}
-                    error={
-                      formik.touched.measurementPeriodStart &&
-                      Boolean(formik.errors.measurementPeriodStart)
-                    }
-                    {...formik.getFieldProps("measurementPeriodStart")}
-                    data-testid="measurement-period-start"
-                  />
-                )}
+                renderInput={(params) => {
+                  const { onChange, ...formikFieldProps } =
+                    formik.getFieldProps("measurementPeriodStart");
+                  return (
+                    <TextField
+                      {...formikFieldProps}
+                      {...params}
+                      required
+                      data-testid="measurement-period-start"
+                      helperText={formikErrorHandler(
+                        "measurementPeriodStart",
+                        true
+                      )}
+                    />
+                  );
+                }}
               />
             </LocalizationProvider>
             <LocalizationProvider dateAdapter={DateAdapter}>
@@ -396,22 +396,22 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
                 onChange={(endDate) => {
                   formik.setFieldValue("measurementPeriodEnd", endDate);
                 }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    required
-                    data-testid="measurement-period-end"
-                    helperText={formikErrorHandler(
-                      "measurementPeriodEnd",
-                      true
-                    )}
-                    error={
-                      formik.touched.measurementPeriodEnd &&
-                      Boolean(formik.errors.measurementPeriodEnd)
-                    }
-                    {...formik.getFieldProps("measurementPeriodEnd")}
-                  />
-                )}
+                renderInput={(params) => {
+                  const { onChange, ...formikFieldProps } =
+                    formik.getFieldProps("measurementPeriodEnd");
+                  return (
+                    <TextField
+                      {...formikFieldProps}
+                      {...params}
+                      required
+                      data-testid="measurement-period-end"
+                      helperText={formikErrorHandler(
+                        "measurementPeriodEnd",
+                        true
+                      )}
+                    />
+                  );
+                }}
               />
             </LocalizationProvider>
           </div>
