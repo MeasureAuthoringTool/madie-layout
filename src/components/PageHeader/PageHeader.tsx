@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, Link, useHistory } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { useLocalStorage } from "../../custom-hooks/useLocalStorage";
 import AddIcon from "@mui/icons-material/Add";
 import { Fade, Breadcrumbs } from "@mui/material";
@@ -11,9 +11,8 @@ import "./pageHeader.scss";
 
 const PageHeader = () => {
   const { pathname } = useLocation();
-  const history = useHistory();
-  // homepage stuff
   const [createOpen, setCreateOpen] = useState<boolean>(false);
+
   const [measureState, setMeasureState] = useState<any>(measureStore.state);
   useEffect(() => {
     const subscription = measureStore.subscribe(setMeasureState);
@@ -122,7 +121,10 @@ const PageHeader = () => {
               <button
                 className="new-measure"
                 data-testid="create-new-cql-library-button"
-                onClick={() => history.push("/cql-libraries/create")}
+                onClick={() => {
+                  const event = new Event("openCreateLibraryDialog");
+                  window.dispatchEvent(event);
+                }}
               >
                 <AddIcon className="add-icon" fontSize="small" />
                 <div>New Library</div>

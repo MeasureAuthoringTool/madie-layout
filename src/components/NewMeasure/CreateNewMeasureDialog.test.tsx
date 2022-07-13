@@ -285,7 +285,7 @@ describe("Measures Create Dialog", () => {
     ).getByRole("textbox");
     userEvent.type(measurementPeriodEndInput, "12/12/2021");
 
-    userEvent.click(getByTestId("create-dialog"));
+    userEvent.click(getByTestId("dialog-form"));
     await waitFor(() => {
       expect(
         getByTestId("measurementPeriodEnd-helper-text")
