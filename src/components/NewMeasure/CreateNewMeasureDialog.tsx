@@ -28,7 +28,7 @@ interface Toast {
   toastMessage: string;
 }
 
-const CreateNewLibraryDialog = ({ open, onClose }) => {
+const CreateNewMeasureDialog = ({ open, onClose }) => {
   const { getAccessToken } = useOktaTokens();
   const [toast, setToast] = useState<Toast>({
     toastOpen: false,
@@ -322,4 +322,4 @@ const CreateNewLibraryDialog = ({ open, onClose }) => {
   );
 };
 
-export default CreateNewLibraryDialog;
+export default CreateNewMeasureDialog;

@@ -93,7 +93,7 @@ const PageHeader = () => {
             </div>
             <div className="right-col">
               <button
-                className="new-measure"
+                className="create-button"
                 data-testid="create-new-measure-button"
                 onClick={openCreate}
               >
@@ -119,7 +119,7 @@ const PageHeader = () => {
             </div>
             <div className="right-col">
               <button
-                className="new-measure"
+                className="create-button"
                 data-testid="create-new-cql-library-button"
                 onClick={() => {
                   const event = new Event("openCreateLibraryDialog");
