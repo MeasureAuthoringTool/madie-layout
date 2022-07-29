@@ -85,7 +85,7 @@ describe("Page Header and Dialogs", () => {
     });
   });
 
-  test("Clicking on new library button routes to library page", () => {
+  test("Clicking on new library button retains the same library page", () => {
     let testHistory, testLocation;
     render(
       <MemoryRouter
@@ -114,7 +114,7 @@ describe("Page Header and Dialogs", () => {
       const libraryButton = await findByTestId("create-new-cql-library-button");
       expect(libraryButton).toBeTruthy();
       fireEvent.click(libraryButton);
-      expect(testLocation.pathname).toBe("/cql-libraries/create");
+      expect(testLocation.pathname).toBe("/cql-libraries");
     });
   });
 
@@ -138,7 +138,7 @@ describe("Page Header and Dialogs", () => {
       const dialogButton = await findByTestId("create-new-measure-button");
       expect(dialogButton).toBeTruthy();
       fireEvent.click(dialogButton);
-      const dialog = await findByTestId("create-dialog");
+      const dialog = await findByTestId("dialog-form");
       expect(dialog).toBeTruthy();
     });
   });
@@ -418,7 +418,7 @@ describe("Page Header and Dialogs", () => {
         </MemoryRouter>
       );
       const dialogButton = await findByTestId("create-new-measure-button");
-      expect(queryByTestId("create-dialog")).not.toBeInTheDocument();
+      expect(queryByTestId("dialog-form")).not.toBeInTheDocument();
       expect(dialogButton).toBeTruthy();
       fireEvent.click(dialogButton);
       // we gotta hit the input to change the value of material ui components. make sure they have ids
@@ -502,7 +502,7 @@ describe("Page Header and Dialogs", () => {
     const dialogButton = await findByTestId("create-new-measure-button");
     expect(dialogButton).toBeTruthy();
     fireEvent.click(dialogButton);
-    const dialog = await findByTestId("create-dialog");
+    const dialog = await findByTestId("dialog-form");
     expect(dialog).toBeTruthy();
     const closeButton = await findByTestId("close-button");
     expect(closeButton).toBeTruthy();
