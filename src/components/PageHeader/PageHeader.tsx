@@ -77,7 +77,7 @@ const PageHeader = () => {
         </Fade>
       )}
       {/* state 2 */}
-      {pathname === "/measures" && (
+      {(pathname === "/measures" || pathname === "/measures/") && (
         <div className="measures">
           <CreateNewMeasureDialog open={createOpen} onClose={handleClose} />
           <div>
