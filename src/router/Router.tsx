@@ -10,6 +10,7 @@ import Footer from "../components/Footer/Footer";
 import PageHeader from "../components/PageHeader/PageHeader";
 import "../styles/LayoutStyles.scss";
 import TimeoutHandler from "../components/timeoutHandler/TimeoutHandler";
+import RouteChangeHandler from "./RouteChangeHandler";
 
 function Router({ props }) {
   const { authState } = useOktaAuth();
@@ -21,6 +22,7 @@ function Router({ props }) {
       <BrowserRouter>
         <MainNavBar />
         <PageHeader />
+        <RouteChangeHandler />
         <div id="page-content">
           <Switch>
             <Route
