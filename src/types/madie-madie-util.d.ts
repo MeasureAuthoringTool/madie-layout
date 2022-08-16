@@ -21,6 +21,11 @@ declare module "@madie/madie-util" {
     };
   }
 
+  export interface RouteHandlerState {
+    canTravel: boolean;
+    pendingRoute: string;
+  }
+
   export const measureStore: {
     subscribe: (
       setMeasureState: React.Dispatch<React.SetStateAction<Measure>>
@@ -28,6 +33,15 @@ declare module "@madie/madie-util" {
     updateMeasure: (measure: Measure | null) => void;
     initialState: null;
     state: Measure;
+  };
+
+  export const routeHandlerStore: {
+    subscribe: (
+      setRouteHandlerState: React.Dispatch<React.SetStateAction<object>>
+    ) => import("rxjs").Subscription;
+    updateRouteHandlerState: (routeHandlerState: RouteHandlerState) => void;
+    initialState: RouteHandlerState;
+    state: RouteHandlerState;
   };
 
   export function getServiceConfig(): Promise<ServiceConfig>;

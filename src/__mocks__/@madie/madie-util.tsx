@@ -11,3 +11,10 @@ export const measureStore = {
   subscribe: () => null, // needs to return an object with key subscribe
   unsubscribe: () => null,
 };
+
+export const routeHandlerStore = {
+  initialState: { canTravel: true, pendingRoute: "" },
+  state: { canTravel: true, pendingRoute: "" },
+  subscribe: () => null, // needs to return an object with key subscribe
+  unsubscribe: () => null,
+};
