@@ -21,7 +21,9 @@ export const MeasureSchemaValidator = Yup.object().shape({
       /^[A-Z][a-zA-Z0-9]*$/,
       "Measure Library name must start with an upper case letter, followed by alpha-numeric character(s) and must not contain spaces or other special characters."
     ),
-
+  ecqmTitle: Yup.string()
+    .required("eCQM Abbreviated Title is required.")
+    .max(32, "eCQM Abbreviated Title cannot be more than 32 characters."),
   measurementPeriodStart: Yup.date()
     .required("Measurement period start date is required")
     .typeError("Invalid date format. (mm/dd/yyyy)")
