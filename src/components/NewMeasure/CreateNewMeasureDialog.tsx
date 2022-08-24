@@ -41,6 +41,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
       measureName: "",
       model: "",
       cqlLibraryName: "",
+      ecqmTitle: "",
       active: true,
       measurementPeriodStart: null,
       measurementPeriodEnd: null,
@@ -239,13 +240,16 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
 
         <Box sx={formRowGapped}>
           <TextField
+            placeholder="eCQM Name"
             required
-            disabled
-            placeholder="Title"
-            id="eqcmTitle"
-            data-testid="eqcm-text-field"
             label="ECQM Abbreviated Title"
+            id="ecqmTitle"
+            data-testid="ecqm-text-field"
+            inputProps={{ "data-testid": "ecqm-input" }}
+            helperText={formikErrorHandler("ecqmTitle", true)}
             size="small"
+            error={formik.touched.ecqmTitle && Boolean(formik.errors.ecqmTitle)}
+            {...formik.getFieldProps("ecqmTitle")}
           />
           <Select
             required

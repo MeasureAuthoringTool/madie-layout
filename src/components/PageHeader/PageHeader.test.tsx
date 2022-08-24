@@ -24,6 +24,7 @@ const mockFormikInfo = {
   measureName: mockName,
   model: "QI-Core",
   cqlLibraryName: mockLib,
+  ecqmTitle: "ecqmTitle",
   measurementPeriodStart: "01/05/2022",
   measurementPeriodEnd: "03/07/2022",
   active: true,
@@ -167,7 +168,7 @@ describe("Page Header and Dialogs", () => {
       expect(await findByTestId("measure-model-select")).toBeInTheDocument();
       expect(await findByTestId("model-version-select")).toBeInTheDocument();
       expect(await findByTestId("cql-library-name")).toBeInTheDocument();
-      expect(await findByTestId("eqcm-text-field")).toBeInTheDocument();
+      expect(await findByTestId("ecqm-text-field")).toBeInTheDocument();
       expect(await findByTestId("subject-select")).toBeInTheDocument();
       expect(
         await findByTestId("create-new-measure-save-button")
@@ -239,6 +240,11 @@ describe("Page Header and Dialogs", () => {
       userEvent.type(libraryNode, mockFormikInfo.cqlLibraryName);
       expect(libraryNode.value).toBe(mockFormikInfo.cqlLibraryName);
       Simulate.change(libraryNode);
+
+      const ecqmNode = await getByTestId("ecqm-input");
+      userEvent.type(ecqmNode, mockFormikInfo.ecqmTitle);
+      expect(ecqmNode.value).toBe(mockFormikInfo.ecqmTitle);
+      Simulate.change(ecqmNode);
 
       const modelSelect = await getByTestId("measure-model-select");
       fireEvent.click(modelSelect);
@@ -339,6 +345,11 @@ describe("Page Header and Dialogs", () => {
     expect(libraryNode.value).toBe(mockFormikInfo.cqlLibraryName);
     Simulate.change(libraryNode);
 
+    const ecqmNode = await getByTestId("ecqm-input");
+    userEvent.type(ecqmNode, mockFormikInfo.ecqmTitle);
+    expect(ecqmNode.value).toBe(mockFormikInfo.ecqmTitle);
+    Simulate.change(ecqmNode);
+
     const modelSelect = await getByTestId("measure-model-select");
     fireEvent.click(modelSelect);
     const modelNode = await getByTestId("measure-model-input");
@@ -434,6 +445,11 @@ describe("Page Header and Dialogs", () => {
       userEvent.type(libraryNode, mockFormikInfo.cqlLibraryName);
       expect(libraryNode.value).toBe(mockFormikInfo.cqlLibraryName);
       Simulate.change(libraryNode);
+
+      const ecqmNode = await getByTestId("ecqm-input");
+      userEvent.type(ecqmNode, mockFormikInfo.ecqmTitle);
+      expect(ecqmNode.value).toBe(mockFormikInfo.ecqmTitle);
+      Simulate.change(ecqmNode);
 
       const modelSelect = await getByTestId("measure-model-select");
       fireEvent.click(modelSelect);
