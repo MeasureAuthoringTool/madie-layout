@@ -185,41 +185,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
             {...formik.getFieldProps("measureName")}
           />
         </Box>
-        <Box sx={formRowGapped}>
-          <Select
-            placeHolder={{ name: "Model", value: "" }}
-            required
-            label="Model"
-            id="model-select"
-            inputProps={{ "data-testid": "measure-model-input" }}
-            data-testid="measure-model-select"
-            {...formik.getFieldProps("model")}
-            error={formik.touched.model && Boolean(formik.errors.model)}
-            helperText={formik.touched.model && formik.errors.model}
-            size="small"
-            options={Object.keys(Model).map((modelKey) => {
-              return (
-                <MenuItem
-                  key={modelKey}
-                  value={Model[modelKey]}
-                  data-testid={`measure-model-option-${Model[modelKey]}`}
-                >
-                  {Model[modelKey]}
-                </MenuItem>
-              );
-            })}
-          />
-          <Select
-            placeHolder={{ name: "Model Version", value: "" }}
-            disabled
-            value=""
-            required
-            id="modelVersion"
-            data-testid="model-version-select"
-            label="Model Version"
-            size="small"
-          />
-        </Box>
+
         <Box sx={formRow}>
           <TextField
             placeholder="Enter CQL Library Name"
@@ -251,15 +217,31 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
             error={formik.touched.ecqmTitle && Boolean(formik.errors.ecqmTitle)}
             {...formik.getFieldProps("ecqmTitle")}
           />
+        </Box>
+
+        <Box sx={formRowGapped}>
           <Select
+            placeHolder={{ name: "Model", value: "" }}
             required
-            disabled
-            placeHolder={{ name: "Select", value: "" }}
-            value=""
-            label="Subject"
-            data-testid="subject-select"
-            id="subject-select"
+            label="Model"
+            id="model-select"
+            inputProps={{ "data-testid": "measure-model-input" }}
+            data-testid="measure-model-select"
+            {...formik.getFieldProps("model")}
+            error={formik.touched.model && Boolean(formik.errors.model)}
+            helperText={formik.touched.model && formik.errors.model}
             size="small"
+            options={Object.keys(Model).map((modelKey) => {
+              return (
+                <MenuItem
+                  key={modelKey}
+                  value={Model[modelKey]}
+                  data-testid={`measure-model-option-${Model[modelKey]}`}
+                >
+                  {Model[modelKey]}
+                </MenuItem>
+              );
+            })}
           />
         </Box>
 
