@@ -47,10 +47,8 @@ describe("Measures Create Dialog", () => {
       );
       expect(await findByTestId("measure-name-text-field")).toBeInTheDocument();
       expect(await findByTestId("measure-model-select")).toBeInTheDocument();
-      expect(await findByTestId("model-version-select")).toBeInTheDocument();
       expect(await findByTestId("cql-library-name")).toBeInTheDocument();
       expect(await findByTestId("ecqm-text-field")).toBeInTheDocument();
-      expect(await findByTestId("subject-select")).toBeInTheDocument();
       expect(
         await findByTestId("create-new-measure-save-button")
       ).toBeInTheDocument();

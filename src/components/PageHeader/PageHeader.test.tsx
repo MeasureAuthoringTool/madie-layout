@@ -16,13 +16,14 @@ import userEvent from "@testing-library/user-event";
 import { mockLibraryName, mockMeasureName } from "../NewMeasure/bulkCreate";
 import axios from "axios";
 import PageHeader from "../PageHeader/PageHeader";
+import { Model } from "@madie/madie-models/dist/Model";
 
 const mockLib = mockLibraryName();
 const mockName = mockMeasureName();
 
 const mockFormikInfo = {
   measureName: mockName,
-  model: "QI-Core",
+  model: Model.QICORE.valueOf(),
   cqlLibraryName: mockLib,
   ecqmTitle: "ecqmTitle",
   measurementPeriodStart: "01/05/2022",
@@ -166,10 +167,8 @@ describe("Page Header and Dialogs", () => {
       fireEvent.click(dialogButton);
       expect(await findByTestId("measure-name-text-field")).toBeInTheDocument();
       expect(await findByTestId("measure-model-select")).toBeInTheDocument();
-      expect(await findByTestId("model-version-select")).toBeInTheDocument();
       expect(await findByTestId("cql-library-name")).toBeInTheDocument();
       expect(await findByTestId("ecqm-text-field")).toBeInTheDocument();
-      expect(await findByTestId("subject-select")).toBeInTheDocument();
       expect(
         await findByTestId("create-new-measure-save-button")
       ).toBeInTheDocument();
