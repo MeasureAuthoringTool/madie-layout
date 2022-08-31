@@ -41,6 +41,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
       measureName: "",
       model: "",
       cqlLibraryName: "",
+      ecqmTitle: "",
       active: true,
       measurementPeriodStart: null,
       measurementPeriodEnd: null,
@@ -184,6 +185,40 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
             {...formik.getFieldProps("measureName")}
           />
         </Box>
+
+        <Box sx={formRow}>
+          <TextField
+            placeholder="Enter CQL Library Name"
+            required
+            label="Measure CQL Library Name"
+            id="cqlLibraryName"
+            data-testid="cql-library-name"
+            inputProps={{ "data-testid": "cql-library-name-input" }}
+            helperText={formikErrorHandler("cqlLibraryName", true)}
+            size="small"
+            error={
+              formik.touched.cqlLibraryName &&
+              Boolean(formik.errors.cqlLibraryName)
+            }
+            {...formik.getFieldProps("cqlLibraryName")}
+          />
+        </Box>
+
+        <Box sx={formRowGapped}>
+          <TextField
+            placeholder="eCQM Name"
+            required
+            label="ECQM Abbreviated Title"
+            id="ecqmTitle"
+            data-testid="ecqm-text-field"
+            inputProps={{ "data-testid": "ecqm-input" }}
+            helperText={formikErrorHandler("ecqmTitle", true)}
+            size="small"
+            error={formik.touched.ecqmTitle && Boolean(formik.errors.ecqmTitle)}
+            {...formik.getFieldProps("ecqmTitle")}
+          />
+        </Box>
+
         <Box sx={formRowGapped}>
           <Select
             placeHolder={{ name: "Model", value: "" }}
@@ -207,55 +242,6 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
                 </MenuItem>
               );
             })}
-          />
-          <Select
-            placeHolder={{ name: "Model Version", value: "" }}
-            disabled
-            value=""
-            required
-            id="modelVersion"
-            data-testid="model-version-select"
-            label="Model Version"
-            size="small"
-          />
-        </Box>
-        <Box sx={formRow}>
-          <TextField
-            placeholder="Enter CQL Library Name"
-            required
-            label="Measure CQL Library Name"
-            id="cqlLibraryName"
-            data-testid="cql-library-name"
-            inputProps={{ "data-testid": "cql-library-name-input" }}
-            helperText={formikErrorHandler("cqlLibraryName", true)}
-            size="small"
-            error={
-              formik.touched.cqlLibraryName &&
-              Boolean(formik.errors.cqlLibraryName)
-            }
-            {...formik.getFieldProps("cqlLibraryName")}
-          />
-        </Box>
-
-        <Box sx={formRowGapped}>
-          <TextField
-            required
-            disabled
-            placeholder="Title"
-            id="eqcmTitle"
-            data-testid="eqcm-text-field"
-            label="ECQM Abbreviated Title"
-            size="small"
-          />
-          <Select
-            required
-            disabled
-            placeHolder={{ name: "Select", value: "" }}
-            value=""
-            label="Subject"
-            data-testid="subject-select"
-            id="subject-select"
-            size="small"
           />
         </Box>
 

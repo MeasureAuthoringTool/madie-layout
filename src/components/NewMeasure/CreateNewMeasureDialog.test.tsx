@@ -29,6 +29,7 @@ const formikInfo = {
   measureName: "myMeasure",
   model: "QI-Core",
   cqlLibraryName: "myLibrary",
+  ecqmTitle: "ecqmTitle",
   measureScoring: "Cohort",
   measurementPeriodStart: "01/05/2022",
   measurementPeriodEnd: "03/07/2022",
@@ -46,10 +47,8 @@ describe("Measures Create Dialog", () => {
       );
       expect(await findByTestId("measure-name-text-field")).toBeInTheDocument();
       expect(await findByTestId("measure-model-select")).toBeInTheDocument();
-      expect(await findByTestId("model-version-select")).toBeInTheDocument();
       expect(await findByTestId("cql-library-name")).toBeInTheDocument();
-      expect(await findByTestId("eqcm-text-field")).toBeInTheDocument();
-      expect(await findByTestId("subject-select")).toBeInTheDocument();
+      expect(await findByTestId("ecqm-text-field")).toBeInTheDocument();
       expect(
         await findByTestId("create-new-measure-save-button")
       ).toBeInTheDocument();
@@ -95,6 +94,11 @@ describe("Measures Create Dialog", () => {
       userEvent.type(libraryNode, formikInfo.cqlLibraryName);
       expect(libraryNode.value).toBe(formikInfo.cqlLibraryName);
       Simulate.change(libraryNode);
+
+      const ecqmNode = await getByTestId("ecqm-input");
+      userEvent.type(ecqmNode, formikInfo.ecqmTitle);
+      expect(ecqmNode.value).toBe(formikInfo.ecqmTitle);
+      Simulate.change(ecqmNode);
 
       const modelSelect = await getByTestId("measure-model-select");
       fireEvent.click(modelSelect);
