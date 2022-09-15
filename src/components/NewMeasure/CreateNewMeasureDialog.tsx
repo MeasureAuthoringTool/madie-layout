@@ -57,7 +57,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
     const config: ServiceConfig = await getServiceConfig();
 
     measure.measureSetId = uuidv4();
-    measure.version = uuidv4();
+    measure.versionId = uuidv4();
     await axios
       .post<Measure>(config?.measureService?.baseUrl + "/measure", measure, {
         headers: {
