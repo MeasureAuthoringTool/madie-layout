@@ -21,6 +21,7 @@ import { useFormik } from "formik";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import DesktopDatePicker from "@mui/lab/DesktopDatePicker";
 import DateAdapter from "@mui/lab/AdapterDateFns";
+import { v4 as uuidv4 } from "uuid";
 
 interface Toast {
   toastOpen: boolean;
@@ -55,6 +56,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
   async function createMeasure(measure: Measure) {
     const config: ServiceConfig = await getServiceConfig();
 
+    measure.versionId = uuidv4();
     await axios
       .post<Measure>(config?.measureService?.baseUrl + "/measure", measure, {
         headers: {
