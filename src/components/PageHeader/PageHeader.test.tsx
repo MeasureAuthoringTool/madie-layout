@@ -33,7 +33,7 @@ const mockFormikInfo = {
 const mockLibraryInfo = {
   id: "randomstring",
   cqlLibraryName: "H1Z1",
-  model: "QI-Core",
+  model: Model.QICORE.valueOf(),
   version: "0.0.000",
   draft: true,
   cqlErrors: true,
