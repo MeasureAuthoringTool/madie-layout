@@ -4,7 +4,7 @@ import { useLocalStorage } from "../../custom-hooks/useLocalStorage";
 import AddIcon from "@mui/icons-material/Add";
 import { Fade, Breadcrumbs } from "@mui/material";
 import CreateNewMeasureDialog from "../NewMeasure/CreateNewMeasureDialog";
-import { measureStore } from "@madie/madie-util";
+import { measureStore, cqlLibraryStore } from "@madie/madie-util";
 import "twin.macro";
 import "styled-components/macro";
 import "./pageHeader.scss";
@@ -12,6 +12,13 @@ import "./pageHeader.scss";
 const PageHeader = () => {
   const { pathname } = useLocation();
   const [createOpen, setCreateOpen] = useState<boolean>(false);
+  const [libraryState, setLibraryState] = useState<any>(cqlLibraryStore.state);
+  useEffect(() => {
+    const subscription = cqlLibraryStore.subscribe(setLibraryState);
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const [measureState, setMeasureState] = useState<any>(measureStore.state);
   useEffect(() => {
@@ -20,6 +27,7 @@ const PageHeader = () => {
       subscription.unsubscribe();
     };
   }, []);
+
   const openCreate = () => {
     setCreateOpen(true);
   };
@@ -33,13 +41,18 @@ const PageHeader = () => {
   const readablePeriodEnd = measureState
     ? new Date(measureState.measurementPeriodEnd).toLocaleDateString()
     : null;
-
+  const readableLibraryStartDate = libraryState
+    ? new Date(libraryState.createdAt).toLocaleDateString()
+    : null;
+  const pageHeaderClass = libraryState?.id
+    ? "page-header details"
+    : "page-header";
   return (
-    <div className="page-header">
+    <div className={pageHeaderClass}>
       {/* state 1 */}
       {pathname.includes("edit") && pathname.includes("measures") && (
         <Fade in={measureState?.measureName !== undefined}>
-          <div className="measure-details">
+          <div className="details">
             <div>
               <Breadcrumbs aria-label="measures">
                 <Link tw="text-white hover:text-white" to="/measures">
@@ -49,7 +62,7 @@ const PageHeader = () => {
               <span className="division">/</span>
             </div>
             <div>
-              <p className="measure-name" tw="text-3xl py-0 mb-4">
+              <p className="name" tw="text-3xl py-0 mb-4">
                 {measureState?.measureName}
               </p>
             </div>
@@ -104,7 +117,48 @@ const PageHeader = () => {
           </div>
         </div>
       )}
-      {pathname.includes("cql-libraries") && (
+      {/* edit library */}
+      {pathname.includes("edit") && pathname.includes("cql-libraries") && (
+        <Fade in={libraryState?.cqlLibraryName !== undefined}>
+          <div className="details">
+            <div>
+              <Breadcrumbs aria-label="Libraries">
+                <Link tw="text-white hover:text-white" to="/cql-libraries">
+                  Libraries
+                </Link>
+                <Link
+                  tw="text-white hover:text-white"
+                  to={`/cql-libraries/${libraryState?.id}/edit/details`}
+                >
+                  Details
+                </Link>
+              </Breadcrumbs>
+            </div>
+            <div>
+              <p className="name" tw="text-3xl py-0 mb-0">
+                {libraryState?.cqlLibraryName}
+              </p>
+            </div>
+            <div>
+              {[libraryState?.model, readableLibraryStartDate].map(
+                (val, key) => {
+                  if (val)
+                    return (
+                      <p
+                        data-testid={`info-${val}-${key}`}
+                        key={`info-${val}-${key}`}
+                        tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(221,221,221, 0.5)] leading-none first:pl-0 first:ml-0 first:border-0"
+                      >
+                        {val}
+                      </p>
+                    );
+                }
+              )}
+            </div>
+          </div>
+        </Fade>
+      )}
+      {pathname.includes("cql-libraries") && !pathname.includes("edit") && (
         <div className="measures">
           <div>
             <div className="left-col">
