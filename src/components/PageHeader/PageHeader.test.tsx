@@ -85,7 +85,7 @@ let postData: object = { status: 201 };
 let getData: object = { status: 200 };
 mockedAxios.post.mockResolvedValueOnce(postData);
 mockedAxios.get.mockResolvedValueOnce(getData);
-const { findByTestId, queryByTestId, getByTestId } = screen;
+const { findByTestId, queryByText, queryByTestId, getByTestId } = screen;
 
 describe("Page Header and Dialogs", () => {
   afterEach(() => {
@@ -111,6 +111,29 @@ describe("Page Header and Dialogs", () => {
       );
       const dialogButton = await findByTestId("create-new-cql-library-button");
       expect(dialogButton).toBeTruthy();
+    });
+  });
+
+  test("Navigating to the cql-libraries/edit page presents us with a library specific header", async () => {
+    await act(async () => {
+      render(
+        <MemoryRouter
+          initialEntries={[
+            {
+              pathname: "/cql-libraries/randomstring/edit/details",
+              search: "",
+              hash: "",
+              state: undefined,
+              key: "1fewtg",
+            },
+          ]}
+        >
+          <PageHeader />
+        </MemoryRouter>
+      );
+      await waitFor(() => {
+        expect(queryByText("QI-Core v4.1.1")).toBeInTheDocument();
+      });
     });
   });
 
