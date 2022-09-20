@@ -1,6 +1,6 @@
 declare module "@madie/madie-util" {
   import { LifeCycleFn } from "single-spa";
-  import { Measure } from "@madie/madie-models/dist/Measure";
+  import { Measure, CqlLibrary } from "@madie/madie-models/";
 
   export interface OktaConfig {
     baseUrl: string;
@@ -25,6 +25,15 @@ declare module "@madie/madie-util" {
     canTravel: boolean;
     pendingRoute: string;
   }
+
+  export const cqlLibraryStore: {
+    subscribe: (
+      setLibrary: React.Dispatch<React.SetStateAction<CqlLibrary>>
+    ) => import("rxjs").Subscription;
+    updateLibrary: (measure: CqlLibrary | null) => void;
+    initialState: null;
+    state: CqlLibrary;
+  };
 
   export const measureStore: {
     subscribe: (
