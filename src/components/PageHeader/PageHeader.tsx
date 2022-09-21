@@ -136,8 +136,9 @@ const PageHeader = () => {
             </div>
             <div>
               <p className="name" tw="text-3xl py-0 mb-0">
-                {libraryState?.cqlLibraryName}
+                {`${libraryState?.cqlLibraryName} v${libraryState?.version}`}
               </p>
+              <div className="draft-bubble">Draft</div>
             </div>
             <div>
               {[libraryState?.model, readableLibraryStartDate].map(
