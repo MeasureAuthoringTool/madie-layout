@@ -30,6 +30,24 @@ const mockFormikInfo = {
   measurementPeriodEnd: "03/07/2022",
   active: true,
 };
+const mockLibraryInfo = {
+  id: "randomstring",
+  cqlLibraryName: "H1Z1",
+  model: Model.QICORE.valueOf(),
+  version: "0.0.000",
+  draft: true,
+  cqlErrors: true,
+  cql: 'library H1Z1 version \'15.0.100\'\nusing QICore version \'4.1.0\'\nparameter "Measurement Period" Interval<DateTime>\ncontext Patient\ndefine "Definition 1":\n  true\ndefine "Definition 2":\n  true\ndefine "Definition 3":\n  false asdfasdfa sdfasd f',
+  elmJson: null,
+  elmXml: null,
+  createdAt: "2022-08-30T00:38:53.304Z",
+  createdBy: "test",
+  lastModifiedAt: "2022-08-30T00:40:51.496Z",
+  lastModifiedBy: "test",
+  publisher: null,
+  description: null,
+  experimental: false,
+};
 
 jest.mock("@madie/madie-util", () => ({
   getServiceConfig: () => ({
@@ -46,6 +64,15 @@ jest.mock("@madie/madie-util", () => ({
     },
     unsubscribe: () => null,
   },
+  cqlLibraryStore: {
+    state: null,
+    initialState: null,
+    subscribe: (set) => {
+      set(mockLibraryInfo);
+      return { unsubscribe: () => null };
+    },
+    unsubscribe: () => null,
+  },
   useOktaTokens: () => ({
     getAccessToken: () => "test.jwt",
     getUserName: () => "nosec@example.com", //#nosec
@@ -58,7 +85,7 @@ let postData: object = { status: 201 };
 let getData: object = { status: 200 };
 mockedAxios.post.mockResolvedValueOnce(postData);
 mockedAxios.get.mockResolvedValueOnce(getData);
-const { findByTestId, queryByTestId, getByTestId } = screen;
+const { findByTestId, queryByText, queryByTestId, getByTestId } = screen;
 
 describe("Page Header and Dialogs", () => {
   afterEach(() => {
@@ -84,6 +111,29 @@ describe("Page Header and Dialogs", () => {
       );
       const dialogButton = await findByTestId("create-new-cql-library-button");
       expect(dialogButton).toBeTruthy();
+    });
+  });
+
+  test("Navigating to the cql-libraries/edit page presents us with a library specific header", async () => {
+    await act(async () => {
+      render(
+        <MemoryRouter
+          initialEntries={[
+            {
+              pathname: "/cql-libraries/randomstring/edit/details",
+              search: "",
+              hash: "",
+              state: undefined,
+              key: "1fewtg",
+            },
+          ]}
+        >
+          <PageHeader />
+        </MemoryRouter>
+      );
+      await waitFor(() => {
+        expect(queryByText("QI-Core v4.1.1")).toBeInTheDocument();
+      });
     });
   });
 
