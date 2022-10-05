@@ -48,7 +48,7 @@ const PageHeader = () => {
     ? "page-header details"
     : "page-header";
   return (
-    <div className={pageHeaderClass}>
+    <div className={pageHeaderClass} id="page-header">
       {/* state 1 */}
       {pathname.includes("edit") && pathname.includes("measures") && (
         <Fade in={measureState?.measureName !== undefined}>

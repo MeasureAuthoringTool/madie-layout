@@ -46,6 +46,9 @@ const MainNavBar = () => {
 
   return (
     <nav>
+      <a href="#page-header" className="skip-nav-link">
+        Skip to main content
+      </a>
       <div className="inner">
         <div>
           <NavLink to="/measures" className="logo">
