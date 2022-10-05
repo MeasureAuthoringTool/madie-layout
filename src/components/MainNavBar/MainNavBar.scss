@@ -4,6 +4,22 @@
   align-self: center;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+.skip-nav-link {
+  position: absolute;
+  transform: translateY(-100%);
+}
+
+.skip-nav-link:focus {
+  position: relative;
+  padding: 5px 10px;
+  color: #0073c8;
+}
+
+
 .inner {
   display: flex;
   flex-wrap: wrap;
