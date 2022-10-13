@@ -614,6 +614,13 @@ describe("Page Header and Dialogs", () => {
         <PageHeader />
       </MemoryRouter>
     );
-    expect(queryByTestId("info-Active-0")).toBeInTheDocument();
+    screen.debug();
+    expect(queryByTestId("info-Active-0")).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(queryByTestId("info-QI-Core v4.1.1-0")).toBeInTheDocument()
+    );
+    await waitFor(() =>
+      expect(queryByTestId("info-1/5/2022 - 3/7/2022-1")).toBeInTheDocument()
+    );
   });
 });

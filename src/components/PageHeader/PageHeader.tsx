@@ -68,7 +68,6 @@ const PageHeader = () => {
             </div>
             <div>
               {[
-                "Active",
                 measureState?.model,
                 // measureState?.version, // not yet implemented
                 readablePeriodStart + " - " + readablePeriodEnd,
@@ -80,7 +79,6 @@ const PageHeader = () => {
                       key={`info-${val}-${key}`}
                       tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(221,221,221, 0.5)] leading-none first:pl-0 first:ml-0 first:border-0"
                     >
-                      {val === "Active" && <div className="active">&nbsp;</div>}
                       {val}
                     </p>
                   );
