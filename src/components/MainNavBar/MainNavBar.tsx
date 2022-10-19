@@ -49,7 +49,7 @@ const MainNavBar = () => {
       <a href="#page-header" className="skip-nav-link">
         Skip to main content
       </a>
-      <header aria-label="Site header" className="inner">
+      <header role="banner" aria-label="Site header" className="inner">
         <div>
           <NavLink to="/measures" className="logo">
             <img src={logo} alt="MADiE Logo" id="logo" />
