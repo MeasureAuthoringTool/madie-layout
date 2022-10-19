@@ -49,14 +49,14 @@ const MainNavBar = () => {
       <a href="#page-header" className="skip-nav-link">
         Skip to main content
       </a>
-      <div className="inner">
+      <header role="banner" aria-label="Site header" className="inner">
         <div>
           <NavLink to="/measures" className="logo">
             <img src={logo} alt="MADiE Logo" id="logo" />
             <div className="divider" />
-            <h2 className="header-info">
+            <h1 className="header-info">
               Measure Authoring Development <br /> Integrated Environment
-            </h2>
+            </h1>
           </NavLink>
         </div>
         <DropDown>
@@ -117,7 +117,7 @@ const MainNavBar = () => {
             )}
           </DropMenu>
         </DropDown>
-      </div>
+      </header>
       <UMLSDialog
         open={dOpen}
         handleClose={() => setDOpen(false)}
