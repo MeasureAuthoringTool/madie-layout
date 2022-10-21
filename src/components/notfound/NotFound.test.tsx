@@ -5,6 +5,10 @@ import { MemoryRouter } from "react-router";
 import { Router } from "react-router-dom";
 import { createMemoryHistory } from "history";
 
+jest.mock("@madie/madie-util", () => ({
+  useDocumentTitle: jest.fn(),
+}));
+
 describe("NotFound component", () => {
   it("should render NotFound component", async () => {
     const { getByTestId, getByText } = render(
