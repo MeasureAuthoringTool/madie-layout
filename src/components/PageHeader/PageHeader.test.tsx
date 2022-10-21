@@ -614,7 +614,6 @@ describe("Page Header and Dialogs", () => {
         <PageHeader />
       </MemoryRouter>
     );
-    screen.debug();
     expect(queryByTestId("info-Active-0")).not.toBeInTheDocument();
     await waitFor(() =>
       expect(queryByTestId("info-QI-Core v4.1.1-0")).toBeInTheDocument()
