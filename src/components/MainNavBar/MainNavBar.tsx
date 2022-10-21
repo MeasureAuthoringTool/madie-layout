@@ -18,6 +18,7 @@ const MainNavBar = () => {
   const [toastType, setToastType] = useState<string>("danger");
   const terminologyServiceApi = useTerminologyServiceApi();
   const [isLoggedInToUMLS, setIsLoggedInToUMLS] = useState<boolean>(undefined);
+  const [headerText, setHeaderText] = useState(true);
 
   const { authState } = useOktaAuth();
   useEffect(() => {
@@ -44,22 +45,46 @@ const MainNavBar = () => {
     setToastOpen(open);
   };
 
+  let resizeWindow = () => {
+    const headerWidth = document.getElementById("madie-header").clientWidth;
+    if (headerWidth > 1256) {
+      setHeaderText(true);
+    } else {
+      setHeaderText(false);
+    }
+  };
+  useEffect(() => {
+    resizeWindow();
+    window.addEventListener("resize", resizeWindow);
+    return () => window.removeEventListener("resize", resizeWindow);
+  }, []);
+
   return (
     <nav>
-      <a href="#page-header" className="skip-nav-link">
-        Skip to main content
-      </a>
-      <header role="banner" aria-label="Site header" className="inner">
-        <div>
+      <header
+        role="banner"
+        aria-label="Site header"
+        className="inner"
+        id="madie-header"
+      >
+        <div id="logo_div">
           <NavLink to="/measures" className="logo">
-            <img src={logo} alt="MADiE Logo" id="logo" />
-            <div className="divider" />
-            <h1 className="header-info">
-              Measure Authoring Development <br /> Integrated Environment
-            </h1>
+            <img
+              src={logo}
+              alt="MADiE Measure Authoring Development Integrated Environment logo"
+              id="logo"
+            />
+            {headerText && (
+              <>
+                <div className="divider" />
+                <h1 className="header-info">
+                  Measure Authoring Development <br /> Integrated Environment
+                </h1>
+              </>
+            )}
           </NavLink>
         </div>
-        <DropDown>
+        <DropDown id="dropdown_div">
           <DropMenu>
             {authState?.isAuthenticated && (
               <>
