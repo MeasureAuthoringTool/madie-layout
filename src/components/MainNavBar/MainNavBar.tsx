@@ -47,9 +47,6 @@ const MainNavBar = () => {
 
   let resizeWindow = () => {
     const headerWidth = document.getElementById("madie-header").clientWidth;
-    const logoDivWidth = document.getElementById("logo_div").clientWidth;
-    const dropdownDivWidth =
-      document.getElementById("dropdown_div").clientWidth;
     if (headerWidth > 1256) {
       setHeaderText(true);
     } else {
@@ -64,9 +61,6 @@ const MainNavBar = () => {
 
   return (
     <nav>
-      {/* <a href="#page-header" className="skip-nav-link">
-        Skip to main content
-      </a> */}
       <header
         role="banner"
         aria-label="Site header"
