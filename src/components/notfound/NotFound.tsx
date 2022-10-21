@@ -5,7 +5,7 @@ import { useDocumentTitle } from "@madie/madie-util";
 const GoHomeLink = tw.button`text-blue-500 hover:text-blue-900`;
 
 const NotFound = () => {
-  useDocumentTitle("MADiE Help");
+  useDocumentTitle("MADiE Page not found");
   let history = useHistory();
 
   function handleClick() {
