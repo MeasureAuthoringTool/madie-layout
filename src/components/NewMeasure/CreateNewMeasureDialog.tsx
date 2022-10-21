@@ -135,11 +135,13 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
         onClick: onClose,
         cancelText: "Cancel",
         "data-testid": "create-new-measure-cancel-button",
+        "aria-label": "create-new-measure-cancel-button",
       }}
       continueButtonProps={{
         variant: "cyan",
         type: "submit",
         "data-testid": "create-new-measure-save-button",
+        "aria-label": "create-new-measure-save-button",
         disabled: !(formik.isValid && formik.dirty),
         continueText: "Continue",
         continueIcon: (
@@ -178,7 +180,11 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
             required
             label="Measure Name"
             id="measureName"
-            inputProps={{ "data-testid": "measure-name-input" }}
+            inputProps={{
+              "data-testid": "measure-name-input",
+              "aria-describedby": "measureName-helper-text",
+              required: true,
+            }}
             helperText={formikErrorHandler("measureName", true)}
             data-testid="measure-name-text-field"
             size="small"
@@ -196,7 +202,11 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
             label="Measure CQL Library Name"
             id="cqlLibraryName"
             data-testid="cql-library-name"
-            inputProps={{ "data-testid": "cql-library-name-input" }}
+            inputProps={{
+              "data-testid": "cql-library-name-input",
+              "aria-describedby": "cqlLibraryName-helper-text",
+              required: true,
+            }}
             helperText={formikErrorHandler("cqlLibraryName", true)}
             size="small"
             error={
@@ -214,7 +224,11 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
             label="ECQM Abbreviated Title"
             id="ecqmTitle"
             data-testid="ecqm-text-field"
-            inputProps={{ "data-testid": "ecqm-input" }}
+            inputProps={{
+              "data-testid": "ecqm-input",
+              "aria-describedby": "ecqmTitle-helper-text",
+              required: true,
+            }}
             helperText={formikErrorHandler("ecqmTitle", true)}
             size="small"
             error={formik.touched.ecqmTitle && Boolean(formik.errors.ecqmTitle)}
@@ -228,7 +242,12 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
             required
             label="Model"
             id="model-select"
-            inputProps={{ "data-testid": "measure-model-input" }}
+            inputProps={{
+              "data-testid": "measure-model-input",
+              id: "model-select",
+              "aria-describedby": "model-select-helper-text",
+              required: true,
+            }}
             data-testid="measure-model-select"
             {...formik.getFieldProps("model")}
             error={formik.touched.model && Boolean(formik.errors.model)}
@@ -264,10 +283,15 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
                 );
                 return (
                   <TextField
+                    id="create-measure-period-start"
                     {...formikFieldProps}
                     {...params}
                     required
                     data-testid="measurement-period-start"
+                    error={
+                      formik.touched.measurementPeriodStart &&
+                      Boolean(formik.errors.measurementPeriodStart)
+                    }
                     helperText={formikErrorHandler(
                       "measurementPeriodStart",
                       true
@@ -292,10 +316,15 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
                 );
                 return (
                   <TextField
+                    id="create-measure-period-end"
                     {...formikFieldProps}
                     {...params}
                     required
                     data-testid="measurement-period-end"
+                    error={
+                      formik.touched.measurementPeriodEnd &&
+                      Boolean(formik.errors.measurementPeriodEnd)
+                    }
                     helperText={formikErrorHandler(
                       "measurementPeriodEnd",
                       true
