@@ -276,8 +276,6 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
               value={formik.values.measurementPeriodStart}
               onChange={(startDate) => {
                 formik.setFieldValue("measurementPeriodStart", startDate);
-                formik.getFieldProps("measurementPeriodStart").value =
-                  startDate;
               }}
               renderInput={(params) => {
                 const { onChange, ...formikFieldProps } = formik.getFieldProps(
