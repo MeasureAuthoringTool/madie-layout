@@ -9,6 +9,10 @@ jest.mock("@okta/okta-react", () => ({
   useOktaAuth: jest.fn(),
 }));
 
+jest.mock("@madie/madie-util", () => ({
+  useDocumentTitle: jest.fn(),
+}));
+
 const mockLoginLogger = jest.fn((args) => {
   Promise.resolve("logged");
 });
