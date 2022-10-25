@@ -3,8 +3,10 @@ import { Redirect } from "react-router-dom";
 import { LoginWidget } from "@madie/madie-auth";
 import { useOktaAuth } from "@okta/okta-react";
 import { loginLogger } from "../../custom-hooks/customLog";
+import { useDocumentTitle } from "@madie/madie-util";
 
 function Login({ config }) {
+  useDocumentTitle("MADiE Login");
   const { oktaAuth, authState } = useOktaAuth();
 
   const loginConfig = {
