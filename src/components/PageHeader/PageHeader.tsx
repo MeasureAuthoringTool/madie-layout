@@ -62,9 +62,7 @@ const PageHeader = () => {
               <span className="division">/</span>
             </div>
             <div>
-              <p className="name" tw="text-3xl py-0 mb-4">
-                {measureState?.measureName}
-              </p>
+              <h1 tw="text-2xl text-white mb-3">{measureState?.measureName}</h1>
             </div>
             <div>
               {[
@@ -132,10 +130,8 @@ const PageHeader = () => {
                 </Link>
               </Breadcrumbs>
             </div>
-            <div>
-              <p className="name" tw="text-3xl py-0 mb-0">
-                {`${libraryState?.cqlLibraryName} v${libraryState?.version}`}
-              </p>
+            <div tw="py-4">
+              <h2 tw="text-2xl text-white mb-0">{`${libraryState?.cqlLibraryName} v${libraryState?.version}`}</h2>
               <div className="draft-bubble">Draft</div>
             </div>
             <div>
