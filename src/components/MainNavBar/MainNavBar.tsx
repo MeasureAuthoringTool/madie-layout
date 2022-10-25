@@ -61,6 +61,9 @@ const MainNavBar = () => {
 
   return (
     <nav>
+      <a href="#page-header" className="skip-nav-link">
+        Skip to main content
+      </a>
       <header
         role="banner"
         aria-label="Site header"
