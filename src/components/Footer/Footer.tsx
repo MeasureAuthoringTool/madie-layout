@@ -16,7 +16,7 @@ const Footer = () => {
     ),
     qppLogo: (
       <img
-        alt="Maddie logo"
+        alt="MADiE Measure Authoring Development Integrated Environment logo"
         className="madie-logo"
         data-testid="custom-madie-logo"
         src={madieLogoPath}
