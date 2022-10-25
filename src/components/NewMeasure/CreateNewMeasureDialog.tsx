@@ -296,6 +296,12 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
                       "measurementPeriodStart",
                       true
                     )}
+                    InputProps={{
+                      "data-testid": "measurement-period-start-input",
+                      "aria-describedby":
+                        "create-measure-period-start-helper-text",
+                      required: true,
+                    }}
                   />
                 );
               }}
@@ -329,6 +335,12 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
                       "measurementPeriodEnd",
                       true
                     )}
+                    InputProps={{
+                      "data-testid": "measurement-period-end-input",
+                      "aria-describedby":
+                        "create-measure-period-end-helper-text",
+                      required: true,
+                    }}
                   />
                 );
               }}
