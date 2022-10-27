@@ -110,6 +110,10 @@ html {
         font-weight: 400;
         text-decoration: none !important;
 
+        &:not(.active)::after {
+          content: none !important;
+        }
+
         &:hover {
           color: #209fa6;
         }

@@ -1,8 +1,7 @@
 import React from "react";
-import { Footer as MadieFooter } from "@madie/madie-design-system/dist/react";
-import "../../styles/FooterStyles.scss";
-import hhsLogoPath from "../../assets/images/hhs-logo-black.svg";
-import madieLogoPath from "../../assets/images/measure_authoring_logo.svg";
+import hhsLogoPath from "../../assets/images/hhs-logo-white.png";
+import madieLogoPath from "../../assets/images/madie-footer-logo.svg";
+import "./FooterStyles.scss";
 
 const Footer = () => {
   const assets = {
@@ -14,7 +13,7 @@ const Footer = () => {
         src={hhsLogoPath}
       />
     ),
-    qppLogo: (
+    madieLogo: (
       <img
         alt="MADiE Measure Authoring Development Integrated Environment logo"
         className="madie-logo"
@@ -23,10 +22,95 @@ const Footer = () => {
       />
     ),
   };
+
   return (
-    <section className="footer-section">
-      <MadieFooter isNewFooter={true} assets={assets} />
-    </section>
+    <footer aria-label="Site footer" id="site-footer">
+      <div className="footer-nav-links">
+        <ul>
+          <li className="nav-link">
+            <a
+              href="mailto:semanticbits-madie-help@icf.com"
+              aria-label="Contact Us"
+            >
+              Contact Us
+            </a>
+          </li>
+          <li className="nav-link">
+            <a
+              href="https://www.emeasuretool.cms.gov/madie-mvp"
+              target="_blank"
+              aria-label="User Guide"
+            >
+              User Guide
+            </a>
+          </li>
+        </ul>
+        <ul>
+          <li className="nav-link">
+            <a
+              href="https://www.cms.gov/center/freedom-of-information-act-center.html"
+              aria-label="Freedom of Information Act"
+              target="_blank"
+            >
+              Freedom of Information Act
+            </a>
+          </li>
+          <li className="nav-link">
+            <a
+              href="https://www.cms.gov/About-CMS/Agency-Information/Aboutwebsite/Policiesforaccessibility"
+              aria-label="Accessibility Policy"
+              target="_blank"
+            >
+              Accessibility Policy
+            </a>
+          </li>
+          <li className="nav-link">
+            <a
+              href="https://www.cms.gov/privacy"
+              aria-label="Privacy Policy"
+              target="_blank"
+            >
+              Privacy Policy
+            </a>
+          </li>
+          <li className="nav-link">
+            <a
+              href="https://www.hhs.gov/web/governance/digital-strategy/it-policy-archive/hhs-rules-of-behavior-for-the-use-of-hhs-information-and-it-resources-policy.html"
+              aria-label="Rules of Behavior"
+              target="_blank"
+            >
+              Rules of Behavior
+            </a>
+          </li>
+          <li className="nav-link">
+            <a
+              href="https://harp.cms.gov/login/terms-of-use"
+              aria-label="Terms of Use"
+              target="_blank"
+            >
+              Terms of Use
+            </a>
+          </li>
+          <li className="nav-link">
+            <a href="https://www.cms.gov/" aria-label="CMS.gov" target="_blank">
+              CMS.gov
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div className="footer-logos">
+        <div className="madie-logo">{assets.madieLogo}</div>
+        <div className="hhs-logo">
+          {assets.hhsLogo}
+          <p>
+            A federal government website managed and paid for by the U.S.
+            <br />
+            Centers for Medicare &amp; Medicaid Services. 7500 Security <br />
+            Boulevard, Baltimore MD 21244
+          </p>
+        </div>
+      </div>
+    </footer>
   );
 };
 
