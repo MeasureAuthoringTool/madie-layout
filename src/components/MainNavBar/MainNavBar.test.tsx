@@ -217,10 +217,10 @@ describe("UMLS Connection Dialog", () => {
       const librariesLI = await findByTestId("main-nav-bar-cql-library");
       expect(librariesLI).toHaveClass("active");
 
-      const help = await findByTestId("main-nav-bar-help");
-      fireEvent.click(help);
-      const helpLI = await findByTestId("main-nav-bar-help");
-      expect(helpLI).toHaveClass("active");
+      // const help = await findByTestId("main-nav-bar-help");
+      // fireEvent.click(help);
+      // const helpLI = await findByTestId("main-nav-bar-help");
+      // expect(helpLI).toHaveClass("active");
     });
   });
 

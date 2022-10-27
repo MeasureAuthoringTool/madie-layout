@@ -119,8 +119,11 @@ const MainNavBar = () => {
                   <NavLink
                     className="nav-link"
                     activeClassName="active"
-                    to="/help"
-                    aria-label="Release Notes"
+                    to={{
+                      pathname: "https://www.emeasuretool.cms.gov/madie-mvp",
+                    }}
+                    target="_blank"
+                    aria-label="Help"
                     data-testid="main-nav-bar-help"
                   >
                     Help
