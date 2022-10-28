@@ -231,7 +231,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
         <TextField
           placeholder="eCQM Name"
           required
-          label="ECQM Abbreviated Title"
+          label="eCQM Abbreviated Title"
           id="ecqmTitle"
           data-testid="ecqm-text-field"
           inputProps={{
