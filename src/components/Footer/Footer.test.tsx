@@ -3,9 +3,11 @@ import * as React from "react";
 import Footer from "./Footer";
 
 describe("Footer component", () => {
-  it("should display custom logos in footer", async () => {
+  it("should display custom madie and hhs logos in footer", async () => {
     const { getByTestId } = render(<Footer />);
-    const customHHSLogo = getByTestId("custom-madie-logo");
+    const customMadieLogo = getByTestId("custom-madie-logo");
+    const customHHSLogo = getByTestId("custom-hhs-logo");
     expect(customHHSLogo).toBeTruthy();
+    expect(customMadieLogo).toBeTruthy();
   });
 });

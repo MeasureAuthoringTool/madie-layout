@@ -61,6 +61,9 @@ const MainNavBar = () => {
 
   return (
     <nav>
+      <a href="#page-header" className="skip-nav-link">
+        Skip to main content
+      </a>
       <header
         role="banner"
         aria-label="Site header"
@@ -116,8 +119,11 @@ const MainNavBar = () => {
                   <NavLink
                     className="nav-link"
                     activeClassName="active"
-                    to="/help"
-                    aria-label="Release Notes"
+                    to={{
+                      pathname: "https://www.emeasuretool.cms.gov/madie-mvp",
+                    }}
+                    target="_blank"
+                    aria-label="Help"
                     data-testid="main-nav-bar-help"
                   >
                     Help
