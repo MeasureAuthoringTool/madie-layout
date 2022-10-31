@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import tw from "twin.macro";
+import "styled-components/macro";
 import { Measure } from "@madie/madie-models/dist/Measure";
 import { Model } from "@madie/madie-models/dist/Model";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -178,8 +180,11 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
         type="warning"
         content={
           <>
-            <h5>Measure Needs a CMS ID</h5>
-            <p>You must first create and import your measure from MAT.</p>
+            <h5 tw="py-1">CMS IDs can not be generated in MADiE</h5>
+            <p>
+              If your measure needs a CMS ID please create and generate your id
+              in MAT and import your measure into MADiE.
+            </p>
           </>
         }
         canClose={false}
