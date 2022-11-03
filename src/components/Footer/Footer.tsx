@@ -29,10 +29,11 @@ const Footer = () => {
         <ul>
           <li className="nav-link">
             <a
-              href="mailto:semanticbits-madie-help@icf.com"
-              aria-label="Contact Us"
+              href="https://oncprojectracking.healthit.gov/support/projects/BONNIEMAT/summary"
+              aria-label="Get Help"
+              target="_blank"
             >
-              Contact Us
+              Get Help
             </a>
           </li>
           <li className="nav-link">
