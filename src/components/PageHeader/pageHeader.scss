@@ -44,41 +44,6 @@
 
       > .right-col {
         align-self: center;
-
-        .create-button {
-          padding: 14px 23px;
-          font-size: 14px;
-          line-height: 17px;
-          font-family: Rubik, sans-serif;
-          font-weight: 500;
-          color: #0073cb;
-          background-color: #fff;
-          display: flex;
-          flex-direction: row;
-          justify-content: center;
-          align-items: center;
-          border-radius: 4px;
-          border: solid 1px #fff;
-
-          &:active {
-            background-color: #efefef;
-            color: #333;
-          }
-
-          &:focus {
-            border: 1px solid #0073c8;
-            box-shadow: rgb(203, 228, 255) 0 0 0 4px;
-          }
-
-          &:focus-visible {
-            outline: -webkit-focus-ring-color auto 1px;
-          }
-
-          .add-icon {
-            margin-right: 5px;
-            margin-top: -2px;
-          }
-        }
       }
     }
   }
@@ -143,6 +108,39 @@
           margin-right: 8px;
         }
       }
+    }
+  }
+
+  .page-header-action-button {
+    padding: 14px 23px;
+    font-size: 14px;
+    line-height: 17px;
+    font-family: Rubik, sans-serif;
+    font-weight: 500;
+    color: #0073cb;
+    background-color: #fff;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    border: solid 1px #fff;
+    &:active {
+      background-color: #efefef;
+      color: #333;
+    }
+
+    &:focus {
+      border: 1px solid #0073c8;
+      box-shadow: rgb(203, 228, 255) 0 0 0 4px;
+    }
+
+    &:focus-visible {
+      outline: -webkit-focus-ring-color auto 1px;
+    }
+    .page-header-action-icon {
+      margin-right: 5px;
+      margin-top: -2px;
     }
   }
 }

@@ -2,9 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { useLocalStorage } from "../../custom-hooks/useLocalStorage";
 import AddIcon from "@mui/icons-material/Add";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import { Fade, Breadcrumbs } from "@mui/material";
 import CreateNewMeasureDialog from "../NewMeasure/CreateNewMeasureDialog";
-import { measureStore, cqlLibraryStore } from "@madie/madie-util";
+import {
+  measureStore,
+  cqlLibraryStore,
+  useOktaTokens,
+} from "@madie/madie-util";
 import "twin.macro";
 import "styled-components/macro";
 import "./pageHeader.scss";
@@ -28,6 +33,7 @@ const PageHeader = () => {
     };
   }, []);
 
+  // create
   const openCreate = () => {
     setCreateOpen(true);
   };
@@ -35,6 +41,11 @@ const PageHeader = () => {
   const handleClose = () => {
     setCreateOpen(false);
   };
+
+  // dialog utilities just for delete measure
+  const { getUserName } = useOktaTokens();
+  const userName = getUserName();
+
   const readablePeriodStart = measureState
     ? new Date(measureState.measurementPeriodStart).toLocaleDateString()
     : null;
@@ -61,8 +72,23 @@ const PageHeader = () => {
               </Breadcrumbs>
               <span className="division">/</span>
             </div>
-            <div>
+            <div style={{ justifyContent: "space-between" }}>
               <h1 tw="text-2xl text-white mb-3">{measureState?.measureName}</h1>
+              <button
+                disabled={measureState?.createdBy !== userName}
+                className="page-header-action-button"
+                data-testid="delete-measure-button"
+                onClick={() => {
+                  const event = new Event("delete-measure");
+                  window.dispatchEvent(event);
+                }}
+              >
+                <DeleteOutlineOutlinedIcon
+                  className="page-header-action-icon"
+                  fontSize="small"
+                />
+                <div>Delete Measure</div>
+              </button>
             </div>
             <div>
               {[
@@ -102,11 +128,11 @@ const PageHeader = () => {
             </div>
             <div className="right-col">
               <button
-                className="create-button"
+                className="page-header-action-button"
                 data-testid="create-new-measure-button"
                 onClick={openCreate}
               >
-                <AddIcon className="add-icon" fontSize="small" />
+                <AddIcon className="page-header-action-icon" fontSize="small" />
                 <div>New Measure</div>
               </button>
             </div>
@@ -132,7 +158,7 @@ const PageHeader = () => {
             </div>
             <div tw="py-4">
               <h2 tw="text-2xl text-white mb-0">{`${libraryState?.cqlLibraryName} v${libraryState?.version}`}</h2>
-              <div className="draft-bubble">Draft</div>
+              {libraryState?.draft && <div className="draft-bubble">Draft</div>}
             </div>
             <div>
               {[libraryState?.model, readableLibraryStartDate].map(
@@ -168,14 +194,14 @@ const PageHeader = () => {
             </div>
             <div className="right-col">
               <button
-                className="create-button"
+                className="page-header-action-button"
                 data-testid="create-new-cql-library-button"
                 onClick={() => {
                   const event = new Event("openCreateLibraryDialog");
                   window.dispatchEvent(event);
                 }}
               >
-                <AddIcon className="add-icon" fontSize="small" />
+                <AddIcon className="page-header-action-icon" fontSize="small" />
                 <div>New Library</div>
               </button>
             </div>
