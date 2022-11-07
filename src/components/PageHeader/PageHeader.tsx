@@ -5,6 +5,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { Fade, Breadcrumbs } from "@mui/material";
 import CreateNewMeasureDialog from "../NewMeasure/CreateNewMeasureDialog";
 import { measureStore, cqlLibraryStore } from "@madie/madie-util";
+import { Button } from "@madie/madie-design-system/dist/react";
 import "twin.macro";
 import "styled-components/macro";
 import "./pageHeader.scss";
@@ -101,14 +102,15 @@ const PageHeader = () => {
               </h4>
             </div>
             <div className="right-col">
-              <button
+              <Button
                 className="create-button"
+                variant="secondary"
                 data-testid="create-new-measure-button"
                 onClick={openCreate}
               >
-                <AddIcon className="add-icon" fontSize="small" />
-                <div>New Measure</div>
-              </button>
+                <AddIcon />
+                New Measure
+              </Button>
             </div>
           </div>
         </div>
@@ -167,17 +169,18 @@ const PageHeader = () => {
               </h4>
             </div>
             <div className="right-col">
-              <button
+              <Button
                 className="create-button"
+                variant="secondary"
                 data-testid="create-new-cql-library-button"
                 onClick={() => {
                   const event = new Event("openCreateLibraryDialog");
                   window.dispatchEvent(event);
                 }}
               >
-                <AddIcon className="add-icon" fontSize="small" />
-                <div>New Library</div>
-              </button>
+                <AddIcon />
+                New Library
+              </Button>
             </div>
           </div>
         </div>
