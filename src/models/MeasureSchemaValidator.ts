@@ -12,7 +12,7 @@ export const MeasureSchemaValidator = Yup.object().shape({
     .oneOf(Object.values(Model))
     .required("A Measure Model is required."),
   cqlLibraryName: Yup.string()
-    .required("Measure Lbrary name is required.")
+    .required("Measure Library name is required.")
     .matches(
       /^((?!_).)*$/,
       "Measure Library name must not contain '_' (underscores)."
