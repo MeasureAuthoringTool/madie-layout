@@ -23,6 +23,7 @@ const mockName = mockMeasureName();
 
 const mockFormikInfo = {
   measureName: mockName,
+  createdBy: "test",
   model: Model.QICORE.valueOf(),
   cqlLibraryName: mockLib,
   ecqmTitle: "ecqmTitle",
@@ -56,8 +57,14 @@ jest.mock("@madie/madie-util", () => ({
     },
   }),
   measureStore: {
-    state: null,
-    initialState: null,
+    state: {
+      createdBy: "test",
+      measureName: "test",
+    },
+    initialState: {
+      createdBy: "test",
+      measureName: "test",
+    },
     subscribe: (set) => {
       set(mockFormikInfo);
       return { unsubscribe: () => null };
@@ -75,7 +82,7 @@ jest.mock("@madie/madie-util", () => ({
   },
   useOktaTokens: () => ({
     getAccessToken: () => "test.jwt",
-    getUserName: () => "nosec@example.com", //#nosec
+    getUserName: () => "test", //#nosec
   }),
 }));
 
@@ -192,6 +199,37 @@ describe("Page Header and Dialogs", () => {
       fireEvent.click(dialogButton);
       const dialog = await findByTestId("dialog-form");
       expect(dialog).toBeTruthy();
+    });
+  });
+
+  test("Clicking on delete broadcasts an event", async () => {
+    await act(async () => {
+      render(
+        <MemoryRouter
+          initialEntries={[
+            {
+              pathname: "/measures/randomstroning/edit/details",
+              search: "",
+              hash: "",
+              state: undefined,
+              key: "1fewtg",
+            },
+          ]}
+        >
+          <PageHeader />
+        </MemoryRouter>
+      );
+
+      const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+
+      const deleteButton = await findByTestId("delete-measure-button");
+      expect(deleteButton).toBeTruthy();
+      expect(deleteButton).toBeEnabled();
+      act(() => {
+        fireEvent.click(deleteButton);
+      });
+      expect(dispatchEventSpy).toHaveBeenCalledWith(expect.any(Event));
+      expect(dispatchEventSpy.mock.calls[0][0].type).toBe("delete-measure");
     });
   });
 
@@ -595,7 +633,7 @@ describe("Page Header and Dialogs", () => {
       },
       useOktaTokens: () => ({
         getAccessToken: () => "test.jwt",
-        getUserName: () => "nosec@example.com", //#nosec
+        getUserName: () => "test", //#nosec
       }),
     }));
 
