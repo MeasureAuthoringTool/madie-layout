@@ -75,21 +75,21 @@ const PageHeader = () => {
             </div>
             <div style={{ justifyContent: "space-between" }}>
               <h1 tw="text-2xl text-white mb-3">{measureState?.measureName}</h1>
-              <button
-                disabled={measureState?.createdBy !== userName}
-                className="page-header-action-button"
-                data-testid="delete-measure-button"
-                onClick={() => {
-                  const event = new Event("delete-measure");
-                  window.dispatchEvent(event);
-                }}
-              >
-                <DeleteOutlineOutlinedIcon
-                  className="page-header-action-icon"
-                  fontSize="small"
-                />
-                <div>Delete Measure</div>
-              </button>
+              <div tw="pr-8">
+                <Button
+                  disabled={measureState?.createdBy !== userName}
+                  className="page-header-action-button"
+                  variant="outline-filled"
+                  data-testid="delete-measure-button"
+                  onClick={() => {
+                    const event = new Event("delete-measure");
+                    window.dispatchEvent(event);
+                  }}
+                >
+                  <DeleteOutlineOutlinedIcon className="page-header-action-icon" />
+                  Delete Measure
+                </Button>
+              </div>
             </div>
             <div>
               {[
@@ -128,14 +128,15 @@ const PageHeader = () => {
               </h4>
             </div>
             <div className="right-col">
-              <button
+              <Button
+                variant="outline-filled"
                 className="page-header-action-button"
                 data-testid="create-new-measure-button"
                 onClick={openCreate}
               >
-                <AddIcon className="page-header-action-icon" fontSize="small" />
-                <div>New Measure</div>
-              </button>
+                <AddIcon className="page-header-action-icon" />
+                New Measure
+              </Button>
             </div>
           </div>
         </div>
@@ -194,7 +195,8 @@ const PageHeader = () => {
               </h4>
             </div>
             <div className="right-col">
-              <button
+              <Button
+                variant="outline-filled"
                 className="page-header-action-button"
                 data-testid="create-new-cql-library-button"
                 onClick={() => {
@@ -202,9 +204,9 @@ const PageHeader = () => {
                   window.dispatchEvent(event);
                 }}
               >
-                <AddIcon className="page-header-action-icon" fontSize="small" />
-                <div>New Library</div>
-              </button>
+                <AddIcon className="page-header-action-icon" />
+                New Library
+              </Button>
             </div>
           </div>
         </div>
