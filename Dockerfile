@@ -6,7 +6,7 @@ RUN npm install && \
     npm test -- --silent
 
 # Stage 1, based on Nginx, to have only the compiled app, ready for production with Nginx
-FROM nginx:1.21.0-alpine
+FROM nginx:1.22.1-alpine
 COPY --from=build-stage /usr/src/app/dist/ /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 8500
