@@ -24,10 +24,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Use Node.js 16.x
+      - name: Use Node.js 14.x
         uses: actions/setup-node@v2-beta
         with:
-          node-version: 16.x
+          node-version: 14.x
 
       - name: Cache node modules
         uses: actions/cache@v2
