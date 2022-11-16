@@ -56,8 +56,8 @@ export const MeasureSchemaValidator = Yup.object().shape({
       if (measurementPeriodStart) {
         if (!isNaN(measurementPeriodStart.getTime())) {
           return schema.min(
-            new Date(measurementPeriodStart.getTime()),
-            "Measurement period end date should be greater than or equal to measurement period start date."
+            new Date(measurementPeriodStart.getTime() + 86400000),
+            "Measurement period end date should be greater than measurement period start date."
           );
         }
       }

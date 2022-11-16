@@ -273,7 +273,7 @@ describe("Measures Create Dialog", () => {
     });
   });
 
-  test("checking if error text is displayed when measurement periods end date is before start date", async () => {
+  test("checking if error text is displayed when measurement periods end date is before or equal to start date", async () => {
     const { getByTestId } = render(
       <CreateNewMeasureDialog open={true} onClose={undefined} />
     );
@@ -295,7 +295,21 @@ describe("Measures Create Dialog", () => {
         getByTestId("measurementPeriodEnd-helper-text")
       ).toBeInTheDocument();
       expect(getByTestId("measurementPeriodEnd-helper-text")).toHaveTextContent(
-        "Measurement period end date should be greater than or equal to measurement period start date."
+        "Measurement period end date should be greater than measurement period start date."
+      );
+      expect(getByTestId("create-new-measure-save-button")).toBeDisabled();
+    });
+
+    userEvent.type(measurementPeriodStartInput, "12/12/2022");
+    userEvent.type(measurementPeriodEndInput, "12/12/2022");
+    userEvent.click(getByTestId("dialog-form"));
+    userEvent.click(getByTestId("dialog-form"));
+    await waitFor(() => {
+      expect(
+        screen.getByTestId("measurementPeriodEnd-helper-text")
+      ).toBeInTheDocument();
+      expect(getByTestId("measurementPeriodEnd-helper-text")).toHaveTextContent(
+        "Measurement period end date should be greater than measurement period start date."
       );
       expect(getByTestId("create-new-measure-save-button")).toBeDisabled();
     });
