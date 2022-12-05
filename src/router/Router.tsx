@@ -19,7 +19,7 @@ function Router({ props }) {
       {authState?.isAuthenticated && (
         <TimeoutHandler timeLeft={25 * 60 * 1000} warningTime={5 * 60 * 1000} />
       )}
-      <BrowserRouter>
+      <BrowserRouter forceRefresh={true}>
         <MainNavBar />
         <PageHeader />
         <RouteChangeHandler />
