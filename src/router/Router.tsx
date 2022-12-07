@@ -17,19 +17,25 @@ function Router({ props }) {
   /*
     On initial page load we want to trigger a hard refresh because single spa loads the apps sequentially based on what contains what
     This init pattern pattern influences tab order so we need to refresh on first login.
+    We intend to listen to a browser event emitted by the measuresLanding page only on render cycle completion
   */
   const [firstLogin, setFirstLogin] = useState<boolean>(true);
   useLayoutEffect(() => {
-    if (firstLogin) {
+    const mountListener = () => {
       setFirstLogin(false);
-    }
-  }, [setFirstLogin]);
+    };
+    window.addEventListener("measures-mount", mountListener, false);
+    return () => {
+      window.removeEventListener("measures-mount", mountListener, false);
+    };
+  }, []);
   return (
     <div className="layout-wrapper">
       {authState?.isAuthenticated && (
         <TimeoutHandler timeLeft={25 * 60 * 1000} warningTime={5 * 60 * 1000} />
       )}
-      <BrowserRouter forceRefresh={firstLogin}>
+      {/* browser router prop forceRefresh does not update as expected. Modifying react key is a hack */}
+      <BrowserRouter key={firstLogin ? 1 : 2} forceRefresh={firstLogin}>
         <MainNavBar />
         <PageHeader />
         <RouteChangeHandler />
