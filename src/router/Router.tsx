@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useLayoutEffect, useState } from "react";
 import { Redirect, BrowserRouter, Route, Switch } from "react-router-dom";
 import { SecureRoute, LoginCallback, useOktaAuth } from "@okta/okta-react";
 import Login from "../components/login/Login";
@@ -14,12 +14,22 @@ import RouteChangeHandler from "./RouteChangeHandler";
 
 function Router({ props }) {
   const { authState } = useOktaAuth();
+  /*
+    On initial page load we want to trigger a hard refresh because single spa loads the apps sequentially based on what contains what
+    This init pattern pattern influences tab order so we need to refresh on first login.
+  */
+  const [firstLogin, setFirstLogin] = useState<boolean>(true);
+  useLayoutEffect(() => {
+    if (firstLogin) {
+      setFirstLogin(false);
+    }
+  }, [setFirstLogin]);
   return (
     <div className="layout-wrapper">
       {authState?.isAuthenticated && (
         <TimeoutHandler timeLeft={25 * 60 * 1000} warningTime={5 * 60 * 1000} />
       )}
-      <BrowserRouter forceRefresh={true}>
+      <BrowserRouter forceRefresh={firstLogin}>
         <MainNavBar />
         <PageHeader />
         <RouteChangeHandler />
