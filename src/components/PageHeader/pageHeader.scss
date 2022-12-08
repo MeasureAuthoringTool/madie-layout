@@ -64,6 +64,10 @@
       color: #fff;
       align-items: center;
 
+      .MuiBreadcrumbs-ol > .MuiBreadcrumbs-li > a:focus {
+        color: #fff;
+      }
+
       .division,
       .MuiBreadcrumbs-separator {
         font-size: 14px;

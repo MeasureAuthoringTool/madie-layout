@@ -257,9 +257,7 @@ describe("Page Header and Dialogs", () => {
       expect(await findByTestId("measure-model-select")).toBeInTheDocument();
       expect(await findByTestId("cql-library-name")).toBeInTheDocument();
       expect(await findByTestId("ecqm-text-field")).toBeInTheDocument();
-      expect(
-        await findByTestId("create-new-measure-save-button")
-      ).toBeInTheDocument();
+      expect(await findByTestId("continue-button")).toBeInTheDocument();
     });
   });
 
@@ -371,7 +369,7 @@ describe("Page Header and Dialogs", () => {
         mockFormikInfo.measurementPeriodEnd
       );
 
-      const submitButton = await findByTestId("create-new-measure-save-button");
+      const submitButton = await findByTestId("continue-button");
       await waitFor(() => expect(submitButton).not.toBeDisabled(), {
         timeout: 5000,
       });
@@ -468,7 +466,7 @@ describe("Page Header and Dialogs", () => {
       mockFormikInfo.measurementPeriodEnd
     );
 
-    const submitButton = await findByTestId("create-new-measure-save-button");
+    const submitButton = await findByTestId("continue-button");
     await waitFor(() => expect(submitButton).not.toBeDisabled(), {
       timeout: 5000,
     });
@@ -569,7 +567,7 @@ describe("Page Header and Dialogs", () => {
       expect(measurementPeriodEndInput.value).toBe(
         mockFormikInfo.measurementPeriodEnd
       );
-      const submitButton = await findByTestId("create-new-measure-save-button");
+      const submitButton = await findByTestId("continue-button");
       await waitFor(() => expect(submitButton).not.toBeDisabled(), {
         timeout: 5000,
       });

@@ -132,6 +132,9 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
         open,
         onClose,
         onSubmit: formik.handleSubmit,
+        sx: {
+          zIndex: 9999,
+        },
       }}
       cancelButtonProps={{
         variant: "secondary",
@@ -143,8 +146,8 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
       continueButtonProps={{
         variant: "cyan",
         type: "submit",
-        "data-testid": "create-new-measure-save-button",
-        "aria-label": "create-new-measure-save-button",
+        "data-testid": "continue-button",
+        "aria-label": "continue button",
         disabled: !(formik.isValid && formik.dirty),
         continueText: "Continue",
         continueIcon: (
