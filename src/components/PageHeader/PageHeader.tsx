@@ -61,7 +61,7 @@ const PageHeader = () => {
     : "page-header";
   return (
     <div className={pageHeaderClass} id="page-header">
-      {/* state 1 */}
+      {/* edit measures, measure details */}
       {pathname.includes("edit") && pathname.includes("measures") && (
         <Fade in={measureState?.measureName !== undefined}>
           <div className="details">
@@ -70,8 +70,14 @@ const PageHeader = () => {
                 <Link tw="text-white hover:text-white" to="/measures">
                   Measures
                 </Link>
+                <Link
+                  tw="text-white hover:text-white"
+                  // to={`/cql/${libraryState?.id}/edit/details`}
+                  to={`/measures/${measureState?.id}/edit/details`}
+                >
+                  Details
+                </Link>
               </Breadcrumbs>
-              <span className="division">/</span>
             </div>
             <div style={{ justifyContent: "space-between" }}>
               <h1 tw="text-2xl text-white mb-3">{measureState?.measureName}</h1>
@@ -112,7 +118,7 @@ const PageHeader = () => {
           </div>
         </Fade>
       )}
-      {/* state 2 */}
+      {/* Measures landing */}
       {(pathname === "/measures" || pathname === "/measures/") && (
         <div className="measures">
           <CreateNewMeasureDialog open={createOpen} onClose={handleClose} />
