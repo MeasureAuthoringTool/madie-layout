@@ -49,9 +49,7 @@ describe("Measures Create Dialog", () => {
       expect(await findByTestId("measure-model-select")).toBeInTheDocument();
       expect(await findByTestId("cql-library-name")).toBeInTheDocument();
       expect(await findByTestId("ecqm-text-field")).toBeInTheDocument();
-      expect(
-        await findByTestId("create-new-measure-save-button")
-      ).toBeInTheDocument();
+      expect(await findByTestId("continue-button")).toBeInTheDocument();
 
       const cancelButton = await findByTestId(
         "create-new-measure-cancel-button"
@@ -59,7 +57,7 @@ describe("Measures Create Dialog", () => {
       expect(cancelButton).toBeInTheDocument();
       expect(cancelButton).toBeEnabled();
 
-      const submitButton = await findByTestId("create-new-measure-save-button");
+      const submitButton = await findByTestId("continue-button");
       expect(submitButton).toBeInTheDocument();
       expect(submitButton).toBeDisabled();
 
@@ -133,7 +131,7 @@ describe("Measures Create Dialog", () => {
         formikInfo.measurementPeriodEnd
       );
 
-      const submitButton = await getByTestId("create-new-measure-save-button");
+      const submitButton = await getByTestId("continue-button");
       expect(submitButton).not.toBeDisabled();
       fireEvent.click(submitButton);
       await waitFor(() => {
@@ -179,9 +177,7 @@ describe("Measures Create Dialog", () => {
         ).toHaveTextContent("Invalid date format. (mm/dd/yyyy)");
       });
 
-      expect(
-        screen.getByTestId("create-new-measure-save-button")
-      ).toBeDisabled();
+      expect(screen.getByTestId("continue-button")).toBeDisabled();
     });
   });
 
@@ -222,9 +218,7 @@ describe("Measures Create Dialog", () => {
         ).toHaveTextContent("Measurement period start date is required");
       });
 
-      expect(
-        screen.getByTestId("create-new-measure-save-button")
-      ).toBeDisabled();
+      expect(screen.getByTestId("continue-button")).toBeDisabled();
     });
   });
 
@@ -267,9 +261,7 @@ describe("Measures Create Dialog", () => {
         );
       });
 
-      expect(
-        screen.getByTestId("create-new-measure-save-button")
-      ).toBeDisabled();
+      expect(screen.getByTestId("continue-button")).toBeDisabled();
     });
   });
 
@@ -297,7 +289,7 @@ describe("Measures Create Dialog", () => {
       expect(getByTestId("measurementPeriodEnd-helper-text")).toHaveTextContent(
         "Measurement period end date should be greater than measurement period start date."
       );
-      expect(getByTestId("create-new-measure-save-button")).toBeDisabled();
+      expect(getByTestId("continue-button")).toBeDisabled();
     });
 
     userEvent.type(measurementPeriodStartInput, "12/12/2022");
@@ -311,7 +303,7 @@ describe("Measures Create Dialog", () => {
       expect(getByTestId("measurementPeriodEnd-helper-text")).toHaveTextContent(
         "Measurement period end date should be greater than measurement period start date."
       );
-      expect(getByTestId("create-new-measure-save-button")).toBeDisabled();
+      expect(getByTestId("continue-button")).toBeDisabled();
     });
   });
 });
