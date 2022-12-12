@@ -132,9 +132,6 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
         open,
         onClose,
         onSubmit: formik.handleSubmit,
-        sx: {
-          zIndex: 9999,
-        },
       }}
       cancelButtonProps={{
         variant: "secondary",
