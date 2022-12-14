@@ -1,9 +1,16 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import hhsLogoPath from "../../assets/images/hhs-logo-white.png";
 import madieLogoPath from "../../assets/images/madie-footer-logo.svg";
 import "./FooterStyles.scss";
+import { getServiceConfig } from "../../custom-hooks/getServiceConfig";
 
 const Footer = () => {
+  const [versionNumber, setVersionNumber] = useState<string>("");
+
+  useEffect(() => {
+    getServiceConfig().then((res) => setVersionNumber(res.madieVersion));
+  }, []);
+
   const assets = {
     hhsLogo: (
       <img
@@ -101,6 +108,7 @@ const Footer = () => {
       </div>
       <div className="footer-logos">
         <div className="madie-logo">{assets.madieLogo}</div>
+        <div className="madie-version">Version {versionNumber}</div>
         <div className="hhs-logo">
           {assets.hhsLogo}
           <p>

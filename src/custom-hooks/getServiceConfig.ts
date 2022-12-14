@@ -7,6 +7,7 @@ export interface ServiceConfig {
   terminologyService: {
     baseUrl: string;
   };
+  madieVersion: string;
 }
 
 export async function getServiceConfig(): Promise<ServiceConfig> {
