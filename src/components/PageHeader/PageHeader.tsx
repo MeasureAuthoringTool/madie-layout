@@ -42,7 +42,6 @@ const PageHeader = () => {
   const handleClose = () => {
     setCreateOpen(false);
   };
-
   // dialog utilities just for delete measure
   const canEdit = checkUserCanEdit(measureState?.createdBy, measureState?.acls);
 
