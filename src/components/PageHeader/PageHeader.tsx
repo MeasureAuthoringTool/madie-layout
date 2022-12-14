@@ -9,7 +9,7 @@ import { Button } from "@madie/madie-design-system/dist/react";
 import {
   measureStore,
   cqlLibraryStore,
-  useOktaTokens,
+  checkUserCanEdit,
 } from "@madie/madie-util";
 import "twin.macro";
 import "styled-components/macro";
@@ -42,10 +42,8 @@ const PageHeader = () => {
   const handleClose = () => {
     setCreateOpen(false);
   };
-
   // dialog utilities just for delete measure
-  const { getUserName } = useOktaTokens();
-  const userName = getUserName();
+  const canEdit = checkUserCanEdit(measureState?.createdBy, measureState?.acls);
 
   const readablePeriodStart = measureState
     ? new Date(measureState.measurementPeriodStart).toLocaleDateString()
@@ -83,7 +81,7 @@ const PageHeader = () => {
               <h1 tw="text-2xl text-white mb-3">{measureState?.measureName}</h1>
               <div tw="pr-8">
                 <Button
-                  disabled={measureState?.createdBy !== userName}
+                  disabled={!canEdit}
                   className="page-header-action-button"
                   variant="outline-filled"
                   data-testid="delete-measure-button"

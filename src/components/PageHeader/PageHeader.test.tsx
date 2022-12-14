@@ -82,7 +82,9 @@ jest.mock("@madie/madie-util", () => ({
   },
   useOktaTokens: () => ({
     getAccessToken: () => "test.jwt",
-    getUserName: () => "test", //#nosec
+  }),
+  checkUserCanEdit: jest.fn(() => {
+    return true;
   }),
 }));
 
@@ -631,7 +633,9 @@ describe("Page Header and Dialogs", () => {
       },
       useOktaTokens: () => ({
         getAccessToken: () => "test.jwt",
-        getUserName: () => "test", //#nosec
+      }),
+      checkUserCanEdit: jest.fn(() => {
+        return true;
       }),
     }));
 
