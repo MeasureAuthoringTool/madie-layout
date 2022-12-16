@@ -1,6 +1,6 @@
 declare module "@madie/madie-util" {
   import { LifeCycleFn } from "single-spa";
-  import { Measure, CqlLibrary } from "@madie/madie-models/";
+  import { Measure, CqlLibrary, Acl } from "@madie/madie-models/";
 
   export interface OktaConfig {
     baseUrl: string;
@@ -63,6 +63,10 @@ declare module "@madie/madie-util" {
     getIdToken: () => any;
     getIdTokenObj: () => any;
   };
+  export function checkUserCanEdit(
+    createdBy: string,
+    acls: Array<Acl>
+  ): boolean;
   export function useOnClickOutside(ref: any, handler: any): void;
 
   export class TerminologyServiceApi {

@@ -35,7 +35,7 @@ const MainNavBar = () => {
   }, [authState?.isAuthenticated]);
 
   const onToastClose = () => {
-    setToastType(null);
+    setToastType("danger");
     setToastMessage("");
     setToastOpen(false);
   };
@@ -166,6 +166,9 @@ const MainNavBar = () => {
         open={toastOpen}
         message={toastMessage}
         onClose={onToastClose}
+        closeButtonProps={{
+          "data-testid": "close-error-button",
+        }}
         autoHideDuration={4000}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
       />

@@ -16,7 +16,6 @@ import CreateNewMeasureDialog from "./CreateNewMeasureDialog";
 jest.mock("@madie/madie-util", () => ({
   useOktaTokens: () => ({
     getAccessToken: () => "test.jwt",
-    getUserName: () => "TestUser@example.com", //#nosec
   }),
   measureStore: {
     state: null,
