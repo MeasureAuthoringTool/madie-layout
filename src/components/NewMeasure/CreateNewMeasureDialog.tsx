@@ -101,6 +101,8 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
     if (formik.touched[name] && formik.errors[name]) {
       return (
         <FormHelperText
+          aria-live="polite"
+          id={`${name}-helper-text`}
           data-testid={`${name}-helper-text`}
           children={formik.errors[name]}
           error={isError}
@@ -170,9 +172,12 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
         onClose={() => {
           setToast({
             toastOpen: false,
-            toastType: null,
+            toastType: "danger",
             toastMessage: "",
           });
+        }}
+        closeButtonProps={{
+          "data-testid": "close-error-button",
         }}
         autoHideDuration={6000}
       />
