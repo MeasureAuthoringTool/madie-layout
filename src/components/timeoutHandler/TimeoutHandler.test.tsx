@@ -14,6 +14,7 @@ import { useOktaAuth } from "@okta/okta-react";
 jest.mock("@okta/okta-react");
 
 describe("Timeout Handler", () => {
+  const mockRenewToken = jest.fn();
   const renderTimeoutHandler = () => {
     return render(
       <div id="main">
@@ -25,8 +26,14 @@ describe("Timeout Handler", () => {
     const MockSignOut = jest.fn().mockImplementation(() => {
       return Promise.resolve();
     });
+    mockRenewToken.mockClear().mockResolvedValue(() => null);
     (useOktaAuth as jest.Mock).mockImplementation(() => ({
-      oktaAuth: { signOut: MockSignOut },
+      oktaAuth: {
+        signOut: MockSignOut,
+        tokenManager: {
+          renew: mockRenewToken,
+        },
+      },
       authState: { isAuthenticated: false },
     }));
     renderTimeoutHandler();
@@ -58,6 +65,7 @@ describe("Timeout Handler", () => {
       screen.queryByText("Session Expiration Warning")
     );
     expect(useOktaAuth().oktaAuth.signOut).not.toHaveBeenCalled();
+    expect(mockRenewToken).toHaveBeenCalled();
   });
 
   test("Timeout handler renders, then disappears on alert click", async () => {
@@ -68,6 +76,7 @@ describe("Timeout Handler", () => {
       screen.queryByText("Session Expiration Warning")
     );
     expect(useOktaAuth().oktaAuth.signOut).not.toHaveBeenCalled();
+    expect(mockRenewToken).toHaveBeenCalled();
   });
 
   test("Timeout handler renders, then disappears after outer click", async () => {
@@ -89,6 +98,7 @@ describe("Timeout Handler", () => {
       screen.queryByText("Session Expiration Warning")
     );
     expect(useOktaAuth().oktaAuth.signOut).not.toHaveBeenCalled();
+    expect(mockRenewToken).toHaveBeenCalled();
   });
 
   test("Timeout handler renders, then signs out user after warning time expires", async () => {
@@ -97,5 +107,6 @@ describe("Timeout Handler", () => {
     await waitFor(() => {
       expect(useOktaAuth().oktaAuth.signOut).toHaveBeenCalled();
     });
+    expect(mockRenewToken).not.toHaveBeenCalled();
   });
 });
