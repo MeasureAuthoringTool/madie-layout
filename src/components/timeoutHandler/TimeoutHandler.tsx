@@ -67,7 +67,7 @@ const TimeoutHandler = ({ timeLeft = 10000, warningTime = 5000 }) => {
         oktaAuth.tokenManager.renew("idToken").finally();
         oktaAuth.tokenManager.renew("accessToken").finally();
       },
-      60000,
+      240000,
       { leading: true, trailing: true }
     ),
     []
