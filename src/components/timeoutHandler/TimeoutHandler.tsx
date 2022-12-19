@@ -34,12 +34,44 @@ const TimeoutHandler = ({ timeLeft = 10000, warningTime = 5000 }) => {
   const { oktaAuth } = useOktaAuth();
   const timeoutCallBack = () => {
     if (mounted.current) {
+      if (localStorage.getItem("madieDebug") || (window as any).madieDebug) {
+        // eslint-disable-next-line no-console
+        console.log(
+          "User has been inactive for the specified period. Showing inactivity warning dialog."
+        );
+      }
       setTimingOut(true);
       logoutTimeoutRef.current = setTimeout(async () => {
+        if (localStorage.getItem("madieDebug") || (window as any).madieDebug) {
+          // eslint-disable-next-line no-console
+          console.log(
+            "User has timed out due to inactivity. Initiating logout."
+          );
+        }
         await oktaAuth.signOut();
       }, warningTime);
+    } else if (
+      localStorage.getItem("madieDebug") ||
+      (window as any).madieDebug
+    ) {
+      // eslint-disable-next-line no-console
+      console.log(
+        "Timeout warning not displayed as component was not mounted!"
+      );
     }
   };
+
+  const refreshTokens = useCallback(
+    throttle(
+      () => {
+        oktaAuth.tokenManager.renew("idToken").finally();
+        oktaAuth.tokenManager.renew("accessToken").finally();
+      },
+      240000,
+      { leading: true, trailing: true }
+    ),
+    []
+  );
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const resetTimeout = useCallback(
@@ -58,34 +90,39 @@ const TimeoutHandler = ({ timeLeft = 10000, warningTime = 5000 }) => {
     [timeLeft]
   );
 
+  const handleUserActivity = useCallback(() => {
+    resetTimeout();
+    refreshTokens();
+  }, []);
+
   // initialize
   useLayoutEffect(() => {
     const rootNode = document.getElementById("main");
     inactivityTimeoutRef.current = setTimeout(timeoutCallBack, timeLeft);
-    rootNode.addEventListener("keypress", resetTimeout);
-    rootNode.addEventListener("click", resetTimeout);
-    rootNode.addEventListener("mousemove", resetTimeout);
+    rootNode.addEventListener("keypress", handleUserActivity);
+    rootNode.addEventListener("click", handleUserActivity);
+    rootNode.addEventListener("mousemove", handleUserActivity);
     return () => {
-      rootNode.removeEventListener("keypress", resetTimeout);
-      rootNode.removeEventListener("click", resetTimeout);
-      rootNode.removeEventListener("mouseMove", resetTimeout);
+      rootNode.removeEventListener("keypress", handleUserActivity);
+      rootNode.removeEventListener("click", handleUserActivity);
+      rootNode.removeEventListener("mouseMove", handleUserActivity);
       clearTimeout(inactivityTimeoutRef.current);
       clearTimeout(logoutTimeoutRef.current);
       inactivityTimeoutRef.current = null;
       logoutTimeoutRef.current = null;
     };
-  }, [resetTimeout, logoutTimeoutRef, inactivityTimeoutRef, timeLeft]);
+  }, [handleUserActivity, logoutTimeoutRef, inactivityTimeoutRef, timeLeft]);
   return (
     <Dialog
       open={timingOut}
-      onKeyDown={resetTimeout}
-      onMouseMove={resetTimeout}
-      onClose={resetTimeout}
+      onKeyDown={handleUserActivity}
+      onMouseMove={handleUserActivity}
+      onClose={handleUserActivity}
       aria-labelledby="warn-timeout-title"
       aria-describedby="warn-timeout-description"
     >
       {/* we want clicks inside to also trigger reset */}
-      <div role="button" tabIndex={0} onClick={resetTimeout}>
+      <div role="button" tabIndex={0} onClick={handleUserActivity}>
         <DialogTitle id="warn-timeout-title">
           Session Expiration Warning
         </DialogTitle>

@@ -52,11 +52,15 @@ beforeEach(() => {
     return Promise.resolve({ name: "test name", given_name: "test" });
   });
   const mockToken = { getUserInfo: mockGetUserInfo };
+  const mockRenewToken = jest.fn().mockResolvedValue(() => null);
 
   (useOktaAuth as jest.Mock).mockImplementation(() => ({
     oktaAuth: {
       token: mockToken,
       signOut: MockSignOut,
+      tokenManager: {
+        renew: mockRenewToken,
+      },
     },
     authState: { isAuthenticated: true },
   }));
