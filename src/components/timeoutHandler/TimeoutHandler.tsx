@@ -37,7 +37,7 @@ const TimeoutHandler = ({ timeLeft = 10000, warningTime = 5000 }) => {
       if (localStorage.getItem("madieDebug") || (window as any).madieDebug) {
         // eslint-disable-next-line no-console
         console.log(
-          "User has been inactive for the specified period. Showing inactivity warning dialog."
+          `[${new Date()}]: User has been inactive for the specified period. Showing inactivity warning dialog.`
         );
       }
       setTimingOut(true);
@@ -45,7 +45,7 @@ const TimeoutHandler = ({ timeLeft = 10000, warningTime = 5000 }) => {
         if (localStorage.getItem("madieDebug") || (window as any).madieDebug) {
           // eslint-disable-next-line no-console
           console.log(
-            "User has timed out due to inactivity. Initiating logout."
+            `[${new Date()}]: User has timed out due to inactivity. Initiating logout.`
           );
         }
         await oktaAuth.signOut();
@@ -56,7 +56,7 @@ const TimeoutHandler = ({ timeLeft = 10000, warningTime = 5000 }) => {
     ) {
       // eslint-disable-next-line no-console
       console.log(
-        "Timeout warning not displayed as component was not mounted!"
+        `[${new Date()}]: Timeout warning not displayed as component was not mounted!`
       );
     }
   };
