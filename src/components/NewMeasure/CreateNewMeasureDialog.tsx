@@ -19,7 +19,12 @@ import {
   useOktaTokens,
 } from "@madie/madie-util";
 import axios from "axios";
-import { FormHelperText, MenuItem } from "@mui/material";
+import {
+  Checkbox,
+  FormControlLabel,
+  FormHelperText,
+  MenuItem,
+} from "@mui/material";
 import { useFormik } from "formik";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import DesktopDatePicker from "@mui/lab/DesktopDatePicker";
@@ -49,6 +54,9 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
       active: true,
       measurementPeriodStart: null,
       measurementPeriodEnd: null,
+      measureMetaData: {
+        experimental: false,
+      },
       // TO DO: validation, models for new entries
     } as Measure,
     validationSchema: MeasureSchemaValidator,
@@ -253,6 +261,27 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
           size="small"
           error={formik.touched.ecqmTitle && Boolean(formik.errors.ecqmTitle)}
           {...formik.getFieldProps("ecqmTitle")}
+        />
+      </Box>
+
+      <Box sx={formRowGapped}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              onChange={formik.handleChange}
+              sx={{
+                color: "#333333",
+              }}
+              name="measureMetaData.experimental"
+              id="experimental"
+              data-testid="experimental"
+            />
+          }
+          label="Experimental"
+          sx={{
+            color: "#333333",
+            textTransform: "none",
+          }}
         />
       </Box>
 
