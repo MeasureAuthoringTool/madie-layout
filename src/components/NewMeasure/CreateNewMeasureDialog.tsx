@@ -19,12 +19,7 @@ import {
   useOktaTokens,
 } from "@madie/madie-util";
 import axios from "axios";
-import {
-  Checkbox,
-  FormControlLabel,
-  FormHelperText,
-  MenuItem,
-} from "@mui/material";
+import { Checkbox, FormControlLabel, MenuItem } from "@mui/material";
 import { useFormik } from "formik";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import DesktopDatePicker from "@mui/lab/DesktopDatePicker";
@@ -41,7 +36,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
   const { getAccessToken } = useOktaTokens();
   const [toast, setToast] = useState<Toast>({
     toastOpen: false,
-    toastType: null,
+    toastType: "danger",
     toastMessage: "",
   });
   const { toastOpen, toastType, toastMessage } = toast;
@@ -81,7 +76,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
           formik.resetForm();
           setToast({
             toastOpen: false,
-            toastType: null,
+            toastType: "danger",
             toastMessage: "",
           });
           const event = new Event("create");
@@ -107,15 +102,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
 
   function formikErrorHandler(name: string, isError: boolean) {
     if (formik.touched[name] && formik.errors[name]) {
-      return (
-        <FormHelperText
-          aria-live="polite"
-          id={`${name}-helper-text`}
-          data-testid={`${name}-helper-text`}
-          children={formik.errors[name]}
-          error={isError}
-        />
-      );
+      return `${formik.errors[name]}`;
     }
   }
   // style utilities
@@ -349,7 +336,6 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
                     "data-testid": "measurement-period-start-input",
                     "aria-describedby":
                       "create-measure-period-start-helper-text",
-                    required: true,
                   }}
                 />
               );
