@@ -121,6 +121,16 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
     },
   };
   const formRowGapped = Object.assign({}, formRow, gap);
+  // we create a state to track current focus. We only display helper text on focus and remove current focus on blur
+  const [focusedField, setFocusedField] = useState("");
+  const onBlur = (field) => {
+    setFocusedField("");
+    formik.setFieldTouched(field);
+  };
+  const onFocus = (field) => {
+    setFocusedField(field);
+  };
+
   return (
     <MadieDialog
       form
@@ -191,6 +201,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
       />
       <Box sx={formRow}>
         <TextField
+          onFocus={() => onFocus("measureName")}
           placeholder="Measure Name"
           required
           label="Measure Name"
@@ -200,18 +211,26 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
             "aria-describedby": "measureName-helper-text",
             required: true,
           }}
-          helperText={formikErrorHandler("measureName", true)}
+          helperText={
+            (formik.touched["measureName"] || focusedField === "measureName") &&
+            (formikErrorHandler("measureName", true) ||
+              "Measure Library name must start with an upper case letter, followed by alpha-numeric character(s) and must not contain spaces or other special characters.")
+          }
           data-testid="measure-name-text-field"
           size="small"
           error={
             formik.touched.measureName && Boolean(formik.errors.measureName)
           }
           {...formik.getFieldProps("measureName")}
+          onBlur={() => {
+            onBlur("measureName");
+          }}
         />
       </Box>
 
       <Box sx={formRow}>
         <TextField
+          onFocus={() => onFocus("cqlLibraryName")}
           placeholder="Enter CQL Library Name"
           required
           label="Measure CQL Library Name"
@@ -222,13 +241,21 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
             "aria-describedby": "cqlLibraryName-helper-text",
             required: true,
           }}
-          helperText={formikErrorHandler("cqlLibraryName", true)}
+          helperText={
+            (formik.touched["cqlLibraryName"] ||
+              focusedField === "cqlLibraryName") &&
+            (formikErrorHandler("cqlLibraryName", true) ||
+              "Measure Library name must start with an upper case letter, followed by alpha-numeric character(s) and must not contain spaces or other special characters.")
+          }
           size="small"
           error={
             formik.touched.cqlLibraryName &&
             Boolean(formik.errors.cqlLibraryName)
           }
           {...formik.getFieldProps("cqlLibraryName")}
+          onBlur={() => {
+            onBlur("cqlLibraryName");
+          }}
         />
       </Box>
 
@@ -319,6 +346,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
               );
               return (
                 <TextField
+                  onFocus={() => onFocus("measurementPeriodStart")}
                   id="create-measure-period-start"
                   {...formikFieldProps}
                   {...params}
@@ -328,15 +356,18 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
                     formik.touched.measurementPeriodStart &&
                     Boolean(formik.errors.measurementPeriodStart)
                   }
-                  helperText={formikErrorHandler(
-                    "measurementPeriodStart",
-                    true
-                  )}
+                  helperText={
+                    (formik.touched["measurementPeriodStart"] ||
+                      focusedField === "measurementPeriodStart") &&
+                    (formikErrorHandler("measurementPeriodStart", true) ||
+                      "Start date should be between the years 1900 and 2099.")
+                  }
                   InputProps={{
                     "data-testid": "measurement-period-start-input",
                     "aria-describedby":
                       "create-measure-period-start-helper-text",
                   }}
+                  onBlur={() => onBlur("measurementPeriodStart")}
                 />
               );
             }}
@@ -358,6 +389,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
               return (
                 <TextField
                   id="create-measure-period-end"
+                  onFocus={() => onFocus("measurementPeriodEnd")}
                   {...formikFieldProps}
                   {...params}
                   required
@@ -366,12 +398,18 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
                     formik.touched.measurementPeriodEnd &&
                     Boolean(formik.errors.measurementPeriodEnd)
                   }
-                  helperText={formikErrorHandler("measurementPeriodEnd", true)}
+                  helperText={
+                    (formik.touched["measurementPeriodEnd"] ||
+                      focusedField === "measurementPeriodEnd") &&
+                    (formikErrorHandler("measurementPeriodEnd", true) ||
+                      "End date should be between the years 1900 and 2099.")
+                  }
                   InputProps={{
                     "data-testid": "measurement-period-end-input",
                     "aria-describedby": "create-measure-period-end-helper-text",
                     required: true,
                   }}
+                  onBlur={() => onBlur("measurementPeriodEnd")}
                 />
               );
             }}
