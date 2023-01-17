@@ -214,7 +214,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
           helperText={
             (formik.touched["measureName"] || focusedField === "measureName") &&
             (formikErrorHandler("measureName", true) ||
-              "Measure Library name must start with an upper case letter, followed by alpha-numeric character(s) and must not contain spaces or other special characters.")
+              "Measure Name must contain at least one letter and must not contain '_' (underscores).")
           }
           data-testid="measure-name-text-field"
           size="small"
