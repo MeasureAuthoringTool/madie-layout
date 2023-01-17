@@ -258,9 +258,8 @@ describe("Measures Create Dialog", () => {
         ).toHaveTextContent(
           "Start date should be between the years 1900 and 2099"
         );
+        expect(screen.getByTestId("continue-button")).toBeDisabled();
       });
-
-      expect(screen.getByTestId("continue-button")).toBeDisabled();
     });
   });
 
