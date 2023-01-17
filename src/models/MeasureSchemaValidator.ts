@@ -4,9 +4,9 @@ import { isWithinInterval } from "date-fns";
 
 export const MeasureSchemaValidator = Yup.object().shape({
   measureName: Yup.string()
-    .max(500, "A Measure Name cannot be more than 500 characters.")
-    .required("A Measure Name is required.")
-    .matches(/[a-zA-Z]/, "A Measure Name must contain at least one letter.")
+    .max(500, "Measure Name cannot be more than 500 characters.")
+    .required("Measure Name is required.")
+    .matches(/[a-zA-Z]/, "Measure Name must contain at least one letter.")
     .matches(/^((?!_).)*$/, "Measure Name must not contain '_' (underscores)."),
   model: Yup.string()
     .oneOf(Object.values(Model))
