@@ -169,10 +169,10 @@ describe("Measures Create Dialog", () => {
       fireEvent.click(measurementPeriodStartNode);
       await waitFor(() => {
         expect(
-          screen.getByTestId("measurementPeriodStart-helper-text")
+          screen.getByTestId("create-measure-period-start-helper-text")
         ).not.toBe(null);
         expect(
-          screen.getByTestId("measurementPeriodStart-helper-text")
+          screen.getByTestId("create-measure-period-start-helper-text")
         ).toHaveTextContent("Invalid date format. (mm/dd/yyyy)");
       });
 
@@ -210,10 +210,10 @@ describe("Measures Create Dialog", () => {
       fireEvent.click(measurementPeriodStartNode);
       await waitFor(() => {
         expect(
-          screen.getByTestId("measurementPeriodStart-helper-text")
+          screen.getByTestId("create-measure-period-start-helper-text")
         ).not.toBe(null);
         expect(
-          screen.getByTestId("measurementPeriodStart-helper-text")
+          screen.getByTestId("create-measure-period-start-helper-text")
         ).toHaveTextContent("Measurement period start date is required");
       });
 
@@ -251,16 +251,15 @@ describe("Measures Create Dialog", () => {
       fireEvent.click(measurementPeriodStartNode);
       await waitFor(() => {
         expect(
-          screen.getByTestId("measurementPeriodStart-helper-text")
+          screen.getByTestId("create-measure-period-start-helper-text")
         ).not.toBe(null);
         expect(
-          screen.getByTestId("measurementPeriodStart-helper-text")
+          screen.getByTestId("create-measure-period-start-helper-text")
         ).toHaveTextContent(
           "Start date should be between the years 1900 and 2099"
         );
+        expect(screen.getByTestId("continue-button")).toBeDisabled();
       });
-
-      expect(screen.getByTestId("continue-button")).toBeDisabled();
     });
   });
 
@@ -283,9 +282,11 @@ describe("Measures Create Dialog", () => {
     userEvent.click(getByTestId("dialog-form"));
     await waitFor(() => {
       expect(
-        getByTestId("measurementPeriodEnd-helper-text")
+        getByTestId("create-measure-period-end-helper-text")
       ).toBeInTheDocument();
-      expect(getByTestId("measurementPeriodEnd-helper-text")).toHaveTextContent(
+      expect(
+        getByTestId("create-measure-period-end-helper-text")
+      ).toHaveTextContent(
         "Measurement period end date should be greater than measurement period start date."
       );
       expect(getByTestId("continue-button")).toBeDisabled();
@@ -297,9 +298,11 @@ describe("Measures Create Dialog", () => {
     userEvent.click(getByTestId("dialog-form"));
     await waitFor(() => {
       expect(
-        screen.getByTestId("measurementPeriodEnd-helper-text")
+        screen.getByTestId("create-measure-period-end-helper-text")
       ).toBeInTheDocument();
-      expect(getByTestId("measurementPeriodEnd-helper-text")).toHaveTextContent(
+      expect(
+        getByTestId("create-measure-period-end-helper-text")
+      ).toHaveTextContent(
         "Measurement period end date should be greater than measurement period start date."
       );
       expect(getByTestId("continue-button")).toBeDisabled();
