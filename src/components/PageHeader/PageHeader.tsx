@@ -9,11 +9,13 @@ import { Button } from "@madie/madie-design-system/dist/react";
 import {
   measureStore,
   cqlLibraryStore,
+  featureFlagsStore,
   checkUserCanEdit,
 } from "@madie/madie-util";
 import "twin.macro";
 import "styled-components/macro";
 import "./pageHeader.scss";
+import axios from "axios";
 
 const PageHeader = () => {
   const { pathname } = useLocation();
@@ -57,6 +59,20 @@ const PageHeader = () => {
   const pageHeaderClass = libraryState?.id
     ? "page-header details"
     : "page-header";
+
+  const { updateFeatureFlags } = featureFlagsStore;
+  // fetch the feature flags and set into feature flag store
+  useEffect(() => {
+    axios
+      .get("/env-config/serviceConfig.json")
+      .then((value) => {
+        updateFeatureFlags(value?.data?.features);
+      })
+      .catch((reason) => {
+        console.error(reason);
+      });
+  }, []);
+
   return (
     <div className={pageHeaderClass} id="page-header">
       {/* edit measures, measure details */}
