@@ -66,7 +66,7 @@ const PageHeader = () => {
     axios
       .get("/env-config/serviceConfig.json")
       .then((value) => {
-        updateFeatureFlags(value?.data?.features);
+        updateFeatureFlags(value.data?.features);
       })
       .catch((reason) => {
         console.error(reason);
