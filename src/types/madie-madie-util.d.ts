@@ -65,7 +65,8 @@ declare module "@madie/madie-util" {
   };
   export function checkUserCanEdit(
     createdBy: string,
-    acls: Array<Acl>
+    acls: Array<Acl>,
+    version?: string
   ): boolean;
   export function useOnClickOutside(ref: any, handler: any): void;
 
