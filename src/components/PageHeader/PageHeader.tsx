@@ -46,7 +46,7 @@ const PageHeader = () => {
   const canEdit = checkUserCanEdit(
     measureState?.createdBy,
     measureState?.acls,
-    measureState?.version
+    measureState?.measureMetaData?.draft
   );
 
   const readablePeriodStart = measureState
