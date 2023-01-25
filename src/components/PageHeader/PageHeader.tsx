@@ -45,7 +45,11 @@ const PageHeader = () => {
     setCreateOpen(false);
   };
   // dialog utilities just for delete measure
-  const canEdit = checkUserCanEdit(measureState?.createdBy, measureState?.acls);
+  const canEdit = checkUserCanEdit(
+    measureState?.createdBy,
+    measureState?.acls,
+    measureState?.measureMetaData?.draft
+  );
 
   const readablePeriodStart = measureState
     ? new Date(measureState.measurementPeriodStart).toLocaleDateString()
