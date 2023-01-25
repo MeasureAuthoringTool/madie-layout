@@ -17,6 +17,7 @@ import { mockLibraryName, mockMeasureName } from "../NewMeasure/bulkCreate";
 import axios from "axios";
 import PageHeader from "../PageHeader/PageHeader";
 import { Model } from "@madie/madie-models/dist/Model";
+import { checkUserCanEdit } from "@madie/madie-util";
 
 const mockLib = mockLibraryName();
 const mockName = mockMeasureName();
@@ -83,9 +84,7 @@ jest.mock("@madie/madie-util", () => ({
   useOktaTokens: () => ({
     getAccessToken: () => "test.jwt",
   }),
-  checkUserCanEdit: jest.fn(() => {
-    return true;
-  }),
+  checkUserCanEdit: jest.fn().mockImplementation(() => true),
 }));
 
 jest.mock("axios");
@@ -232,6 +231,30 @@ describe("Page Header and Dialogs", () => {
       });
       expect(dispatchEventSpy).toHaveBeenCalledWith(expect.any(Event));
       expect(dispatchEventSpy.mock.calls[0][0].type).toBe("delete-measure");
+    });
+  });
+
+  test("Delete button is disabled when checkUserCanEdit returns false", async () => {
+    checkUserCanEdit.mockImplementationOnce(() => false);
+    await act(async () => {
+      render(
+        <MemoryRouter
+          initialEntries={[
+            {
+              pathname: "/measures/randomstroning/edit/details",
+              search: "",
+              hash: "",
+              state: undefined,
+              key: "1fewtg",
+            },
+          ]}
+        >
+          <PageHeader />
+        </MemoryRouter>
+      );
+      await waitFor(() =>
+        expect(queryByTestId("delete-measure-button")).toBeDisabled()
+      );
     });
   });
 
@@ -633,9 +656,6 @@ describe("Page Header and Dialogs", () => {
       },
       useOktaTokens: () => ({
         getAccessToken: () => "test.jwt",
-      }),
-      checkUserCanEdit: jest.fn(() => {
-        return true;
       }),
     }));
 
