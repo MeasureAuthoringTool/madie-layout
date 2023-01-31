@@ -19,11 +19,24 @@ declare module "@madie/madie-util" {
     terminologyService: {
       baseUrl: string;
     };
+    features: {
+      export: boolean;
+      measureVersioning: boolean;
+      populationCriteriaTabs: boolean;
+      applyDefaults: boolean;
+    };
   }
 
   export interface RouteHandlerState {
     canTravel: boolean;
     pendingRoute: string;
+  }
+
+  interface FeatureFlags {
+    export: boolean;
+    measureVersioning: boolean;
+    populationCriteriaTabs: boolean;
+    applyDefaults: boolean;
   }
 
   export const cqlLibraryStore: {
@@ -51,6 +64,15 @@ declare module "@madie/madie-util" {
     updateRouteHandlerState: (routeHandlerState: RouteHandlerState) => void;
     initialState: RouteHandlerState;
     state: RouteHandlerState;
+  };
+
+  export const featureFlagsStore: {
+    subscribe: (
+      setRouteHandlerState: React.Dispatch<React.SetStateAction<object>>
+    ) => import("rxjs").Subscription;
+    updateFeatureFlags: (featureFlags: FeatureFlags) => void;
+    initialState: FeatureFlags;
+    state: FeatureFlags;
   };
 
   export function getServiceConfig(): Promise<ServiceConfig>;
