@@ -97,9 +97,12 @@ const PageHeader = () => {
                 </Link>
               </Breadcrumbs>
             </div>
-            <div style={{ justifyContent: "space-between" }}>
-              <h1 tw="text-2xl text-white mb-3">{measureState?.measureName}</h1>
-              <div tw="pr-8">
+            <div>
+              <h1 tw="text-2xl text-white mb-3">{`${measureState?.measureName} v${measureState?.version}`}</h1>
+              {measureState?.measureMetaData?.draft && (
+                <div className="draft-bubble">Draft</div>
+              )}
+              <div tw="pr-8" style={{ marginLeft: "auto" }}>
                 <Button
                   disabled={!canEdit}
                   className="page-header-action-button"
