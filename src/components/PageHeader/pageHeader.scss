@@ -1,6 +1,7 @@
 .page-header {
   min-height: 186px;
   width: 100%;
+  background: linear-gradient(to right, #125496, #1a7d9f);
   &.details {
     // display:none;
     min-height: min-content;
@@ -11,7 +12,6 @@
   }
   > .measures {
     padding: 32px 64px 85px 64px;
-    background: linear-gradient(to right, #125496, #1a7d9f);
 
     > div {
       display: flex;
