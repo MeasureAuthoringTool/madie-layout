@@ -81,6 +81,14 @@ jest.mock("@madie/madie-util", () => ({
     },
     unsubscribe: () => null,
   },
+  featureFlagsStore: {
+    updateFeatureFlags: jest.fn((featureFlags) => featureFlags),
+    state: jest.fn().mockImplementation(() => null),
+    initialState: jest.fn().mockImplementation(() => null),
+    subscribe: (set) => {
+      return { unsubscribe: () => null };
+    },
+  },
   useOktaTokens: () => ({
     getAccessToken: () => "test.jwt",
   }),
@@ -92,10 +100,12 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 let postData: object = { status: 201 };
 let getData: object = { status: 200 };
 mockedAxios.post.mockResolvedValueOnce(postData);
-mockedAxios.get.mockResolvedValueOnce(getData);
 const { findByTestId, queryByText, queryByTestId, getByTestId } = screen;
 
 describe("Page Header and Dialogs", () => {
+  beforeEach(() => {
+    mockedAxios.get.mockResolvedValueOnce(getData);
+  });
   afterEach(() => {
     jest.clearAllMocks();
   });
