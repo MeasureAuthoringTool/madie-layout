@@ -1,6 +1,5 @@
 .page-header {
-  min-height: 207.04px;
-  background: linear-gradient(to right, #125496, #1a7d9f);
+  min-height: 186px;
   width: 100%;
   &.details {
     // display:none;
@@ -11,7 +10,50 @@
     }
   }
   > .measures {
-    padding: 40px 130px 30px 130px;
+    padding: 32px 64px 85px 64px;
+    background: linear-gradient(to right, #125496, #1a7d9f);
+
+    > div {
+      display: flex;
+      flex-direction: row;
+      flex-grow: 1;
+      justify-content: space-between;
+
+      > .left-col {
+        display: flex;
+        flex-direction: column;
+        font-family: Rubik, sans-serif;
+        color: #fff;
+
+        > h1 {
+          font-size: 42px;
+          font-weight: 400;
+          color: inherit;
+          margin: 0 0 8px 0;
+          line-height: 42px;
+        }
+
+        > h4 {
+          color: inherit;
+          font-size: 16px;
+          font-weight: 500;
+          margin: 0;
+          line-height: 20px;
+        }
+      }
+
+      > .right-col {
+        padding-right: 2rem;
+
+        .create-button {
+          color: #0073cb;
+        }
+      }
+    }
+  }
+  > .libraries {
+    padding: 32px 64px 95px 64px;
+    background-color: #003366;
 
     > div {
       display: flex;
@@ -29,7 +71,7 @@
           font-size: 48px;
           font-weight: 400;
           color: inherit;
-          margin: 0 0 16px 0;
+          margin: 0 0 8px 0;
           line-height: 54px;
         }
 
