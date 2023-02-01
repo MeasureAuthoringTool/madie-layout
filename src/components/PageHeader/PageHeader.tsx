@@ -209,17 +209,10 @@ const PageHeader = () => {
         </Fade>
       )}
       {pathname.includes("cql-libraries") && !pathname.includes("edit") && (
-        <div className="measures">
+        <div className="libraries">
           <div>
             <div className="left-col">
               <h1> Libraries </h1>
-              <h4>
-                {" "}
-                Welcome,{" "}
-                <Fade in={userFirstName !== ""}>
-                  <span>{userFirstName}</span>
-                </Fade>
-              </h4>
             </div>
             <div className="right-col">
               <Button
