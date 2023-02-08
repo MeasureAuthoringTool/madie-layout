@@ -47,7 +47,7 @@ const PageHeader = () => {
   const openCreate = () => {
     setCreateOpen(true);
   };
-  // const [userFirstName] = useLocalStorage("givenName", "");
+
   const handleClose = () => {
     setCreateOpen(false);
   };
