@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useOktaAuth } from "@okta/okta-react";
 import { logoutLogger } from "../../custom-hooks/customLog";
-import { useLocalStorage } from "../../custom-hooks/useLocalStorage";
 import tw, { styled } from "twin.macro";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -21,9 +20,10 @@ function UserProfile() {
         setUserInfo(info);
         setUserFirstName(info.given_name);
         window.localStorage.setItem("givenName", info.given_name);
+        window.dispatchEvent(new Event("storage"));
       })
       .catch((error) => {});
-  }, []);
+  }, [oktaAuth.token]);
 
   const logout = async () => {
     logoutLogger(userInfo);

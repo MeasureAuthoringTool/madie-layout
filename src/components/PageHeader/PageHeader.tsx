@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { useLocalStorage } from "../../custom-hooks/useLocalStorage";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import { Fade, Breadcrumbs } from "@mui/material";
@@ -19,6 +18,14 @@ import axios from "axios";
 
 const PageHeader = () => {
   const { pathname } = useLocation();
+
+  const [userFirstName, setUserFirstName] = useState<string>();
+  useEffect(() => {
+    window.addEventListener("storage", () =>
+      setUserFirstName(window.localStorage.getItem("givenName"))
+    );
+  }, []);
+
   const [createOpen, setCreateOpen] = useState<boolean>(false);
   const [libraryState, setLibraryState] = useState<any>(cqlLibraryStore.state);
   useEffect(() => {
@@ -40,7 +47,7 @@ const PageHeader = () => {
   const openCreate = () => {
     setCreateOpen(true);
   };
-  const [userFirstName] = useLocalStorage("givenName", "");
+  // const [userFirstName] = useLocalStorage("givenName", "");
   const handleClose = () => {
     setCreateOpen(false);
   };
