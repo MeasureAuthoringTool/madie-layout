@@ -10,6 +10,7 @@ export const useLocalStorage = (
 
   useEffect(() => {
     localStorage.setItem(key, value);
+    window.dispatchEvent(new Event("storage"));
   }, [key, value]);
 
   return [value, setValue];
