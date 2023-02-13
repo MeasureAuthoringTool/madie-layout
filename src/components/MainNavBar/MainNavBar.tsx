@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import logo from "../../assets/images/Logo.svg";
+import logoFull from "../../assets/images/Logo-Full.svg";
 import { DropDown, DropMenu } from "../../styles/styles";
 import { useOktaAuth } from "@okta/okta-react";
 import { NavLink } from "react-router-dom";
@@ -72,17 +73,22 @@ const MainNavBar = () => {
       >
         <div id="logo_div">
           <NavLink to="/measures" className="logo">
-            <img
-              src={logo}
-              alt="MADiE Measure Authoring Development Integrated Environment logo"
-              id="logo"
-            />
+            {!headerText && (
+              <>
+                <img
+                  src={logo}
+                  alt="MADiE Measure Authoring Development Integrated Environment logo"
+                  id="logo"
+                />
+              </>
+            )}
             {headerText && (
               <>
-                <div className="divider" />
-                <h1 className="header-info">
-                  Measure Authoring Development <br /> Integrated Environment
-                </h1>
+                <img
+                  src={logoFull}
+                  alt="MADiE Measure Authoring Development Integrated Environment logo"
+                  id="fulllogo"
+                />
               </>
             )}
           </NavLink>
