@@ -24,6 +24,7 @@ declare module "@madie/madie-util" {
       measureVersioning: boolean;
       populationCriteriaTabs: boolean;
       applyDefaults: boolean;
+      importTestCases: boolean;
     };
   }
 
@@ -37,6 +38,7 @@ declare module "@madie/madie-util" {
     measureVersioning: boolean;
     populationCriteriaTabs: boolean;
     applyDefaults: boolean;
+    importTestCases: boolean;
   }
 
   export const cqlLibraryStore: {
