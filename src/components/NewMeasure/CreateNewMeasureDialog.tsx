@@ -349,7 +349,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
                   0
                 )
               );
-              formik.setFieldValue("measurementPeriodEnd", utcStartDate);
+              formik.setFieldValue("measurementPeriodStart", utcStartDate);
             }}
             renderInput={(params) => {
               const { onChange, ...formikFieldProps } = formik.getFieldProps(
