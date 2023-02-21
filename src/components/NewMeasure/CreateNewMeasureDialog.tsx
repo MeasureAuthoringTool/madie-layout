@@ -338,18 +338,8 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
             inputFormat="MM/dd/yyyy"
             value={formik.values.measurementPeriodStart}
             onChange={(startDate) => {
-              const utcStartDate = new Date(
-                Date.UTC(
-                  startDate.getFullYear(),
-                  startDate.getMonth(),
-                  startDate.getDate(),
-                  0,
-                  0,
-                  0,
-                  0
-                )
-              );
-              formik.setFieldValue("measurementPeriodStart", utcStartDate);
+              startDate.setHours(0, 0, 0, 0);
+              formik.setFieldValue("measurementPeriodStart", startDate);
             }}
             renderInput={(params) => {
               const { onChange, ...formikFieldProps } = formik.getFieldProps(
@@ -391,18 +381,8 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
             inputFormat="MM/dd/yyyy"
             value={formik.values.measurementPeriodEnd}
             onChange={(endDate) => {
-              const utcEndDate = new Date(
-                Date.UTC(
-                  endDate.getFullYear(),
-                  endDate.getMonth(),
-                  endDate.getDate(),
-                  0,
-                  0,
-                  0,
-                  0
-                )
-              );
-              formik.setFieldValue("measurementPeriodEnd", utcEndDate);
+              endDate.setHours(23, 59, 59);
+              formik.setFieldValue("measurementPeriodEnd", endDate);
             }}
             renderInput={(params) => {
               const { onChange, ...formikFieldProps } = formik.getFieldProps(
