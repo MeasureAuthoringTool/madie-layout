@@ -1,5 +1,5 @@
 .page-header {
-  min-height: 186px;
+  min-height: 191px;
   width: 100%;
   background: linear-gradient(to right, #125496, #1a7d9f);
   &.details {
@@ -26,6 +26,7 @@
         color: #fff;
 
         > h1 {
+          display: "block";
           font-size: 42px;
           font-weight: 400;
           color: inherit;
@@ -103,6 +104,7 @@
     > div {
       display: flex;
       flex-direction: row;
+      column-gap: 8px;
       color: #fff;
       align-items: center;
 
@@ -161,10 +163,65 @@
     }
   }
 
+  //  action button and header changes
   .page-header-action-button {
     padding: 14px 23px !important;
+    white-space: nowrap;
     .page-header-action-icon {
       margin-right: 5px;
+    }
+  }
+}
+
+.truncate-header {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: horizontal;
+  overflow: hidden;
+  white-space: nowrap;
+  margin: 8px 0px;
+}
+
+.more-measures-button {
+  min-width: 21px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  font-size: 14.4px;
+  line-height: 20px;
+  color: #222222;
+  background-color: #fff;
+  border-radius: 100%;
+  gap: 8px;
+  &:hover {
+    cursor: help;
+    .more-text {
+      visibility: visible;
+    }
+  }
+  > .more-text {
+    visibility: hidden;
+    background-color: #333;
+    border-radius: 3px;
+    color: #fff;
+    text-align: center;
+    font-size: 14px;
+    padding: 8px 16px;
+    white-space: nowrap;
+    top: 27px;
+    right: 0px;
+    position: absolute;
+    z-index: 1;
+    &:after {
+      content: "";
+      width: 9px;
+      height: 9px;
+      position: absolute;
+      background-color: #333;
+      right: 6px;
+      top: -4px;
+      z-index: 2;
+      rotate: 45deg;
     }
   }
 }

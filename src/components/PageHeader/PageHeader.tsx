@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLocation, Link } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
@@ -15,6 +15,7 @@ import "twin.macro";
 import "styled-components/macro";
 import "./pageHeader.scss";
 import axios from "axios";
+import { useIsOverflow } from "./useIsOverflow";
 
 const PageHeader = () => {
   const { pathname } = useLocation();
@@ -84,6 +85,9 @@ const PageHeader = () => {
       });
   }, []);
 
+  const overflowingText = useRef<HTMLHeadingElement>(null);
+  const isOverflow = useIsOverflow(overflowingText, () => {});
+
   return (
     <div className={pageHeaderClass} id="page-header">
       {/* edit measures, measure details */}
@@ -97,7 +101,6 @@ const PageHeader = () => {
                 </Link>
                 <Link
                   tw="text-white hover:text-white"
-                  // to={`/cql/${libraryState?.id}/edit/details`}
                   to={`/measures/${measureState?.id}/edit/details`}
                 >
                   Details
@@ -105,10 +108,18 @@ const PageHeader = () => {
               </Breadcrumbs>
             </div>
             <div>
-              <h1 tw="text-2xl text-white mb-3">{`${measureState?.measureName} v${measureState?.version}`}</h1>
-              {measureState?.measureMetaData?.draft && (
-                <div className="draft-bubble">Draft</div>
+              <h1
+                ref={overflowingText}
+                className="truncate-header"
+                tw="text-2xl text-white mb-3"
+              >{`${measureState?.measureName}`}</h1>
+              {isOverflow && (
+                <div className="more-measures-button">
+                  ...
+                  <span className="more-text">{measureState?.measureName}</span>
+                </div>
               )}
+
               <div tw="pr-8" style={{ marginLeft: "auto" }}>
                 <Button
                   disabled={!canEdit}
@@ -126,6 +137,7 @@ const PageHeader = () => {
               </div>
             </div>
             <div>
+              <p tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(221,221,221, 0.5)] leading-none first:pl-0 first:ml-0 first:border-0">{`Version ${measureState?.version}`}</p>
               {[
                 measureState?.model,
                 // measureState?.version, // not yet implemented
@@ -142,6 +154,9 @@ const PageHeader = () => {
                     </p>
                   );
               })}
+              {measureState?.measureMetaData?.draft && (
+                <div className="draft-bubble">Draft</div>
+              )}
             </div>
           </div>
         </Fade>
@@ -193,10 +208,11 @@ const PageHeader = () => {
               </Breadcrumbs>
             </div>
             <div tw="py-4">
-              <h2 tw="text-2xl text-white mb-0">{`${libraryState?.cqlLibraryName} v${libraryState?.version}`}</h2>
+              <h2 tw="text-2xl text-white mb-0">{`${libraryState?.cqlLibraryName}`}</h2>
               {libraryState?.draft && <div className="draft-bubble">Draft</div>}
             </div>
             <div>
+              <p tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(221,221,221, 0.5)] leading-none first:pl-0 first:ml-0 first:border-0">{`Version ${libraryState?.version}`}</p>
               {[libraryState?.model, readableLibraryStartDate].map(
                 (val, key) => {
                   if (val)
