@@ -113,6 +113,7 @@ const PageHeader = () => {
                 className="truncate-header"
                 tw="text-2xl text-white mb-3"
               >{`${measureState?.measureName}`}</h1>
+              {/* Currently unable to test ResizeObserver with Jest and RTL due to limitations. Testable with cypress. */}
               {isOverflow && (
                 <div
                   className="more-measures-button"
