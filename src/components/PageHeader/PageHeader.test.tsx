@@ -31,6 +31,9 @@ const mockFormikInfo = {
   measurementPeriodStart: "01/05/2022",
   measurementPeriodEnd: "03/07/2022",
   active: true,
+  measureMetaData: {
+    draft: true,
+  },
 };
 const mockLibraryInfo = {
   id: "randomstring",
@@ -152,6 +155,9 @@ describe("Page Header and Dialogs", () => {
       await waitFor(() => {
         expect(queryByText("QI-Core v4.1.1")).toBeInTheDocument();
       });
+      await waitFor(() => {
+        expect(queryByText("Draft")).toBeInTheDocument();
+      });
     });
   });
 
@@ -236,6 +242,9 @@ describe("Page Header and Dialogs", () => {
       const deleteButton = await findByTestId("delete-measure-button");
       expect(deleteButton).toBeTruthy();
       expect(deleteButton).toBeEnabled();
+      await waitFor(() => {
+        expect(queryByText("Draft")).toBeInTheDocument();
+      });
       act(() => {
         fireEvent.click(deleteButton);
       });
