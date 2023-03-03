@@ -114,7 +114,10 @@ const PageHeader = () => {
                 tw="text-2xl text-white mb-3"
               >{`${measureState?.measureName}`}</h1>
               {isOverflow && (
-                <div className="more-measures-button">
+                <div
+                  className="more-measures-button"
+                  data-testId="more-measure-name-button"
+                >
                   ...
                   <span className="more-text">{measureState?.measureName}</span>
                 </div>
@@ -155,7 +158,9 @@ const PageHeader = () => {
                   );
               })}
               {measureState?.measureMetaData?.draft && (
-                <div className="draft-bubble">Draft</div>
+                <div className="draft-bubble" data-testid="draft-bubble">
+                  Draft
+                </div>
               )}
             </div>
           </div>
@@ -209,7 +214,11 @@ const PageHeader = () => {
             </div>
             <div tw="py-4">
               <h2 tw="text-2xl text-white mb-0">{`${libraryState?.cqlLibraryName}`}</h2>
-              {libraryState?.draft && <div className="draft-bubble">Draft</div>}
+              {libraryState?.draft && (
+                <div className="draft-bubble" data-testid="draft-bubble">
+                  Draft
+                </div>
+              )}
             </div>
             <div>
               <p tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(221,221,221, 0.5)] leading-none first:pl-0 first:ml-0 first:border-0">{`Version ${libraryState?.version}`}</p>
