@@ -21,7 +21,7 @@ declare module "@madie/madie-util" {
     };
     features: {
       export: boolean;
-      measureVersioning: boolean;
+      //measureVersioning: boolean;
       populationCriteriaTabs: boolean;
       applyDefaults: boolean;
       importTestCases: boolean;
@@ -35,7 +35,7 @@ declare module "@madie/madie-util" {
 
   interface FeatureFlags {
     export: boolean;
-    measureVersioning: boolean;
+    // measureVersioning: boolean;
     populationCriteriaTabs: boolean;
     applyDefaults: boolean;
     importTestCases: boolean;
