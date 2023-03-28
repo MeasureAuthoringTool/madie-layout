@@ -23,7 +23,7 @@ jest.mock("@madie/madie-util", () => ({
     initialState: null,
     updateMeasure: (measure) => measure,
   },
-  useFeatureFlags: jest.fn().mockReturnValue({qdm: false}),
+  useFeatureFlags: jest.fn().mockReturnValue({ qdm: false }),
 }));
 
 const formikInfo = {
@@ -43,8 +43,8 @@ describe("Measures Create Dialog", () => {
 
   test("Checking for all the items in the measure creation form", async () => {
     await act(async () => {
-      const {findByTestId} = await render(
-        <CreateNewMeasureDialog open={true} onClose={undefined}/>
+      const { findByTestId } = await render(
+        <CreateNewMeasureDialog open={true} onClose={undefined} />
       );
       expect(await findByTestId("measure-name-text-field")).toBeInTheDocument();
       expect(await findByTestId("measure-model-select")).toBeInTheDocument();
@@ -80,8 +80,8 @@ describe("Measures Create Dialog", () => {
 
   test("to check if all given inputs are as expected", async () => {
     await act(async () => {
-      const {queryByTestId, getByTestId} = await render(
-        <CreateNewMeasureDialog open={true} onClose={undefined}/>
+      const { queryByTestId, getByTestId } = await render(
+        <CreateNewMeasureDialog open={true} onClose={undefined} />
       );
 
       const nameNode = await getByTestId("measure-name-input");
@@ -102,7 +102,7 @@ describe("Measures Create Dialog", () => {
       const modelSelect = await getByTestId("measure-model-select");
       fireEvent.click(modelSelect);
       const modelNode = await getByTestId("measure-model-input");
-      fireEvent.select(modelNode, {target: {value: formikInfo.model}});
+      fireEvent.select(modelNode, { target: { value: formikInfo.model } });
       expect(modelNode.value).toBe(formikInfo.model);
       Simulate.change(modelNode);
 
@@ -143,8 +143,8 @@ describe("Measures Create Dialog", () => {
 
   test("the dialog does not have a Model option for QDM when the feature flag is disabled", async () => {
     await act(async () => {
-      const {queryByTestId, getByTestId} = await render(
-        <CreateNewMeasureDialog open={true} onClose={undefined}/>
+      const { queryByTestId, getByTestId } = await render(
+        <CreateNewMeasureDialog open={true} onClose={undefined} />
       );
 
       const nameNode = (await getByTestId(
@@ -162,9 +162,9 @@ describe("Measures Create Dialog", () => {
   }, 10000);
 
   test("the dialog allows create for a QDM measure", async () => {
-    (useFeatureFlags as jest.Mock).mockReturnValue({qdm: true});
-    const {queryByTestId, getByTestId} = await render(
-      <CreateNewMeasureDialog open={true} onClose={undefined}/>
+    (useFeatureFlags as jest.Mock).mockReturnValue({ qdm: true });
+    const { queryByTestId, getByTestId } = await render(
+      <CreateNewMeasureDialog open={true} onClose={undefined} />
     );
 
     const nameNode = (await getByTestId(
@@ -190,9 +190,7 @@ describe("Measures Create Dialog", () => {
     expect(options.length).toEqual(2);
     userEvent.click(options[1]);
 
-    const measurementPeriodStartNode = getByTestId(
-      "measurement-period-start"
-    );
+    const measurementPeriodStartNode = getByTestId("measurement-period-start");
     const measurementPeriodStartInput = within(
       measurementPeriodStartNode
     ).getByRole("textbox") as HTMLInputElement;
@@ -208,10 +206,7 @@ describe("Measures Create Dialog", () => {
     const measurementPeriodEndInput = within(
       measurementPeriodEndNode
     ).getByRole("textbox") as HTMLInputElement;
-    userEvent.type(
-      measurementPeriodEndInput,
-      formikInfo.measurementPeriodEnd
-    );
+    userEvent.type(measurementPeriodEndInput, formikInfo.measurementPeriodEnd);
     expect(measurementPeriodEndInput.value).toBe(
       formikInfo.measurementPeriodEnd
     );
@@ -226,7 +221,7 @@ describe("Measures Create Dialog", () => {
 
   test("checking if error text is displayed for invalid dates", async () => {
     await act(async () => {
-      await render(<CreateNewMeasureDialog open={true} onClose={undefined}/>);
+      await render(<CreateNewMeasureDialog open={true} onClose={undefined} />);
 
       const measurementPeriodStartNode = screen.getByTestId(
         "measurement-period-start"
@@ -267,7 +262,7 @@ describe("Measures Create Dialog", () => {
 
   test("checking if error text is displayed when measurement periods are not provided", async () => {
     await act(async () => {
-      await render(<CreateNewMeasureDialog open={true} onClose={undefined}/>);
+      await render(<CreateNewMeasureDialog open={true} onClose={undefined} />);
 
       const measurementPeriodStartNode = screen.getByTestId(
         "measurement-period-start"
@@ -308,7 +303,7 @@ describe("Measures Create Dialog", () => {
 
   test("checking if error text is displayed when measurement periods are not between the years 1900 and 2100", async () => {
     await act(async () => {
-      await render(<CreateNewMeasureDialog open={true} onClose={undefined}/>);
+      await render(<CreateNewMeasureDialog open={true} onClose={undefined} />);
 
       const measurementPeriodStartNode = screen.getByTestId(
         "measurement-period-start"
@@ -349,8 +344,8 @@ describe("Measures Create Dialog", () => {
   });
 
   test("checking if error text is displayed when measurement periods end date is before or equal to start date", async () => {
-    const {getByTestId} = render(
-      <CreateNewMeasureDialog open={true} onClose={undefined}/>
+    const { getByTestId } = render(
+      <CreateNewMeasureDialog open={true} onClose={undefined} />
     );
     const measurementPeriodStartNode = getByTestId("measurement-period-start");
     const measurementPeriodStartInput = within(
