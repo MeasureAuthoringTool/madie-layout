@@ -12,6 +12,7 @@ import {
 import { act, Simulate } from "react-dom/test-utils";
 import userEvent from "@testing-library/user-event";
 import CreateNewMeasureDialog from "./CreateNewMeasureDialog";
+import { useFeatureFlags } from "@madie/madie-util";
 
 jest.mock("@madie/madie-util", () => ({
   useOktaTokens: () => ({
@@ -22,6 +23,7 @@ jest.mock("@madie/madie-util", () => ({
     initialState: null,
     updateMeasure: (measure) => measure,
   },
+  useFeatureFlags: jest.fn().mockReturnValue({ qdm: false }),
 }));
 
 const formikInfo = {
@@ -138,6 +140,84 @@ describe("Measures Create Dialog", () => {
       });
     });
   });
+
+  test("the dialog does not have a Model option for QDM when the feature flag is disabled", async () => {
+    await act(async () => {
+      const { queryByTestId, getByTestId } = await render(
+        <CreateNewMeasureDialog open={true} onClose={undefined} />
+      );
+
+      const nameNode = (await getByTestId(
+        "measure-name-input"
+      )) as HTMLInputElement;
+      userEvent.type(nameNode, "QdmMeasure");
+      expect(nameNode.value).toBe("QdmMeasure");
+
+      const modelSelect = await getByTestId("measure-model-select");
+      const modelSelectBtn = await within(modelSelect).getByRole("button");
+      userEvent.click(modelSelectBtn);
+      const options = await screen.findAllByRole("option");
+      expect(options.length).toEqual(1);
+    });
+  }, 10000);
+
+  test("the dialog allows create for a QDM measure", async () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ qdm: true });
+    const { queryByTestId, getByTestId } = await render(
+      <CreateNewMeasureDialog open={true} onClose={undefined} />
+    );
+
+    const nameNode = (await getByTestId(
+      "measure-name-input"
+    )) as HTMLInputElement;
+    userEvent.type(nameNode, "QdmMeasure");
+    expect(nameNode.value).toBe("QdmMeasure");
+
+    const libraryNode = (await getByTestId(
+      "cql-library-name-input"
+    )) as HTMLInputElement;
+    userEvent.type(libraryNode, "QdmMeasureLib");
+    expect(libraryNode.value).toBe("QdmMeasureLib");
+
+    const ecqmNode = (await getByTestId("ecqm-input")) as HTMLInputElement;
+    userEvent.type(ecqmNode, "ecqmTitleQdm");
+    expect(ecqmNode.value).toBe("ecqmTitleQdm");
+
+    const modelSelect = await getByTestId("measure-model-select");
+    const modelSelectBtn = await within(modelSelect).getByRole("button");
+    userEvent.click(modelSelectBtn);
+    const options = await screen.findAllByRole("option");
+    expect(options.length).toEqual(2);
+    userEvent.click(options[1]);
+
+    const measurementPeriodStartNode = getByTestId("measurement-period-start");
+    const measurementPeriodStartInput = within(
+      measurementPeriodStartNode
+    ).getByRole("textbox") as HTMLInputElement;
+    userEvent.type(
+      measurementPeriodStartInput,
+      formikInfo.measurementPeriodStart
+    );
+    expect(measurementPeriodStartInput.value).toBe(
+      formikInfo.measurementPeriodStart
+    );
+
+    const measurementPeriodEndNode = getByTestId("measurement-period-end");
+    const measurementPeriodEndInput = within(
+      measurementPeriodEndNode
+    ).getByRole("textbox") as HTMLInputElement;
+    userEvent.type(measurementPeriodEndInput, formikInfo.measurementPeriodEnd);
+    expect(measurementPeriodEndInput.value).toBe(
+      formikInfo.measurementPeriodEnd
+    );
+
+    const submitButton = await getByTestId("continue-button");
+    await waitFor(() => expect(submitButton).not.toBeDisabled());
+    fireEvent.click(submitButton);
+    await waitFor(() => {
+      expect(queryByTestId("server-error-alerts")).not.toBeInTheDocument();
+    });
+  }, 10000);
 
   test("checking if error text is displayed for invalid dates", async () => {
     await act(async () => {

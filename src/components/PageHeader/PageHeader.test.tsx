@@ -96,6 +96,7 @@ jest.mock("@madie/madie-util", () => ({
     getAccessToken: () => "test.jwt",
   }),
   checkUserCanEdit: jest.fn().mockImplementation(() => true),
+  useFeatureFlags: jest.fn().mockReturnValue({ qdm: false }),
 }));
 
 jest.mock("axios");
