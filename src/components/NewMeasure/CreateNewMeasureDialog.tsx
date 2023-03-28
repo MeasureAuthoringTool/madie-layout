@@ -41,7 +41,6 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
     toastType: "danger",
     toastMessage: "",
   });
-  // const [modelOptions, setModelOptions] = useState<string[]>([]);
   const { toastOpen, toastType, toastMessage } = toast;
   const formik = useFormik({
     initialValues: {
