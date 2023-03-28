@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import tw from "twin.macro";
 import "styled-components/macro";
 import { Measure } from "@madie/madie-models/dist/Measure";
@@ -16,6 +16,7 @@ import { Box } from "@mui/system";
 import {
   getServiceConfig,
   ServiceConfig,
+  useFeatureFlags,
   useOktaTokens,
 } from "@madie/madie-util";
 import axios from "axios";
@@ -34,11 +35,13 @@ interface Toast {
 
 const CreateNewMeasureDialog = ({ open, onClose }) => {
   const { getAccessToken } = useOktaTokens();
+  const featureFlags = useFeatureFlags();
   const [toast, setToast] = useState<Toast>({
     toastOpen: false,
     toastType: "danger",
     toastMessage: "",
   });
+  // const [modelOptions, setModelOptions] = useState<string[]>([]);
   const { toastOpen, toastType, toastMessage } = toast;
   const formik = useFormik({
     initialValues: {
@@ -59,6 +62,11 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
       await createMeasure(values);
     },
   });
+
+  const modelOptions = featureFlags?.qdm
+    ? Object.keys(Model)
+    : [Object.keys(Model)[0]];
+
   async function createMeasure(measure: Measure) {
     const config: ServiceConfig = await getServiceConfig();
 
@@ -316,7 +324,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
           error={formik.touched.model && Boolean(formik.errors.model)}
           helperText={formik.touched.model && formik.errors.model}
           size="small"
-          options={Object.keys(Model).map((modelKey) => {
+          options={modelOptions.map((modelKey) => {
             return (
               <MenuItem
                 key={modelKey}
