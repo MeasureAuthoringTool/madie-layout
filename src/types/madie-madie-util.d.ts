@@ -22,7 +22,6 @@ declare module "@madie/madie-util" {
     features: {
       export: boolean;
       populationCriteriaTabs: boolean;
-      applyDefaults: boolean;
       importTestCases: boolean;
       qdm: boolean;
     };
