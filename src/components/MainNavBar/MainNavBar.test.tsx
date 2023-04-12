@@ -212,19 +212,19 @@ describe("UMLS Connection Dialog", () => {
       );
 
       const measuresLink = await findByTestId("main-nav-bar-measures");
-      fireEvent.click(measuresLink);
-      const measuresLi = await findByTestId("main-nav-bar-measures");
-      expect(measuresLi).toHaveClass("active");
-
+      act(() => {
+        fireEvent.click(measuresLink);
+      });
+      await waitFor(() => {
+        expect(measuresLink).toHaveAttribute("aria-selected", "true");
+      });
       const librariesLink = await findByTestId("main-nav-bar-cql-library");
-      fireEvent.click(librariesLink);
-      const librariesLI = await findByTestId("main-nav-bar-cql-library");
-      expect(librariesLI).toHaveClass("active");
-
-      // const help = await findByTestId("main-nav-bar-help");
-      // fireEvent.click(help);
-      // const helpLI = await findByTestId("main-nav-bar-help");
-      // expect(helpLI).toHaveClass("active");
+      act(() => {
+        fireEvent.click(librariesLink);
+      });
+      await waitFor(() => {
+        expect(librariesLink).toHaveAttribute("aria-selected", "true");
+      });
     });
   });
 
