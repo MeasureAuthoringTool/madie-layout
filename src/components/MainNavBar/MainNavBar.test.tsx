@@ -9,7 +9,7 @@ import {
   screen,
 } from "@testing-library/react";
 import { describe, expect, test } from "@jest/globals";
-import { act, Simulate } from "react-dom/test-utils";
+import { act } from "react-dom/test-utils";
 import { MemoryRouter } from "react-router";
 
 import { useOktaAuth } from "@okta/okta-react";
