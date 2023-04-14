@@ -60,7 +60,6 @@ const MainNavBar = () => {
   }, []);
 
   const { pathname } = useLocation();
-  const history = useHistory();
   // need either /measures/ we will never hit /help
   const [selected, setSelected] = useState("");
   useEffect(() => {
@@ -70,15 +69,6 @@ const MainNavBar = () => {
       setSelected("/cql-libraries");
     }
   }, [pathname, setSelected]);
-
-  const handleChange = (e, v) => {
-    if (v === "help") {
-      window.open("https://www.emeasuretool.cms.gov/madie-mvp", "_blank");
-    } else {
-      setSelected(v);
-      history.push(v);
-    }
-  };
 
   return (
     <nav>
@@ -117,15 +107,12 @@ const MainNavBar = () => {
           <DropMenu>
             {authState?.isAuthenticated && (
               <>
-                <Tabs
-                  size="standard"
-                  type="B"
-                  onChange={handleChange}
-                  value={selected}
-                >
+                <Tabs size="standard" type="B" value={selected}>
                   <Tab
                     type="B"
                     value="/measures"
+                    to="/measures"
+                    component={NavLink}
                     name="measures"
                     aria-label="Measures"
                     id="measures-main-nav-bar-tab"
@@ -135,7 +122,9 @@ const MainNavBar = () => {
                   <Tab
                     type="B"
                     name="cql-libraries"
+                    component={NavLink}
                     value="/cql-libraries"
+                    to="/cql-libraries"
                     aria-label="CQL Library"
                     id="cql-library-main-nav-bar-tab"
                     data-testid="main-nav-bar-cql-library"
@@ -147,6 +136,12 @@ const MainNavBar = () => {
                     data-testid="main-nav-bar-help"
                     label="Help"
                     value="help"
+                    onClick={() => {
+                      window.open(
+                        "https://www.emeasuretool.cms.gov/madie-mvp",
+                        "_blank"
+                      );
+                    }}
                   />
                 </Tabs>
                 <li className="activity-button">
