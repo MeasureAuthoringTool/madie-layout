@@ -60,7 +60,6 @@ const MainNavBar = () => {
   }, []);
 
   const { pathname } = useLocation();
-  const history = useHistory();
   // need either /measures/ we will never hit /help
   const [selected, setSelected] = useState("");
   useEffect(() => {
@@ -70,15 +69,6 @@ const MainNavBar = () => {
       setSelected("/cql-libraries");
     }
   }, [pathname, setSelected]);
-
-  const handleChange = (e, v) => {
-    if (v === "help") {
-      window.open("https://www.emeasuretool.cms.gov/madie-mvp", "_blank");
-    } else {
-      setSelected(v);
-      history.push(v);
-    }
-  };
 
   return (
     <nav>
