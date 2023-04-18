@@ -58,12 +58,16 @@ const PageHeader = () => {
     measureState?.acls,
     measureState?.measureMetaData?.draft
   );
-
+  const makeUTCDate = (date) => {
+    return `${
+      date.getUTCMonth() + 1
+    }/${date.getUTCDate()}/${date.getUTCFullYear()}`;
+  };
   const readablePeriodStart = measureState
-    ? new Date(measureState.measurementPeriodStart).toLocaleDateString()
+    ? makeUTCDate(new Date(measureState.measurementPeriodStart))
     : null;
   const readablePeriodEnd = measureState
-    ? new Date(measureState.measurementPeriodEnd).toLocaleDateString()
+    ? makeUTCDate(new Date(measureState.measurementPeriodEnd))
     : null;
   const readableLibraryStartDate = libraryState
     ? new Date(libraryState.createdAt).toLocaleDateString()
