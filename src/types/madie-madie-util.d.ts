@@ -21,10 +21,9 @@ declare module "@madie/madie-util" {
     };
     features: {
       export: boolean;
-      measureVersioning: boolean;
       populationCriteriaTabs: boolean;
-      applyDefaults: boolean;
       importTestCases: boolean;
+      qdm: boolean;
     };
   }
 
@@ -35,10 +34,10 @@ declare module "@madie/madie-util" {
 
   interface FeatureFlags {
     export: boolean;
-    measureVersioning: boolean;
     populationCriteriaTabs: boolean;
     applyDefaults: boolean;
     importTestCases: boolean;
+    qdm: boolean;
   }
 
   export const cqlLibraryStore: {
@@ -67,6 +66,8 @@ declare module "@madie/madie-util" {
     initialState: RouteHandlerState;
     state: RouteHandlerState;
   };
+
+  export function useFeatureFlags(): FeatureFlags;
 
   export const featureFlagsStore: {
     subscribe: (

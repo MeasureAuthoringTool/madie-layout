@@ -3,13 +3,12 @@ import logo from "../../assets/images/Logo.svg";
 import logoFull from "../../assets/images/Logo-Full.svg";
 import { DropDown, DropMenu } from "../../styles/styles";
 import { useOktaAuth } from "@okta/okta-react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useHistory, useLocation } from "react-router-dom";
 import UserProfile from "./UserProfile";
 import UserAvatar from "./UserAvatar";
 import UMLSDialog from "./UMLSDialog";
-import { Toast } from "@madie/madie-design-system/dist/react";
+import { Tabs, Tab, Toast } from "@madie/madie-design-system/dist/react";
 import { useTerminologyServiceApi } from "@madie/madie-util";
-
 import "./MainNavBar.scss";
 
 const MainNavBar = () => {
@@ -60,6 +59,17 @@ const MainNavBar = () => {
     return () => window.removeEventListener("resize", resizeWindow);
   }, []);
 
+  const { pathname } = useLocation();
+  // need either /measures/ we will never hit /help
+  const [selected, setSelected] = useState("");
+  useEffect(() => {
+    if (pathname.includes("/measures")) {
+      setSelected("/measures");
+    } else if (pathname.includes("/cql-libraries")) {
+      setSelected("/cql-libraries");
+    }
+  }, [pathname, setSelected]);
+
   return (
     <nav>
       <a href="#page-header" className="skip-nav-link">
@@ -97,44 +107,43 @@ const MainNavBar = () => {
           <DropMenu>
             {authState?.isAuthenticated && (
               <>
-                <li data-testid="nav-measures-li" className="nav-item">
-                  <NavLink
-                    activeClassName="active"
-                    className="nav-link"
+                <Tabs size="standard" type="B" value={selected}>
+                  <Tab
+                    type="B"
+                    value="/measures"
                     to="/measures"
+                    component={NavLink}
+                    name="measures"
                     aria-label="Measures"
                     id="measures-main-nav-bar-tab"
                     data-testid="main-nav-bar-measures"
-                  >
-                    Measures
-                  </NavLink>
-                </li>
-                <li data-testid="nav-libraries-li" className="nav-item">
-                  <NavLink
-                    className="nav-link"
-                    activeClassName="active"
+                    label="Measures"
+                  />
+                  <Tab
+                    type="B"
+                    name="cql-libraries"
+                    component={NavLink}
+                    value="/cql-libraries"
                     to="/cql-libraries"
                     aria-label="CQL Library"
                     id="cql-library-main-nav-bar-tab"
                     data-testid="main-nav-bar-cql-library"
-                  >
-                    Libraries
-                  </NavLink>
-                </li>
-                <li data-testid="nav-help-li" className="nav-item">
-                  <NavLink
-                    className="nav-link"
-                    activeClassName="active"
-                    to={{
-                      pathname: "https://www.emeasuretool.cms.gov/madie-mvp",
-                    }}
-                    target="_blank"
+                    label="Libraries"
+                  />
+                  <Tab
+                    type="B"
                     aria-label="Help"
                     data-testid="main-nav-bar-help"
-                  >
-                    Help
-                  </NavLink>
-                </li>
+                    label="Help"
+                    value="help"
+                    onClick={() => {
+                      window.open(
+                        "https://www.emeasuretool.cms.gov/madie-mvp",
+                        "_blank"
+                      );
+                    }}
+                  />
+                </Tabs>
                 <li className="activity-button">
                   <button
                     onClick={() => setDOpen(!isLoggedInToUMLS)}
