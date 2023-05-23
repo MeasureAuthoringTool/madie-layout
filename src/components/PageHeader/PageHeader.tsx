@@ -54,8 +54,8 @@ const PageHeader = () => {
   };
   // dialog utilities just for delete measure
   const canEdit = checkUserCanEdit(
-    measureState?.createdBy,
-    measureState?.acls,
+    measureState?.measureSet?.owner,
+    measureState?.measureSet?.acls,
     measureState?.measureMetaData?.draft
   );
   const makeUTCDate = (date) => {
