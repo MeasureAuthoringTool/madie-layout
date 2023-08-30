@@ -36,6 +36,7 @@ interface Toast {
 const CreateNewMeasureDialog = ({ open, onClose }) => {
   const { getAccessToken } = useOktaTokens();
   const featureFlags = useFeatureFlags();
+  const [cqlLibraryHelper, setCqlLibraryHelper] = useState(String);
   const [toast, setToast] = useState<Toast>({
     toastOpen: false,
     toastType: "danger",
@@ -137,6 +138,23 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
   const onFocus = (field) => {
     setFocusedField(field);
   };
+
+  useEffect(() => {
+    if (
+      (formik.touched["cqlLibraryName"] || focusedField === "cqlLibraryName") &&
+      formikErrorHandler("cqlLibraryName", true)
+    ) {
+      setCqlLibraryHelper(
+        "Measure Library name must start with an upper case letter, followed by alpha-numeric character(s) and must not contain spaces or other special characters."
+      );
+    } else if (formik.values.cqlLibraryName.length > 64) {
+      setCqlLibraryHelper(
+        "A Measure Libary Name cannot be more than 64 characters"
+      );
+    } else {
+      setCqlLibraryHelper(null);
+    }
+  }, [formik.values.cqlLibraryName, formik.touched, focusedField]);
 
   return (
     <MadieDialog
@@ -247,13 +265,9 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
             "data-testid": "cql-library-name-input",
             "aria-describedby": "cqlLibraryName-helper-text",
             required: true,
+            maxLength: 64,
           }}
-          helperText={
-            (formik.touched["cqlLibraryName"] ||
-              focusedField === "cqlLibraryName") &&
-            (formikErrorHandler("cqlLibraryName", true) ||
-              "Measure Library name must start with an upper case letter, followed by alpha-numeric character(s) and must not contain spaces or other special characters.")
-          }
+          helperText={cqlLibraryHelper}
           size="small"
           error={
             formik.touched.cqlLibraryName &&
