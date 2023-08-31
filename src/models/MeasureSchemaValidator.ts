@@ -20,7 +20,8 @@ export const MeasureSchemaValidator = Yup.object().shape({
     .matches(
       /^[A-Z][a-zA-Z0-9]*$/,
       "Measure Library name must start with an upper case letter, followed by alpha-numeric character(s) and must not contain spaces or other special characters."
-    ),
+    )
+    .max(64, "Measure Library name must be shorter than 64 characters."),
   ecqmTitle: Yup.string()
     .required("eCQM Abbreviated Title is required.")
     .max(32, "eCQM Abbreviated Title cannot be more than 32 characters."),
