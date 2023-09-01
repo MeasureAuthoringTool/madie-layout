@@ -247,7 +247,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
             "data-testid": "cql-library-name-input",
             "aria-describedby": "cqlLibraryName-helper-text",
             required: true,
-            maxLength: 65,
+            maxLength: 64,
           }}
           helperText={
             (formik.touched["cqlLibraryName"] ||
