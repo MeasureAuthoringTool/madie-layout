@@ -247,12 +247,13 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
             "data-testid": "cql-library-name-input",
             "aria-describedby": "cqlLibraryName-helper-text",
             required: true,
-            maxLength: 64,
+            maxLength: 65,
           }}
           helperText={
             (formik.touched["cqlLibraryName"] ||
               focusedField === "cqlLibraryName") &&
-            formikErrorHandler("cqlLibraryName", true)
+            (formikErrorHandler("cqlLibraryName", true) ||
+              "Measure Library name must start with an upper case letter, followed by alpha-numeric character(s) and must not contain spaces or other special characters.")
           }
           size="small"
           error={
