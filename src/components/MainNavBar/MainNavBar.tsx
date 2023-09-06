@@ -72,10 +72,14 @@ const MainNavBar = () => {
 
   return (
     <nav>
-      <a href="#page-header" className="skip-nav-link" onClick={(e) => {
-        e.preventDefault();
-        document.getElementById("first-item").focus();
-      }}>
+      <a
+        href="#page-header"
+        className="skip-nav-link"
+        onClick={(e) => {
+          e.preventDefault();
+          document.getElementById("first-item").focus();
+        }}
+      >
         Skip to main content
       </a>
       <header

@@ -100,7 +100,11 @@ const PageHeader = () => {
           <div className="details">
             <div>
               <Breadcrumbs aria-label="measures">
-                <Link tw="text-white hover:text-white" to="/measures" id="first-item">
+                <Link
+                  tw="text-white hover:text-white"
+                  to="/measures"
+                  id="first-item"
+                >
                   Measures
                 </Link>
                 <Link
@@ -207,7 +211,11 @@ const PageHeader = () => {
           <div className="details">
             <div>
               <Breadcrumbs aria-label="Libraries">
-                <Link tw="text-white hover:text-white" to="/cql-libraries" id="first-item">
+                <Link
+                  tw="text-white hover:text-white"
+                  to="/cql-libraries"
+                  id="first-item"
+                >
                   Libraries
                 </Link>
                 <Link
