@@ -100,7 +100,11 @@ const PageHeader = () => {
           <div className="details">
             <div>
               <Breadcrumbs aria-label="measures">
-                <Link tw="text-white hover:text-white" to="/measures">
+                <Link
+                  tw="text-white hover:text-white"
+                  to="/measures"
+                  id="first-item"
+                >
                   Measures
                 </Link>
                 <Link
@@ -188,6 +192,7 @@ const PageHeader = () => {
             </div>
             <div className="right-col">
               <Button
+                id="first-item"
                 variant="outline-filled"
                 className="page-header-action-button"
                 data-testid="create-new-measure-button"
@@ -206,7 +211,11 @@ const PageHeader = () => {
           <div className="details">
             <div>
               <Breadcrumbs aria-label="Libraries">
-                <Link tw="text-white hover:text-white" to="/cql-libraries">
+                <Link
+                  tw="text-white hover:text-white"
+                  to="/cql-libraries"
+                  id="first-item"
+                >
                   Libraries
                 </Link>
                 <Link
@@ -253,6 +262,7 @@ const PageHeader = () => {
             </div>
             <div className="right-col">
               <Button
+                id="first-item"
                 variant="outline-filled"
                 className="page-header-action-button"
                 data-testid="create-new-cql-library-button"

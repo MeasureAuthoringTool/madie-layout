@@ -1,3 +1,8 @@
+#first-item:focus {
+  outline: 5px auto -webkit-focus-ring-color !important;
+  outline-offset: -2px !important;
+}
+
 #logo {
   width: 137.5px;
   height: 25px;
