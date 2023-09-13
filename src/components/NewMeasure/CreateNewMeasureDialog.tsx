@@ -217,6 +217,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
             "data-testid": "measure-name-input",
             "aria-describedby": "measureName-helper-text",
             required: true,
+            "aria-required": true,
           }}
           helperText={
             (formik.touched["measureName"] || focusedField === "measureName") &&
@@ -247,6 +248,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
             "data-testid": "cql-library-name-input",
             "aria-describedby": "cqlLibraryName-helper-text",
             required: true,
+            "aria-required": true,
           }}
           helperText={
             (formik.touched["cqlLibraryName"] ||
@@ -277,6 +279,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
             "data-testid": "ecqm-input",
             "aria-describedby": "ecqmTitle-helper-text",
             required: true,
+            "aria-required": true,
           }}
           helperText={formikErrorHandler("ecqmTitle", true)}
           size="small"
@@ -318,6 +321,9 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
             "aria-describedby": "model-select-helper-text",
             required: true,
           }}
+          SelectDisplayProps={{
+            "aria-required": "true",
+          }}
           data-testid="measure-model-select"
           {...formik.getFieldProps("model")}
           error={formik.touched.model && Boolean(formik.errors.model)}
@@ -348,6 +354,8 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
               formik.setFieldValue("measurementPeriodStart", startDate);
             }}
             renderInput={(params) => {
+              const { inputProps } = params;
+              inputProps["aria-required"] = true;
               const { onChange, ...formikFieldProps } = formik.getFieldProps(
                 "measurementPeriodStart"
               );
@@ -373,6 +381,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
                     "data-testid": "measurement-period-start-input",
                     "aria-describedby":
                       "create-measure-period-start-helper-text",
+                    "aria-required": true,
                   }}
                   onBlur={() => onBlur("measurementPeriodStart")}
                 />
@@ -390,6 +399,8 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
               formik.setFieldValue("measurementPeriodEnd", endDate);
             }}
             renderInput={(params) => {
+              const { inputProps } = params;
+              inputProps["aria-required"] = true;
               const { onChange, ...formikFieldProps } = formik.getFieldProps(
                 "measurementPeriodEnd"
               );
@@ -415,6 +426,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
                     "data-testid": "measurement-period-end-input",
                     "aria-describedby": "create-measure-period-end-helper-text",
                     required: true,
+                    "aria-required": true,
                   }}
                   onBlur={() => onBlur("measurementPeriodEnd")}
                 />
