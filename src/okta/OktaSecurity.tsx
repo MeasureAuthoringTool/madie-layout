@@ -7,6 +7,15 @@ import Router from "../router/Router";
 
 export const transformAuthState = async (oktaAuth, authState) => {
   // verifies unexpired tokens are available from the tokenManager (default behavior)
+  if (localStorage.getItem("madieDebug") || (window as any).madieDebug) {
+    // eslint-disable-next-line no-console
+    console.log(`[${new Date()}] - transformAuthState oktaAuth: `, oktaAuth);
+    // eslint-disable-next-line no-console
+    console.log(
+      `[${new Date()}] - transformAuthState authState: `,
+      JSON.stringify(authState, null, 2)
+    );
+  }
   if (!authState.isAuthenticated) {
     return authState;
   }
