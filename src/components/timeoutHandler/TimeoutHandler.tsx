@@ -37,7 +37,7 @@ const TimeoutHandler = ({ timeLeft = 10000, warningTime = 5000 }) => {
       if (localStorage.getItem("madieDebug") || (window as any).madieDebug) {
         // eslint-disable-next-line no-console
         console.log(
-          "User has been inactive for the specified period. Showing inactivity warning dialog."
+          `[${new Date()}] - User has been inactive for the specified period. Showing inactivity warning dialog.`
         );
       }
       setTimingOut(true);
@@ -45,7 +45,7 @@ const TimeoutHandler = ({ timeLeft = 10000, warningTime = 5000 }) => {
         if (localStorage.getItem("madieDebug") || (window as any).madieDebug) {
           // eslint-disable-next-line no-console
           console.log(
-            "User has timed out due to inactivity. Initiating logout."
+            `[${new Date()}] - User has timed out due to inactivity. Initiating logout.`
           );
         }
         await oktaAuth.signOut();
@@ -64,8 +64,51 @@ const TimeoutHandler = ({ timeLeft = 10000, warningTime = 5000 }) => {
   const refreshTokens = useCallback(
     throttle(
       () => {
-        oktaAuth.tokenManager.renew("idToken").finally();
-        oktaAuth.tokenManager.renew("accessToken").finally();
+        oktaAuth.tokenManager
+          .renew("idToken")
+          .catch((error) => {
+            if (
+              localStorage.getItem("madieDebug") ||
+              (window as any).madieDebug
+            ) {
+              console.error(
+                "An error occurred while refreshing the idToken",
+                error
+              );
+              console.error("Stringified error: ", JSON.stringify(error));
+            }
+          })
+          .finally();
+        oktaAuth.tokenManager
+          .renew("accessToken")
+          .catch((error) => {
+            if (
+              localStorage.getItem("madieDebug") ||
+              (window as any).madieDebug
+            ) {
+              console.error(
+                "An error occurred while refreshing the accessToken",
+                error
+              );
+              console.error("Stringified error: ", JSON.stringify(error));
+            }
+          })
+          .finally();
+        oktaAuth.session
+          .refresh()
+          .catch((error) => {
+            if (
+              localStorage.getItem("madieDebug") ||
+              (window as any).madieDebug
+            ) {
+              console.error(
+                "An error occurred while refreshing the session",
+                error
+              );
+              console.error("Stringified error: ", JSON.stringify(error));
+            }
+          })
+          .finally();
       },
       240000,
       { leading: true, trailing: true }

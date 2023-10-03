@@ -15,6 +15,7 @@ jest.mock("@okta/okta-react");
 
 describe("Timeout Handler", () => {
   const mockRenewToken = jest.fn();
+  const mockRefreshSession = jest.fn().mockResolvedValue(true);
   const renderTimeoutHandler = () => {
     return render(
       <div id="main">
@@ -32,6 +33,9 @@ describe("Timeout Handler", () => {
         signOut: MockSignOut,
         tokenManager: {
           renew: mockRenewToken,
+        },
+        session: {
+          refresh: mockRefreshSession,
         },
       },
       authState: { isAuthenticated: false },
