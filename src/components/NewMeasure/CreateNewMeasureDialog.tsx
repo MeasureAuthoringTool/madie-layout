@@ -13,6 +13,7 @@ import {
   MadieAlert,
 } from "@madie/madie-design-system/dist/react";
 import { Box } from "@mui/system";
+
 import {
   getServiceConfig,
   ServiceConfig,
@@ -20,7 +21,12 @@ import {
   useOktaTokens,
 } from "@madie/madie-util";
 import axios from "axios";
-import { Checkbox, FormControlLabel, MenuItem } from "@mui/material";
+import {
+  Checkbox,
+  FormControlLabel,
+  MenuItem,
+  Typography,
+} from "@mui/material";
 import { useFormik } from "formik";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import DesktopDatePicker from "@mui/lab/DesktopDatePicker";
@@ -193,6 +199,22 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
         }}
         autoHideDuration={6000}
       />
+      <div style={{ marginBottom: 4 }}>
+        <Typography
+          style={{ fontSize: 14, fontWeight: 300, fontFamily: "Rubik" }}
+        >
+          <span
+            style={{
+              color: "rgb(174, 28, 28)",
+              marginRight: 3,
+              fontWeight: 400,
+            }}
+          >
+            *
+          </span>
+          Indicates required field
+        </Typography>
+      </div>
       <MadieAlert
         type="warning"
         content={
@@ -206,6 +228,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
         }
         canClose={false}
       />
+
       <Box sx={formRow}>
         <TextField
           onFocus={() => onFocus("measureName")}
