@@ -110,6 +110,7 @@
 
       .MuiBreadcrumbs-ol > .MuiBreadcrumbs-li > a:focus {
         color: #fff;
+        border-color: #fff;
       }
 
       .division,
@@ -117,7 +118,6 @@
         font-size: 14px;
         font-weight: 400;
         font-family: Rubik, sans-serif;
-        opacity: 0.3;
         margin-left: 8px;
         color: #fff;
       }

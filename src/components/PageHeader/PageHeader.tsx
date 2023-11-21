@@ -134,6 +134,7 @@ const PageHeader = () => {
 
               <div tw="pr-8" style={{ marginLeft: "auto" }}>
                 <Button
+                  style={{ border: "none" }}
                   disabled={!canEdit}
                   className="page-header-action-button"
                   variant="outline-filled"
@@ -149,7 +150,7 @@ const PageHeader = () => {
               </div>
             </div>
             <div>
-              <p tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(221,221,221, 0.5)] leading-none first:pl-0 first:ml-0 first:border-0">{`Version ${measureState?.version}`}</p>
+              <p tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0">{`Version ${measureState?.version}`}</p>
               {[
                 measureState?.model,
                 // measureState?.version, // not yet implemented
@@ -160,7 +161,7 @@ const PageHeader = () => {
                     <p
                       data-testid={`info-${val}-${key}`}
                       key={`info-${val}-${key}`}
-                      tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(221,221,221, 0.5)] leading-none first:pl-0 first:ml-0 first:border-0"
+                      tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0"
                     >
                       {val}
                     </p>
@@ -235,7 +236,7 @@ const PageHeader = () => {
               )}
             </div>
             <div>
-              <p tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(221,221,221, 0.5)] leading-none first:pl-0 first:ml-0 first:border-0">{`Version ${libraryState?.version}`}</p>
+              <p tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0">{`Version ${libraryState?.version}`}</p>
               {[libraryState?.model, readableLibraryStartDate].map(
                 (val, key) => {
                   if (val)
@@ -243,7 +244,7 @@ const PageHeader = () => {
                       <p
                         data-testid={`info-${val}-${key}`}
                         key={`info-${val}-${key}`}
-                        tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(221,221,221, 0.5)] leading-none first:pl-0 first:ml-0 first:border-0"
+                        tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0"
                       >
                         {val}
                       </p>
