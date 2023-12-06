@@ -17,7 +17,6 @@ import { Box } from "@mui/system";
 import {
   getServiceConfig,
   ServiceConfig,
-  useFeatureFlags,
   useOktaTokens,
 } from "@madie/madie-util";
 import axios from "axios";
@@ -41,7 +40,6 @@ interface Toast {
 
 const CreateNewMeasureDialog = ({ open, onClose }) => {
   const { getAccessToken } = useOktaTokens();
-  const featureFlags = useFeatureFlags();
   const [toast, setToast] = useState<Toast>({
     toastOpen: false,
     toastType: "danger",
@@ -68,9 +66,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
     },
   });
 
-  const modelOptions = featureFlags?.qdm
-    ? Object.keys(Model)
-    : [Object.keys(Model)[0]];
+  const modelOptions = Object.keys(Model);
 
   async function createMeasure(measure: Measure) {
     const config: ServiceConfig = await getServiceConfig();

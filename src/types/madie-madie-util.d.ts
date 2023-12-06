@@ -33,11 +33,7 @@ declare module "@madie/madie-util" {
   }
 
   interface FeatureFlags {
-    export: boolean;
-    populationCriteriaTabs: boolean;
-    applyDefaults: boolean;
     importTestCases: boolean;
-    qdm: boolean;
   }
 
   export const cqlLibraryStore: {

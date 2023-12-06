@@ -23,7 +23,7 @@ jest.mock("@madie/madie-util", () => ({
     initialState: null,
     updateMeasure: (measure) => measure,
   },
-  useFeatureFlags: jest.fn().mockReturnValue({ qdm: false }),
+  useFeatureFlags: jest.fn().mockReturnValue({}),
 }));
 
 const formikInfo = {
@@ -140,26 +140,6 @@ describe("Measures Create Dialog", () => {
       });
     });
   });
-
-  test("the dialog does not have a Model option for QDM when the feature flag is disabled", async () => {
-    await act(async () => {
-      const { queryByTestId, getByTestId } = await render(
-        <CreateNewMeasureDialog open={true} onClose={undefined} />
-      );
-
-      const nameNode = (await getByTestId(
-        "measure-name-input"
-      )) as HTMLInputElement;
-      userEvent.type(nameNode, "QdmMeasure");
-      expect(nameNode.value).toBe("QdmMeasure");
-
-      const modelSelect = await getByTestId("measure-model-select");
-      const modelSelectBtn = await within(modelSelect).getByRole("button");
-      userEvent.click(modelSelectBtn);
-      const options = await screen.findAllByRole("option");
-      expect(options.length).toEqual(1);
-    });
-  }, 10000);
 
   test("the dialog allows create for a QDM measure", async () => {
     (useFeatureFlags as jest.Mock).mockReturnValue({ qdm: true });
