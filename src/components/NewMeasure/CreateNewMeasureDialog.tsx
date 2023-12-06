@@ -67,7 +67,6 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
   });
 
   const modelOptions = Object.keys(Model);
-  console.log("model options: ", modelOptions);
 
   async function createMeasure(measure: Measure) {
     const config: ServiceConfig = await getServiceConfig();
