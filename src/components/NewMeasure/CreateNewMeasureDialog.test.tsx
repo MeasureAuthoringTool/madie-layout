@@ -23,7 +23,7 @@ jest.mock("@madie/madie-util", () => ({
     initialState: null,
     updateMeasure: (measure) => measure,
   },
-  useFeatureFlags: jest.fn().mockReturnValue({ }),
+  useFeatureFlags: jest.fn().mockReturnValue({}),
 }));
 
 const formikInfo = {
