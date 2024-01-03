@@ -74,7 +74,7 @@ const Footer = () => {
           </li>
           <li className="nav-link">
             <a
-              href="https://www.cms.gov/About-CMS/Agency-Information/Aboutwebsite/Privacy-Policy "
+              href="https://www.cms.gov/About-CMS/Agency-Information/Aboutwebsite/Privacy-Policy"
               aria-label="Privacy Policy"
               target="_blank"
             >
