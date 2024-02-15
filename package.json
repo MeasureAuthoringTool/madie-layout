@@ -112,6 +112,7 @@
     }
   },
   "overrides": {
-    "glob-parent": "^5.1.2"
+    "glob-parent": "^5.1.2",
+    "dset": "3.1.3"
   }
 }
