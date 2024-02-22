@@ -96,9 +96,9 @@
     "react-router-dom": "^5.3.0",
     "single-spa": "^5.9.3",
     "single-spa-react": "^4.4.0",
-    "styled-components": "^5.3.1",
+    "styled-components": "^5.3.7",
     "tailwindcss": "^3.2.7",
-    "twin.macro": "^2.7.0",
+    "twin.macro": "^3.0.0",
     "yup": "^0.32.11"
   },
   "types": "dist/madie-madie-layout.d.ts",
