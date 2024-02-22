@@ -211,19 +211,6 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
           Indicates required field
         </Typography>
       </div>
-      <MadieAlert
-        type="warning"
-        content={
-          <>
-            <h5 tw="py-1">CMS IDs can not be generated in MADiE</h5>
-            <p>
-              If your measure needs a CMS ID please create and generate your id
-              in MAT and import your measure into MADiE.
-            </p>
-          </>
-        }
-        canClose={false}
-      />
 
       <Box sx={formRow}>
         <TextField
