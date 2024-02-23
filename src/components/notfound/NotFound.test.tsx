@@ -2,7 +2,6 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import * as React from "react";
 import NotFound from "./NotFound";
 import { MemoryRouter } from "react-router";
-import { Router } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 jest.mock("@madie/madie-util", () => ({
