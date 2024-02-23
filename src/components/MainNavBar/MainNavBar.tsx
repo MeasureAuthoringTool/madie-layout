@@ -3,7 +3,7 @@ import logo from "../../assets/images/Logo.svg";
 import logoFull from "../../assets/images/Logo-Full.svg";
 import { DropDown, DropMenu } from "../../styles/styles";
 import { useOktaAuth } from "@okta/okta-react";
-import { NavLink, useHistory, useLocation } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import UserProfile from "./UserProfile";
 import UserAvatar from "./UserAvatar";
 import UMLSDialog from "./UMLSDialog";

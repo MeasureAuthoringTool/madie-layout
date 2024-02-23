@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate, useBlocker } from "react-router-dom";
 import { MadieDiscardDialog } from "@madie/madie-design-system/dist/react";
 import { routeHandlerStore } from "@madie/madie-util";
 // We have to listen at the top level for navigational changes to block them.
@@ -22,24 +22,18 @@ const RouteChangePrompt = () => {
     };
   }, []);
 
-  const history = useHistory();
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  let navigate = useNavigate();
 
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) => !routeHandlerState.canTravel
+  );
   useEffect(() => {
-    const unblock = history.block(({ pathname }) => {
-      if (!routeHandlerState.canTravel) {
-        updateRouteHandlerState({ canTravel: true, pendingRoute: pathname });
-        return false;
-      }
-      unblock();
+    updateRouteHandlerState({
+      ...routeHandlerState,
+      pendingRoute: blocker?.location?.pathname,
     });
-    return unblock;
-  }, [
-    setDialogOpen,
-    history.block,
-    routeHandlerState.canTravel,
-    routeHandlerState.pendingRoute,
-  ]);
+  }, [blocker?.location?.pathname]);
 
   useEffect(() => {
     if (routeHandlerState.pendingRoute) {
@@ -56,9 +50,9 @@ const RouteChangePrompt = () => {
     const currentRoute = routeHandlerState.pendingRoute;
     updateRouteHandlerState({
       canTravel: true,
-      pendingRoute: currentRoute,
+      pendingRoute: "",
     });
-    history.push(routeHandlerState.pendingRoute);
+    navigate(currentRoute);
   };
   const onClose = () => {
     updateRouteHandlerState({ canTravel: false, pendingRoute: "" });

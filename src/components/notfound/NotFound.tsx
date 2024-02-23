@@ -1,15 +1,15 @@
 import React from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import tw from "twin.macro";
 import { useDocumentTitle } from "@madie/madie-util";
 const GoHomeLink = tw.button`text-blue-500 hover:text-blue-900`;
 
 const NotFound = () => {
   useDocumentTitle("MADiE Page not found");
-  let history = useHistory();
+  let navigate = useNavigate();
 
   function handleClick() {
-    history.push("/measures");
+    navigate("/measures");
   }
   return (
     <div data-testid="404-page">

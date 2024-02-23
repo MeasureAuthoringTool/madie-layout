@@ -1,5 +1,5 @@
 import React from "react";
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { LoginWidget } from "@madie/madie-auth";
 import { useOktaAuth } from "@okta/okta-react";
 import { loginLogger } from "../../custom-hooks/customLog";
@@ -30,9 +30,8 @@ function Login({ config }) {
   };
 
   if (!authState) return null;
-
   return authState.isAuthenticated ? (
-    <Redirect to={{ pathname: "/" }} />
+    <Navigate to="/measures" />
   ) : (
     <>
       <LoginWidget {...loginConfig} />

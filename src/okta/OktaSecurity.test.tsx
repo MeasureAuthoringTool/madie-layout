@@ -30,12 +30,12 @@ jest.mock("@okta/okta-react", () => ({
   },
 }));
 
-jest.mock("react-router-dom", () => ({
-  useHistory: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-  }),
-}));
+// jest.mock("react-router-dom", () => ({
+//   useHistory: () => ({
+//     push: jest.fn(),
+//     replace: jest.fn(),
+//   }),
+// }));
 
 describe("Config component", () => {
   afterEach(() => {

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
 import { Security } from "@okta/okta-react";
 import { OktaAuth, toRelativeUrl } from "@okta/okta-auth-js";
 import { getOktaConfig, OktaConfig } from "./Config";
@@ -25,16 +24,17 @@ export const transformAuthState = async (oktaAuth, authState) => {
 };
 
 function OktaSecurity() {
-  const history = useHistory();
+  // const navigate = useNavigate();
   const [oktaConfig, setOktaConfig] = useState<OktaConfig>();
   const [oktaConfigErr, setOktaConfigErr] = useState<string>();
 
   const customAuthHandler = () => {
-    history.push("/login");
+    window.location.href = "/login";
   };
 
   const restoreOriginalUri = async (_oktaAuth, originalUri) => {
-    history.replace(toRelativeUrl(originalUri, window.location.origin));
+    // history.replace(toRelativeUrl(originalUri || '/', window.location.origin));
+    // navigate(toRelativeUrl(originalUri, window.location.origin));
   };
 
   if (!oktaConfig && !oktaConfigErr) {
