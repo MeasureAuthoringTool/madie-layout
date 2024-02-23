@@ -9,7 +9,7 @@ const NotFound = () => {
   let navigate = useNavigate();
 
   function handleClick() {
-    navigate("/measures");
+    navigate("/");
   }
   return (
     <div data-testid="404-page">
