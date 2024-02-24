@@ -42,12 +42,13 @@ function Router({ props }) {
         <Route
           path="login"
           element={
-            <div>
+            <div className="layout-wrapper">
               <MainNavBar />
               <PageHeader />
               <div id="page-content">
                 <Login config={props.oktaSignInConfig} />
               </div>
+              <Footer />
             </div>
           }
         />
@@ -56,10 +57,7 @@ function Router({ props }) {
           path="measures/*"
           element={
             authenticated ? (
-              <LayoutWrapper
-                children={<MadieMeasure />}
-                authenticated={authenticated}
-              />
+              <LayoutWrapper children={<MadieMeasure />} />
             ) : (
               <Navigate to="/login" />
             )
@@ -69,10 +67,11 @@ function Router({ props }) {
         <Route
           path="cql-libraries/*"
           element={
-            <LayoutWrapper
-              children={<MadieCqlLibrary />}
-              authenticated={authenticated}
-            />
+            authenticated ? (
+              <LayoutWrapper children={<MadieCqlLibrary />} />
+            ) : (
+              <Navigate to="/login" />
+            )
           }
         />
         <Route path="/404" element={NotFound} />
@@ -81,12 +80,11 @@ function Router({ props }) {
   );
 
   return (
-    <div className="layout-wrapper">
+    <div>
       {authenticated && (
         <TimeoutHandler timeLeft={25 * 60 * 1000} warningTime={5 * 60 * 1000} />
       )}
       <RouterProvider router={BrowserRouter} key={firstLogin ? 1 : 2} />
-      <Footer />
     </div>
   );
 }
