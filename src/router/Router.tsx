@@ -15,6 +15,8 @@ import Footer from "../components/Footer/Footer";
 import "../styles/LayoutStyles.scss";
 import TimeoutHandler from "../components/timeoutHandler/TimeoutHandler";
 import LayoutWrapper from "./LayoutWrapper";
+import MainNavBar from "../components/MainNavBar/MainNavBar";
+import PageHeader from "../components/PageHeader/PageHeader";
 
 function Router({ props }) {
   const { authState } = useOktaAuth();
@@ -39,8 +41,17 @@ function Router({ props }) {
       <Route path="">
         <Route
           path="login"
-          element={<Login config={props.oktaSignInConfig} />}
+          element={
+            <div>
+              <MainNavBar />
+              <PageHeader />
+              <div id="page-content">
+                <Login config={props.oktaSignInConfig} />
+              </div>
+            </div>
+          }
         />
+
         <Route
           path="measures/*"
           element={
