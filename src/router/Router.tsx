@@ -42,40 +42,20 @@ function Router({ props }) {
       <Route
         path=""
         element={
-          authenticated ? (
-            <LayoutWrapper>
-              <Outlet />
-            </LayoutWrapper>
-          ) : (
-            <Navigate to="/login" />
-          )
+          <LayoutWrapper>
+            <Outlet />
+            {!authenticated && <Navigate to="login" />}
+          </LayoutWrapper>
         }
       >
         <Route
-          path="measures/*"
-          element={authenticated ? <MadieMeasure /> : <Navigate to="/login" />}
-        />
-        <Route path="login/callback" element={LoginCallback} />
-        <Route
-          path="cql-libraries/*"
-          element={
-            authenticated ? <MadieCqlLibrary /> : <Navigate to="/login" />
-          }
-        />
-        <Route path="/404" element={NotFound} />
-        <Route
           path="login"
-          element={
-            <div className="layout-wrapper">
-              <MainNavBar />
-              <PageHeader />
-              <div id="page-content">
-                <Login config={props.oktaSignInConfig} />
-              </div>
-              <Footer />
-            </div>
-          }
+          element={<Login config={props.oktaSignInConfig} />}
         />
+        <Route path="measures/*" element={<MadieMeasure />} />
+        <Route path="login/callback" element={LoginCallback} />
+        <Route path="cql-libraries/*" element={<MadieCqlLibrary />} />
+        <Route path="/404" element={NotFound} />
         <Route path="*" element={NotFound} />
       </Route>
     )
