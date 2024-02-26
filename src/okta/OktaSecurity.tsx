@@ -36,7 +36,7 @@ function OktaSecurity() {
     // To avoid completely refactoring this app:
     // previously we had two routers to have access to history.replace. router-dom6 does not like this.
     // New method is to just update the url using native function. Same with customAuthHandler.
-    // This may also very likely not even be necessary at all with router-dom 6 based on how the routes are set.
+    // This may also very likely not even be necessary at all with router-dom 6 based on how the routes are set
     window.location.assign(
       toRelativeUrl(originalUri || "/", window.location.origin)
     );
