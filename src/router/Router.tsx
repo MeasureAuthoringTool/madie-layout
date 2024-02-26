@@ -2,6 +2,7 @@ import React, { useLayoutEffect, useState } from "react";
 import {
   Route,
   Navigate,
+  Outlet,
   RouterProvider,
   createBrowserRouter,
   createRoutesFromElements,
@@ -38,7 +39,30 @@ function Router({ props }) {
   }, []);
   const BrowserRouter = createBrowserRouter(
     createRoutesFromElements(
-      <Route path="">
+      <Route
+        path=""
+        element={
+          authenticated ? (
+            <LayoutWrapper>
+              <Outlet />
+            </LayoutWrapper>
+          ) : (
+            <Navigate to="/login" />
+          )
+        }
+      >
+        <Route
+          path="measures/*"
+          element={authenticated ? <MadieMeasure /> : <Navigate to="/login" />}
+        />
+        <Route path="login/callback" element={LoginCallback} />
+        <Route
+          path="cql-libraries/*"
+          element={
+            authenticated ? <MadieCqlLibrary /> : <Navigate to="/login" />
+          }
+        />
+        <Route path="/404" element={NotFound} />
         <Route
           path="login"
           element={
@@ -52,29 +76,7 @@ function Router({ props }) {
             </div>
           }
         />
-
-        <Route
-          path="measures/*"
-          element={
-            authenticated ? (
-              <LayoutWrapper children={<MadieMeasure />} />
-            ) : (
-              <Navigate to="/login" />
-            )
-          }
-        />
-        <Route path="login/callback" element={LoginCallback} />
-        <Route
-          path="cql-libraries/*"
-          element={
-            authenticated ? (
-              <LayoutWrapper children={<MadieCqlLibrary />} />
-            ) : (
-              <Navigate to="/login" />
-            )
-          }
-        />
-        <Route path="/404" element={NotFound} />
+        <Route path="*" element={NotFound} />
       </Route>
     )
   );
