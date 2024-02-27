@@ -38,7 +38,7 @@ function OktaSecurity() {
     // New method is to just update the url using native function. Same with customAuthHandler.
     // This may also very likely not even be necessary at all with router-dom 6 based on how the routes are set
     window.location.assign(
-      toRelativeUrl(originalUri || "/", window.location.origin)
+      toRelativeUrl(originalUri || "/measures", window.location.origin)
     );
   };
 

@@ -12,16 +12,14 @@ import Login from "../components/login/Login";
 import { MadieMeasure } from "@madie/madie-measure";
 import { MadieCqlLibrary } from "@madie/madie-cql-library";
 import NotFound from "../components/notfound/NotFound";
-import Footer from "../components/Footer/Footer";
 import "../styles/LayoutStyles.scss";
 import TimeoutHandler from "../components/timeoutHandler/TimeoutHandler";
 import LayoutWrapper from "./LayoutWrapper";
-import MainNavBar from "../components/MainNavBar/MainNavBar";
-import PageHeader from "../components/PageHeader/PageHeader";
 
 function Router({ props }) {
   const { authState } = useOktaAuth();
   const authenticated = authState?.isAuthenticated;
+
   /*
     On initial page load we want to trigger a hard refresh because single spa loads the apps sequentially based on what contains what
     This init pattern pattern influences tab order so we need to refresh on first login.
@@ -44,19 +42,19 @@ function Router({ props }) {
         element={
           <LayoutWrapper>
             <Outlet />
-            {!authenticated && <Navigate to="login" />}
+            {authenticated === false && <Navigate to="login" />}
           </LayoutWrapper>
         }
       >
+        <Route path="login/callback" element={LoginCallback} />
+        <Route path="measures/*" element={<MadieMeasure />} />
+        <Route path="cql-libraries/*" element={<MadieCqlLibrary />} />
         <Route
           path="login"
           element={<Login config={props.oktaSignInConfig} />}
         />
-        <Route path="measures/*" element={<MadieMeasure />} />
-        <Route path="login/callback" element={LoginCallback} />
-        <Route path="cql-libraries/*" element={<MadieCqlLibrary />} />
-        <Route path="/404" element={NotFound} />
-        <Route path="*" element={NotFound} />
+        <Route path="404" element={<NotFound />} />
+        <Route path="*" element={<NotFound />} />
       </Route>
     )
   );

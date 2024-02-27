@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useBlocker } from "react-router-dom";
+import { useNavigate, useBlocker, Blocker } from "react-router-dom";
 import { MadieDiscardDialog } from "@madie/madie-design-system/dist/react";
 import { routeHandlerStore } from "@madie/madie-util";
 // We have to listen at the top level for navigational changes to block them.
@@ -25,7 +25,7 @@ const RouteChangePrompt = () => {
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   let navigate = useNavigate();
 
-  const blocker = useBlocker(
+  const blocker: Blocker = useBlocker(
     ({ currentLocation, nextLocation }) => !routeHandlerState.canTravel
   );
   useEffect(() => {
