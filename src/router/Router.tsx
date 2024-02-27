@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from "react";
+import React, { useLayoutEffect, useEffect, useState } from "react";
 import {
   Route,
   Navigate,
@@ -19,7 +19,6 @@ import LayoutWrapper from "./LayoutWrapper";
 function Router({ props }) {
   const { authState } = useOktaAuth();
   const authenticated = authState?.isAuthenticated;
-
   /*
     On initial page load we want to trigger a hard refresh because single spa loads the apps sequentially based on what contains what
     This init pattern pattern influences tab order so we need to refresh on first login.
@@ -46,6 +45,7 @@ function Router({ props }) {
           </LayoutWrapper>
         }
       >
+        <Route path="/" element={<Navigate to="/measures" />} />
         <Route path="login/callback" element={LoginCallback} />
         <Route path="measures/*" element={<MadieMeasure />} />
         <Route path="cql-libraries/*" element={<MadieCqlLibrary />} />
