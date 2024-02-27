@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useLocation, Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import { Fade, Breadcrumbs } from "@mui/material";
@@ -19,7 +19,6 @@ import { useIsOverflow } from "./useIsOverflow";
 
 const PageHeader = () => {
   const { pathname } = useLocation();
-
   const [userFirstName, setUserFirstName] = useState<string>();
   useEffect(() => {
     window.addEventListener("storage", () =>
@@ -153,7 +152,6 @@ const PageHeader = () => {
               <p tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0">{`Version ${measureState?.version}`}</p>
               {[
                 measureState?.model,
-                // measureState?.version, // not yet implemented
                 readablePeriodStart + " - " + readablePeriodEnd,
               ].map((val, key) => {
                 if (val)

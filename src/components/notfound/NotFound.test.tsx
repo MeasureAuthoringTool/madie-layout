@@ -2,11 +2,14 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import * as React from "react";
 import NotFound from "./NotFound";
 import { MemoryRouter } from "react-router";
-import { Router } from "react-router-dom";
-import { createMemoryHistory } from "history";
+import { useNavigate } from "react-router-dom";
 
 jest.mock("@madie/madie-util", () => ({
   useDocumentTitle: jest.fn(),
+}));
+jest.mock("react-router-dom", () => ({
+  ...jest.requireActual("react-router-dom"),
+  useNavigate: jest.fn(),
 }));
 
 describe("NotFound component", () => {
@@ -23,16 +26,16 @@ describe("NotFound component", () => {
   });
 
   it("should render home page after clicking Go Home", async () => {
-    const history = createMemoryHistory();
-    const pushSpy = jest.spyOn(history, "push");
+    const navigate = jest.fn();
+    useNavigate.mockReturnValue(navigate);
     render(
-      <Router history={history}>
+      <MemoryRouter>
         <NotFound />
-      </Router>
+      </MemoryRouter>
     );
 
     const link = screen.getByTestId("404-page-link");
     fireEvent.click(link);
-    expect(pushSpy).toHaveBeenCalled();
+    expect(navigate).toHaveBeenCalledWith("/");
   });
 });

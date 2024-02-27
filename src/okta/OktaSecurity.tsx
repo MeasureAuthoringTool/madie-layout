@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
 import { Security } from "@okta/okta-react";
 import { OktaAuth, toRelativeUrl } from "@okta/okta-auth-js";
 import { getOktaConfig, OktaConfig } from "./Config";
@@ -25,16 +24,22 @@ export const transformAuthState = async (oktaAuth, authState) => {
 };
 
 function OktaSecurity() {
-  const history = useHistory();
+  // const navigate = useNavigate();
   const [oktaConfig, setOktaConfig] = useState<OktaConfig>();
   const [oktaConfigErr, setOktaConfigErr] = useState<string>();
 
   const customAuthHandler = () => {
-    history.push("/login");
+    window.location.href = "/login";
   };
 
   const restoreOriginalUri = async (_oktaAuth, originalUri) => {
-    history.replace(toRelativeUrl(originalUri, window.location.origin));
+    // To avoid completely refactoring this app:
+    // previously we had two routers to have access to history.replace. router-dom6 does not like this.
+    // New method is to just update the url using native function. Same with customAuthHandler.
+    // This may also very likely not even be necessary at all with router-dom 6 based on how the routes are set
+    window.location.assign(
+      toRelativeUrl(originalUri || "/measures", window.location.origin)
+    );
   };
 
   if (!oktaConfig && !oktaConfigErr) {

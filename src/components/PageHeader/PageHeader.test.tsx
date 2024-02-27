@@ -114,56 +114,49 @@ describe("Page Header and Dialogs", () => {
     jest.clearAllMocks();
   });
 
+  function renderPageHeader(initialEntries: any) {
+    return render(
+      <MemoryRouter initialEntries={initialEntries}>
+        <PageHeader />
+      </MemoryRouter>
+    );
+  }
+
   test("Navigating to the cql-libraries page presents us with a library specific header", async () => {
-    await act(async () => {
-      render(
-        <MemoryRouter
-          initialEntries={[
-            {
-              pathname: "/cql-libraries",
-              search: "",
-              hash: "",
-              state: undefined,
-              key: "1fewtg",
-            },
-          ]}
-        >
-          <PageHeader />
-        </MemoryRouter>
-      );
-      const dialogButton = await findByTestId("create-new-cql-library-button");
-      expect(dialogButton).toBeTruthy();
-    });
+    renderPageHeader([
+      {
+        pathname: "/cql-libraries",
+        search: "",
+        hash: "",
+        state: undefined,
+        key: "1fewtg",
+      },
+    ]);
+    const dialogButton = await findByTestId("create-new-cql-library-button");
+    expect(dialogButton).toBeTruthy();
   });
 
   test("Navigating to the cql-libraries/edit page presents us with a library specific header", async () => {
-    await act(async () => {
-      render(
-        <MemoryRouter
-          initialEntries={[
-            {
-              pathname: "/cql-libraries/randomstring/edit/details",
-              search: "",
-              hash: "",
-              state: undefined,
-              key: "1fewtg",
-            },
-          ]}
-        >
-          <PageHeader />
-        </MemoryRouter>
-      );
-      await waitFor(() => {
-        expect(queryByText("QI-Core v4.1.1")).toBeInTheDocument();
-      });
-      await waitFor(() => {
-        expect(queryByText("Draft")).toBeInTheDocument();
-      });
+    renderPageHeader([
+      {
+        pathname: "/cql-libraries/randomstring/edit/details",
+        search: "",
+        hash: "",
+        state: undefined,
+        key: "1fewtg",
+      },
+    ]);
+    await waitFor(() => {
+      expect(queryByText("QI-Core v4.1.1")).toBeInTheDocument();
+    });
+    await waitFor(() => {
+      expect(queryByText("Draft")).toBeInTheDocument();
     });
   });
 
   test("Clicking on new library button retains the same library page", () => {
     let testHistory, testLocation;
+
     render(
       <MemoryRouter
         initialEntries={[
@@ -177,47 +170,37 @@ describe("Page Header and Dialogs", () => {
         ]}
       >
         <PageHeader />
-        <Route
-          path="*"
-          render={({ history, location }) => {
-            testHistory = history;
-            testLocation = location;
-            return null;
-          }}
-        />
       </MemoryRouter>
     );
     act(async () => {
       const libraryButton = await findByTestId("create-new-cql-library-button");
       expect(libraryButton).toBeTruthy();
       fireEvent.click(libraryButton);
-      expect(testLocation.pathname).toBe("/cql-libraries");
+      const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+
+      const button = screen.getByTestId("create-new-cql-library-button");
+      fireEvent.click(button);
+      expect(dispatchEventSpy).toHaveBeenCalledWith(
+        new Event("openCreateLibraryDialog")
+      );
     });
   });
 
   test("Clicking on create opens up the create dialog", async () => {
-    await act(async () => {
-      render(
-        <MemoryRouter
-          initialEntries={[
-            {
-              pathname: "/measures",
-              search: "",
-              hash: "",
-              state: undefined,
-              key: "1fewtg",
-            },
-          ]}
-        >
-          <PageHeader />
-        </MemoryRouter>
-      );
-      const dialogButton = await findByTestId("create-new-measure-button");
-      expect(dialogButton).toBeTruthy();
-      fireEvent.click(dialogButton);
-      const dialog = await findByTestId("dialog-form");
-      expect(dialog).toBeTruthy();
-    });
+    renderPageHeader([
+      {
+        pathname: "/measures",
+        search: "",
+        hash: "",
+        state: undefined,
+        key: "1fewtg",
+      },
+    ]);
+    const dialogButton = await findByTestId("create-new-measure-button");
+    expect(dialogButton).toBeTruthy();
+    fireEvent.click(dialogButton);
+    const dialog = await findByTestId("dialog-form");
+    expect(dialog).toBeTruthy();
   });
 
   test("Clicking on delete broadcasts an event", async () => {

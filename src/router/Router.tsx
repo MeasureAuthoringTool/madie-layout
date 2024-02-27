@@ -1,19 +1,24 @@
-import React, { useLayoutEffect, useState } from "react";
-import { Redirect, BrowserRouter, Route, Switch } from "react-router-dom";
-import { SecureRoute, LoginCallback, useOktaAuth } from "@okta/okta-react";
+import React, { useLayoutEffect, useEffect, useState } from "react";
+import {
+  Route,
+  Navigate,
+  Outlet,
+  RouterProvider,
+  createBrowserRouter,
+  createRoutesFromElements,
+} from "react-router-dom";
+import { LoginCallback, useOktaAuth } from "@okta/okta-react";
 import Login from "../components/login/Login";
-import MainNavBar from "../components/MainNavBar/MainNavBar";
 import { MadieMeasure } from "@madie/madie-measure";
 import { MadieCqlLibrary } from "@madie/madie-cql-library";
 import NotFound from "../components/notfound/NotFound";
-import Footer from "../components/Footer/Footer";
-import PageHeader from "../components/PageHeader/PageHeader";
 import "../styles/LayoutStyles.scss";
 import TimeoutHandler from "../components/timeoutHandler/TimeoutHandler";
-import RouteChangeHandler from "./RouteChangeHandler";
+import LayoutWrapper from "./LayoutWrapper";
 
 function Router({ props }) {
   const { authState } = useOktaAuth();
+  const authenticated = authState?.isAuthenticated;
   /*
     On initial page load we want to trigger a hard refresh because single spa loads the apps sequentially based on what contains what
     This init pattern pattern influences tab order so we need to refresh on first login.
@@ -29,34 +34,37 @@ function Router({ props }) {
       window.removeEventListener("measures-mount", mountListener, false);
     };
   }, []);
+  const BrowserRouter = createBrowserRouter(
+    createRoutesFromElements(
+      <Route
+        path=""
+        element={
+          <LayoutWrapper>
+            <Outlet />
+            {authenticated === false && <Navigate to="login" />}
+          </LayoutWrapper>
+        }
+      >
+        <Route path="/" element={<Navigate to="/measures" />} />
+        <Route path="login/callback" element={LoginCallback} />
+        <Route path="measures/*" element={<MadieMeasure />} />
+        <Route path="cql-libraries/*" element={<MadieCqlLibrary />} />
+        <Route
+          path="login"
+          element={<Login config={props.oktaSignInConfig} />}
+        />
+        <Route path="404" element={<NotFound />} />
+        <Route path="*" element={<NotFound />} />
+      </Route>
+    )
+  );
+
   return (
-    <div className="layout-wrapper">
-      {authState?.isAuthenticated && (
+    <div>
+      {authenticated && (
         <TimeoutHandler timeLeft={25 * 60 * 1000} warningTime={5 * 60 * 1000} />
       )}
-      {/* browser router prop forceRefresh does not update as expected. Modifying react key is a hack */}
-      <BrowserRouter key={firstLogin ? 1 : 2} forceRefresh={firstLogin}>
-        <MainNavBar />
-        <PageHeader />
-        <RouteChangeHandler />
-        <div id="page-content">
-          <Switch>
-            <Route
-              path="/login"
-              render={() => <Login config={props.oktaSignInConfig} />}
-            />
-            <Route path="/login/callback" component={LoginCallback} />
-            <SecureRoute path="/measures" component={MadieMeasure} />
-            <SecureRoute path="/cql-libraries" component={MadieCqlLibrary} />
-            <SecureRoute path="/" exact={true}>
-              <Redirect to="/measures" />
-            </SecureRoute>
-            <Route path="/404" component={NotFound} />
-            <Redirect to="/404" />
-          </Switch>
-        </div>
-      </BrowserRouter>
-      <Footer />
+      <RouterProvider router={BrowserRouter} key={firstLogin ? 1 : 2} />
     </div>
   );
 }
