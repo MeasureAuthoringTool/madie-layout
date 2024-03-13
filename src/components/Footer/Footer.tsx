@@ -100,6 +100,15 @@ const Footer = () => {
             </a>
           </li>
           <li className="nav-link">
+            <a
+              href="https://www.cms.gov/about-cms/information-systems/privacy/vulnerability-disclosure-policy"
+              aria-label="CMS/HHS Vulnerability Disclosure Policy"
+              target="_blank"
+            >
+              CMS/HHS Vulnerability Disclosure Policy
+            </a>
+          </li>
+          <li className="nav-link">
             <a href="https://www.cms.gov/" aria-label="CMS.gov" target="_blank">
               CMS.gov
             </a>
