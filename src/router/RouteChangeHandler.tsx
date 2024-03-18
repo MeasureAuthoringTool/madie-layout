@@ -55,8 +55,9 @@ const RouteChangePrompt = () => {
     navigate(currentRoute);
   };
   const onClose = () => {
-    updateRouteHandlerState({ canTravel: false, pendingRoute: "" });
+    setRouteHandlerState({ canTravel: false, pendingRoute: "" });
     setDialogOpen(false);
+    if (blocker.location) blocker.reset();
   };
 
   return (
