@@ -34,11 +34,10 @@ const RouteChangePrompt = () => {
       pendingRoute: blocker?.location?.pathname,
     });
   }, [blocker?.location?.pathname]);
-
   useEffect(() => {
     if (routeHandlerState.pendingRoute) {
       setDialogOpen(true);
-      setRouteHandlerState({
+      updateRouteHandlerState({
         canTravel: true,
         pendingRoute: routeHandlerState.pendingRoute,
       });
