@@ -56,7 +56,7 @@ const UserAvatar = () => {
           height: "32px",
           width: "32px",
           fontSize: "15px",
-          backgroundColor: "#EA5F92",
+          backgroundColor: "#E22268",
         }}
       />
     </span>
