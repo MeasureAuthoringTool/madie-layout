@@ -141,7 +141,7 @@ describe("Measures Create Dialog", () => {
     });
   });
 
-  test("the dialog allows create for a QDM measure", async () => {
+  test("the dialog allows create for a QDM measure with underscore in library name", async () => {
     (useFeatureFlags as jest.Mock).mockReturnValue({ qdm: true });
     const { queryByTestId, getByTestId } = await render(
       <CreateNewMeasureDialog open={true} onClose={undefined} />
@@ -156,8 +156,8 @@ describe("Measures Create Dialog", () => {
     const libraryNode = (await getByTestId(
       "cql-library-name-input"
     )) as HTMLInputElement;
-    userEvent.type(libraryNode, "QdmMeasureLib");
-    expect(libraryNode.value).toBe("QdmMeasureLib");
+    userEvent.type(libraryNode, "Qdm_MeasureLib");
+    expect(libraryNode.value).toBe("Qdm_MeasureLib");
 
     const ecqmNode = (await getByTestId("ecqm-input")) as HTMLInputElement;
     userEvent.type(ecqmNode, "ecqmTitleQdm");
@@ -368,4 +368,58 @@ describe("Measures Create Dialog", () => {
       expect(getByTestId("continue-button")).toBeDisabled();
     });
   });
+
+  test("the dialog does not allow create for a QI-Core measure with underscore in library name", async () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ qdm: true });
+    const { queryByTestId, getByTestId } = await render(
+      <CreateNewMeasureDialog open={true} onClose={undefined} />
+    );
+
+    const nameNode = (await getByTestId(
+      "measure-name-input"
+    )) as HTMLInputElement;
+    userEvent.type(nameNode, "QiCoreMeasure");
+    expect(nameNode.value).toBe("QiCoreMeasure");
+
+    const libraryNode = (await getByTestId(
+      "cql-library-name-input"
+    )) as HTMLInputElement;
+    userEvent.type(libraryNode, "QiCore_MeasureLib");
+    expect(libraryNode.value).toBe("QiCore_MeasureLib");
+
+    const ecqmNode = (await getByTestId("ecqm-input")) as HTMLInputElement;
+    userEvent.type(ecqmNode, "ecqmTitleQdm");
+    expect(ecqmNode.value).toBe("ecqmTitleQdm");
+
+    const modelSelect = await getByTestId("measure-model-select");
+    const modelSelectBtn = await within(modelSelect).getByRole("button");
+    userEvent.click(modelSelectBtn);
+    const options = await screen.findAllByRole("option");
+    expect(options.length).toEqual(2);
+    userEvent.click(options[0]);
+
+    const measurementPeriodStartNode = getByTestId("measurement-period-start");
+    const measurementPeriodStartInput = within(
+      measurementPeriodStartNode
+    ).getByRole("textbox") as HTMLInputElement;
+    userEvent.type(
+      measurementPeriodStartInput,
+      formikInfo.measurementPeriodStart
+    );
+    expect(measurementPeriodStartInput.value).toBe(
+      formikInfo.measurementPeriodStart
+    );
+
+    const measurementPeriodEndNode = getByTestId("measurement-period-end");
+    const measurementPeriodEndInput = within(
+      measurementPeriodEndNode
+    ).getByRole("textbox") as HTMLInputElement;
+    userEvent.type(measurementPeriodEndInput, formikInfo.measurementPeriodEnd);
+    expect(measurementPeriodEndInput.value).toBe(
+      formikInfo.measurementPeriodEnd
+    );
+
+    const submitButton = await getByTestId("continue-button");
+    await waitFor(() => expect(submitButton).toBeDisabled());
+  }, 10000);
 });
