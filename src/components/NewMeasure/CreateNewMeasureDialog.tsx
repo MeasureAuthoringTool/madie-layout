@@ -260,7 +260,9 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
             (formik.touched["cqlLibraryName"] ||
               focusedField === "cqlLibraryName") &&
             (formikErrorHandler("cqlLibraryName", true) ||
-              "Measure Library name must start with an upper case letter, followed by alpha-numeric character(s) and must not contain spaces or other special characters.")
+            formik.values.model === Model.QICORE
+              ? "Measure Library name must start with an upper case letter, followed by alpha-numeric character(s) and must not contain spaces or other special characters."
+              : "Measure Library name must start with an upper case letter, followed by alpha-numeric character(s) and must not contain spaces or other special characters except of underscore for QDM.")
           }
           size="small"
           error={

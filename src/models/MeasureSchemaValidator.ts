@@ -13,14 +13,24 @@ export const MeasureSchemaValidator = Yup.object().shape({
     .required("A Measure Model is required."),
   cqlLibraryName: Yup.string()
     .required("Measure Library name is required.")
-    .matches(
-      /^((?!_).)*$/,
-      "Measure Library name must not contain '_' (underscores)."
-    )
-    .matches(
-      /^[A-Z][a-zA-Z0-9]*$/,
-      "Measure Library name must start with an upper case letter, followed by alpha-numeric character(s) and must not contain spaces or other special characters."
-    )
+    .when("model", {
+      is: Model.QICORE,
+      then: Yup.string().matches(
+        /^((?!_).)*$/,
+        "Measure library name must not contain '_' (underscores)."
+      ),
+    })
+    .when("model", {
+      is: Model.QDM_5_6,
+      then: Yup.string().matches(
+        /^[A-Z][a-zA-Z0-9_]*$/,
+        "Measure Library name must start with an upper case letter, followed by alpha-numeric character(s) and must not contain spaces or other special characters except of underscore for QDM."
+      ),
+      otherwise: Yup.string().matches(
+        /^[A-Z][a-zA-Z0-9]*$/,
+        "Measure library name must start with an upper case letter, followed by alpha-numeric character(s) and must not contain spaces or other special characters."
+      ),
+    })
     .max(64, "A Measure CQL Library Name cannot be more than 64 characters."),
   ecqmTitle: Yup.string()
     .required("eCQM Abbreviated Title is required.")
