@@ -1,15 +1,22 @@
 import React from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import { Button } from "@madie/madie-design-system/dist/react";
-import { Dialog, IconButton, DialogActions, Divider } from "@mui/material";
+import {
+  Dialog,
+  IconButton,
+  DialogActions,
+  Divider,
+  DialogContent,
+} from "@mui/material";
 
 export interface wafDialogProps {
   open: boolean;
   onClose: any;
+  supportId: string;
 }
 
 const WafDialog = (props: wafDialogProps) => {
-  const { open, onClose } = props;
+  const { open, onClose, supportId } = props;
   return (
     <Dialog
       open={open}
@@ -58,7 +65,14 @@ const WafDialog = (props: wafDialogProps) => {
         </IconButton>
       </div>
       <Divider sx={{ borderColor: "#8c8c8c" }} />
-      WAF IS BROKEN ALERT
+      <DialogContent>
+        The system has encountered a Web Application Firewall (WAF) issue.
+        Please submit a ticket to the help desk
+        {supportId.length > 0
+          ? ` and include the following SOC #${supportId}`
+          : ""}
+        .{" "}
+      </DialogContent>
       <DialogActions>
         <Button
           variant="secondary"

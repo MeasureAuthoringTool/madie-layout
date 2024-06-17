@@ -31,12 +31,13 @@ const PageHeader = () => {
   useEffect(() => {
     document.addEventListener("wafReject", (e: any) => {
       setWafOpen(true);
-      // console.log(e.detail);
+      setWafSupportId(e.detail.supportId);
     });
   }, []);
 
   const [createOpen, setCreateOpen] = useState<boolean>(false);
   const [wafOpen, setWafOpen] = useState<boolean>(false);
+  const [wafSupportId, setWafSupportId] = useState<string>("");
   const [libraryState, setLibraryState] = useState<any>(cqlLibraryStore.state);
   useEffect(() => {
     const subscription = cqlLibraryStore.subscribe(setLibraryState);
@@ -197,7 +198,11 @@ const PageHeader = () => {
           </div>
         </Fade>
       )}
-      <WafDialog open={wafOpen} onClose={handleWafClose} />
+      <WafDialog
+        open={wafOpen}
+        onClose={handleWafClose}
+        supportId={wafSupportId}
+      />
       {/* Measures landing */}
       {(pathname === "/measures" || pathname === "/measures/") && (
         <div className="measures">
