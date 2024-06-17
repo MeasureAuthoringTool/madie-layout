@@ -15,6 +15,7 @@ import {
 import { Box } from "@mui/system";
 
 import {
+  wafIntercept,
   getServiceConfig,
   ServiceConfig,
   useOktaTokens,
@@ -108,6 +109,10 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
         });
       });
   }
+
+  axios.interceptors.response.use((response) => {
+    return response;
+  }, wafIntercept);
 
   function formikErrorHandler(name: string, isError: boolean) {
     if (formik.touched[name] && formik.errors[name]) {

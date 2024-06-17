@@ -1,3 +1,4 @@
+import { wafIntercept } from "@madie/madie-util";
 import axios from "axios";
 
 export interface OktaConfig {
@@ -12,6 +13,10 @@ interface OktaEnvConfig {
   issuerUrl: string;
   clientId: string;
 }
+
+axios.interceptors.response.use((response) => {
+  return response;
+}, wafIntercept);
 
 export async function getOktaConfig(): Promise<OktaConfig> {
   const oktaEnvConfig: OktaEnvConfig = (

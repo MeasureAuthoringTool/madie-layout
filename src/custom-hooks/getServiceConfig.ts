@@ -1,3 +1,4 @@
+import { wafIntercept } from "@madie/madie-util";
 import axios from "axios";
 
 export interface ServiceConfig {
@@ -28,6 +29,10 @@ export async function getServiceConfig(): Promise<ServiceConfig> {
   ) {
     throw new Error("Invalid Terminology Service Config");
   }
+
+  axios.interceptors.response.use((response) => {
+    return response;
+  }, wafIntercept);
 
   return serviceConfig;
 }

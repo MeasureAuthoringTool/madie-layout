@@ -4,12 +4,14 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import { Fade, Breadcrumbs } from "@mui/material";
 import CreateNewMeasureDialog from "../NewMeasure/CreateNewMeasureDialog";
+import WafDialog from "../WafDialog/WafDialog";
 import { Button } from "@madie/madie-design-system/dist/react";
 import {
   measureStore,
   cqlLibraryStore,
   featureFlagsStore,
   checkUserCanEdit,
+  wafIntercept,
 } from "@madie/madie-util";
 import "twin.macro";
 import "styled-components/macro";
@@ -26,7 +28,15 @@ const PageHeader = () => {
     );
   }, []);
 
+  useEffect(() => {
+    document.addEventListener("wafReject", (e: any) => {
+      setWafOpen(true);
+      // console.log(e.detail);
+    });
+  }, []);
+
   const [createOpen, setCreateOpen] = useState<boolean>(false);
+  const [wafOpen, setWafOpen] = useState<boolean>(false);
   const [libraryState, setLibraryState] = useState<any>(cqlLibraryStore.state);
   useEffect(() => {
     const subscription = cqlLibraryStore.subscribe(setLibraryState);
@@ -50,6 +60,15 @@ const PageHeader = () => {
 
   const handleClose = () => {
     setCreateOpen(false);
+  };
+
+  //waf error
+  const openWaf = () => {
+    setWafOpen(true);
+  };
+
+  const handleWafClose = () => {
+    setWafOpen(false);
   };
   // dialog utilities just for delete measure
   const canEdit = checkUserCanEdit(
@@ -90,6 +109,10 @@ const PageHeader = () => {
 
   const overflowingText = useRef<HTMLHeadingElement>(null);
   const isOverflow = useIsOverflow(overflowingText, () => {});
+
+  axios.interceptors.response.use((response) => {
+    return response;
+  }, wafIntercept);
 
   return (
     <div className={pageHeaderClass} id="page-header">
@@ -174,6 +197,7 @@ const PageHeader = () => {
           </div>
         </Fade>
       )}
+      <WafDialog open={wafOpen} onClose={handleWafClose} />
       {/* Measures landing */}
       {(pathname === "/measures" || pathname === "/measures/") && (
         <div className="measures">

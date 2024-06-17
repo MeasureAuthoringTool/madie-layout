@@ -6,12 +6,10 @@ import { Dialog, IconButton, DialogActions, Divider } from "@mui/material";
 export interface wafDialogProps {
   open: boolean;
   onClose: any;
-  measureName: String;
-  deleteMeasure: Function;
 }
 
 const WafDialog = (props: wafDialogProps) => {
-  const { open, onClose, measureName, deleteMeasure } = props;
+  const { open, onClose } = props;
   return (
     <Dialog
       open={open}
