@@ -25,9 +25,6 @@ function Router({ props }) {
     We intend to listen to a browser event emitted by the measuresLanding page only on render cycle completion
   */
   const [firstLogin, setFirstLogin] = useState<boolean>(true);
-
-
-  
   useLayoutEffect(() => {
     const mountListener = () => {
       setFirstLogin(false);

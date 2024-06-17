@@ -55,14 +55,12 @@ const WafDialog = (props: wafDialogProps) => {
     >
       <div className="top-row">
         <h3>WAF Issue Encountered</h3>
-        <IconButton
-          onClick={onClose}
-          data-testid="waf-dialog-button"
-        >
+        <IconButton onClick={onClose} data-testid="waf-dialog-button">
           <CloseIcon />
         </IconButton>
       </div>
       <Divider sx={{ borderColor: "#8c8c8c" }} />
+      WAF IS BROKEN ALERT
       <DialogActions>
         <Button
           variant="secondary"
