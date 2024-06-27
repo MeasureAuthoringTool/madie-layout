@@ -20,7 +20,7 @@ import {
   ServiceConfig,
   useOktaTokens,
 } from "@madie/madie-util";
-import axios from "axios";
+import axios from "../../../api/axios-instance";
 import {
   Checkbox,
   FormControlLabel,
@@ -109,10 +109,6 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
         });
       });
   }
-
-  axios.interceptors.response.use((response) => {
-    return response;
-  }, wafIntercept);
 
   function formikErrorHandler(name: string, isError: boolean) {
     if (formik.touched[name] && formik.errors[name]) {

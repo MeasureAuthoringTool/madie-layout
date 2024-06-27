@@ -1,6 +1,6 @@
-import axios, { AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
+import axios from "../../api/axios-instance";
 import { ServiceConfig, getServiceConfig } from "./getServiceConfig";
-import { wafIntercept } from "@madie/madie-util";
 
 export default async function customLog(
   input: any,
@@ -31,7 +31,3 @@ export const loginLogger = (content) => {
 export const logoutLogger = (content) => {
   return customLog(content, "logout");
 };
-
-axios.interceptors.response.use((response) => {
-  return response;
-}, wafIntercept);

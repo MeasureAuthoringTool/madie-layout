@@ -16,7 +16,7 @@ import {
 import "twin.macro";
 import "styled-components/macro";
 import "./pageHeader.scss";
-import axios from "axios";
+import axios from "../../../api/axios-instance";
 import { useIsOverflow } from "./useIsOverflow";
 
 const PageHeader = () => {
@@ -110,10 +110,6 @@ const PageHeader = () => {
 
   const overflowingText = useRef<HTMLHeadingElement>(null);
   const isOverflow = useIsOverflow(overflowingText, () => {});
-
-  axios.interceptors.response.use((response) => {
-    return response;
-  }, wafIntercept);
 
   return (
     <div className={pageHeaderClass} id="page-header">

@@ -14,7 +14,7 @@ import { act, Simulate } from "react-dom/test-utils";
 import { describe, expect, test } from "@jest/globals";
 import userEvent from "@testing-library/user-event";
 import { mockLibraryName, mockMeasureName } from "../NewMeasure/bulkCreate";
-import axios from "axios";
+import axios from "../../../api/axios-instance";
 import PageHeader from "../PageHeader/PageHeader";
 import { Model } from "@madie/madie-models/dist/Model";
 import { checkUserCanEdit } from "@madie/madie-util";
@@ -99,7 +99,7 @@ jest.mock("@madie/madie-util", () => ({
   useFeatureFlags: jest.fn().mockReturnValue({ qdm: false }),
 }));
 
-jest.mock("axios");
+jest.mock("../../../api/axios-instance");
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 let postData: object = { status: 201 };
 let getData: object = { status: 200 };
