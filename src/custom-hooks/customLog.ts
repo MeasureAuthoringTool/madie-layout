@@ -1,4 +1,5 @@
-import axios, { AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
+import axios from "../../api/axios-instance";
 import { ServiceConfig, getServiceConfig } from "./getServiceConfig";
 
 export default async function customLog(

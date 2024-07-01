@@ -15,11 +15,12 @@ import {
 import { Box } from "@mui/system";
 
 import {
+  wafIntercept,
   getServiceConfig,
   ServiceConfig,
   useOktaTokens,
 } from "@madie/madie-util";
-import axios from "axios";
+import axios from "../../../api/axios-instance";
 import {
   Checkbox,
   FormControlLabel,

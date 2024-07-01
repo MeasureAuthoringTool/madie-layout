@@ -90,7 +90,7 @@ declare module "@madie/madie-util" {
     draft?: boolean
   ): boolean;
   export function useOnClickOutside(ref: any, handler: any): void;
-
+  export function wafIntercept(): void;
   export class TerminologyServiceApi {
     constructor(baseUrl: string, getAccessToken: () => string);
     checkLogin(): Promise<Boolean>;

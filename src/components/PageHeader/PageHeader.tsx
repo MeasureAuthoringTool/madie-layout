@@ -4,17 +4,19 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import { Fade, Breadcrumbs } from "@mui/material";
 import CreateNewMeasureDialog from "../NewMeasure/CreateNewMeasureDialog";
+import WafDialog from "../WafDialog/WafDialog";
 import { Button } from "@madie/madie-design-system/dist/react";
 import {
   measureStore,
   cqlLibraryStore,
   featureFlagsStore,
   checkUserCanEdit,
+  wafIntercept,
 } from "@madie/madie-util";
 import "twin.macro";
 import "styled-components/macro";
 import "./pageHeader.scss";
-import axios from "axios";
+import axios from "../../../api/axios-instance";
 import { useIsOverflow } from "./useIsOverflow";
 
 const PageHeader = () => {
@@ -26,7 +28,16 @@ const PageHeader = () => {
     );
   }, []);
 
+  useEffect(() => {
+    document.addEventListener("wafReject", (e: any) => {
+      setWafOpen(true);
+      setWafSupportId(e.detail.supportId);
+    });
+  }, []);
+
   const [createOpen, setCreateOpen] = useState<boolean>(false);
+  const [wafOpen, setWafOpen] = useState<boolean>(false);
+  const [wafSupportId, setWafSupportId] = useState<string>("");
   const [libraryState, setLibraryState] = useState<any>(cqlLibraryStore.state);
   useEffect(() => {
     const subscription = cqlLibraryStore.subscribe(setLibraryState);
@@ -50,6 +61,15 @@ const PageHeader = () => {
 
   const handleClose = () => {
     setCreateOpen(false);
+  };
+
+  //waf error
+  const openWaf = () => {
+    setWafOpen(true);
+  };
+
+  const handleWafClose = () => {
+    setWafOpen(false);
   };
   // dialog utilities just for delete measure
   const canEdit = checkUserCanEdit(
@@ -174,6 +194,11 @@ const PageHeader = () => {
           </div>
         </Fade>
       )}
+      <WafDialog
+        open={wafOpen}
+        onClose={handleWafClose}
+        supportId={wafSupportId}
+      />
       {/* Measures landing */}
       {(pathname === "/measures" || pathname === "/measures/") && (
         <div className="measures">

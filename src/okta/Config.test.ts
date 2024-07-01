@@ -1,7 +1,7 @@
-import axios from "axios";
+import axios from "../../api/axios-instance";
 import { getOktaConfig } from "./Config";
 
-jest.mock("axios");
+jest.mock("../../api/axios-instance");
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe("Config component", () => {

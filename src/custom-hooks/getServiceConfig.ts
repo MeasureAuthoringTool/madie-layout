@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../../api/axios-instance";
 
 export interface ServiceConfig {
   loggingService: {

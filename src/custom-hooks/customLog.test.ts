@@ -6,9 +6,9 @@ import customLog, {
   logoutLogger,
 } from "./customLog";
 import { ServiceConfig } from "./getServiceConfig";
-import axios from "axios";
+import axios from "../../api/axios-instance";
 
-jest.mock("axios");
+jest.mock("../../api/axios-instance");
 
 const mockConfig: ServiceConfig = {
   loggingService: {
