@@ -66,12 +66,13 @@ const WafDialog = (props: wafDialogProps) => {
       </div>
       <Divider sx={{ borderColor: "#8c8c8c" }} />
       <DialogContent>
-        The system has encountered a Web Application Firewall (WAF) issue.
-        Please submit a ticket to the help desk
+        The system has encountered a CMS Web Application Firewall (WAF) issue.
+        Please submit a ticket to the help desk and include the action you were
+        performing
         {supportId.length > 0
-          ? ` and include the following SOC #${supportId}`
+          ? `, as well as the following SOC #${supportId}`
           : ""}
-        .{" "}
+        .
       </DialogContent>
       <DialogActions>
         <Button
