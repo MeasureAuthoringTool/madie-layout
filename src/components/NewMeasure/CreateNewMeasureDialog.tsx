@@ -334,7 +334,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
         />
       </Box>
 
-      {formik.values.model !== Model.QDM_5_6 && (
+      {formik.values.model && formik.values.model !== Model.QDM_5_6 && (
         <Box sx={formRowGapped}>
           <FormControlLabel
             control={
