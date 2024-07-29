@@ -74,6 +74,9 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
 
     measure.measureSetId = uuidv4();
     measure.versionId = uuidv4();
+    if (measure.model === Model.QDM_5_6) {
+      measure.measureMetaData.experimental = false;
+    }
     await axios
       .post<Measure>(config?.measureService?.baseUrl + "/measure", measure, {
         headers: {
@@ -298,27 +301,6 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
       </Box>
 
       <Box sx={formRowGapped}>
-        <FormControlLabel
-          control={
-            <Checkbox
-              onChange={formik.handleChange}
-              sx={{
-                color: "#333333",
-              }}
-              name="measureMetaData.experimental"
-              id="experimental"
-              data-testid="experimental"
-            />
-          }
-          label="Experimental"
-          sx={{
-            color: "#333333",
-            textTransform: "none",
-          }}
-        />
-      </Box>
-
-      <Box sx={formRowGapped}>
         <Select
           placeHolder={{ name: "Model", value: "" }}
           required
@@ -351,6 +333,29 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
           })}
         />
       </Box>
+
+      {formik.values.model !== Model.QDM_5_6 && (
+        <Box sx={formRowGapped}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                onChange={formik.handleChange}
+                sx={{
+                  color: "#333333",
+                }}
+                name="measureMetaData.experimental"
+                id="experimental"
+                data-testid="experimental"
+              />
+            }
+            label="Experimental"
+            sx={{
+              color: "#333333",
+              textTransform: "none",
+            }}
+          />
+        </Box>
+      )}
 
       <Box sx={formRowGapped} data-testid="measurement-period-div">
         <LocalizationProvider dateAdapter={DateAdapter}>
