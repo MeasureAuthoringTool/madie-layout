@@ -75,7 +75,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
     measure.measureSetId = uuidv4();
     measure.versionId = uuidv4();
     if (measure.model === Model.QDM_5_6) {
-      measure.measureMetaData.experimental = false;
+      measure.measureMetaData.experimental = null;
     }
     await axios
       .post<Measure>(config?.measureService?.baseUrl + "/measure", measure, {
