@@ -1,4 +1,4 @@
-import { AbstractToken } from "@okta/okta-auth-js/lib/types/Token";
+import { AbstractToken } from "@okta/okta-auth-js";
 import { AuthState, OktaAuth, UserClaims } from "@okta/okta-auth-js";
 
 const oktaAuthTestProps = (isAuthenticated?: boolean) => {
