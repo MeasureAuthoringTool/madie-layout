@@ -24,6 +24,7 @@ declare module "@madie/madie-util" {
       populationCriteriaTabs: boolean;
       importTestCases: boolean;
       qdm: boolean;
+      qiCore6: boolean;
     };
   }
 
@@ -34,6 +35,7 @@ declare module "@madie/madie-util" {
 
   interface FeatureFlags {
     importTestCases: boolean;
+    qiCore6: boolean;
   }
 
   export const cqlLibraryStore: {

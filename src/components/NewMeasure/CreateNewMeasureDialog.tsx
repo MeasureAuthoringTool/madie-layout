@@ -13,12 +13,12 @@ import {
   MadieAlert,
 } from "@madie/madie-design-system/dist/react";
 import { Box } from "@mui/system";
-
 import {
   wafIntercept,
   getServiceConfig,
   ServiceConfig,
   useOktaTokens,
+  useFeatureFlags,
 } from "@madie/madie-util";
 import axios from "../../../api/axios-instance";
 import {
@@ -67,7 +67,11 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
     },
   });
 
-  const modelOptions = Object.keys(Model);
+  let modelOptions = Object.keys(Model);
+  const featureFlags = useFeatureFlags();
+  if (!featureFlags?.qiCore6) {
+    modelOptions = modelOptions.filter((option) => option !== "QICORE_6_0_0");
+  }
 
   async function createMeasure(measure: Measure) {
     const config: ServiceConfig = await getServiceConfig();
