@@ -1,5 +1,9 @@
-import { AbstractToken } from "@okta/okta-auth-js/lib/types/Token";
-import { AuthState, OktaAuth, UserClaims } from "@okta/okta-auth-js";
+import {
+  AbstractToken,
+  AuthState,
+  OktaAuth,
+  UserClaims,
+} from "@okta/okta-auth-js";
 
 const oktaAuthTestProps = (isAuthenticated?: boolean) => {
   const testToken = <M extends Record<string, any>>(
