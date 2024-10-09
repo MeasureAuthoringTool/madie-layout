@@ -5,12 +5,14 @@ import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined
 import { Fade, Breadcrumbs } from "@mui/material";
 import CreateNewMeasureDialog from "../NewMeasure/CreateNewMeasureDialog";
 import WafDialog from "../WafDialog/WafDialog";
+import MeasureActionCenter from "./MeasureActionCenter/MeasureActionCenter"
 import { Button } from "@madie/madie-design-system/dist/react";
 import {
   measureStore,
   cqlLibraryStore,
   featureFlagsStore,
   checkUserCanEdit,
+  useFeatureFlags,
   wafIntercept,
 } from "@madie/madie-util";
 import "twin.macro";
@@ -107,6 +109,7 @@ const PageHeader = () => {
         console.error(reason);
       });
   }, []);
+  const featureFlags = useFeatureFlags();
 
   const overflowingText = useRef<HTMLHeadingElement>(null);
   const isOverflow = useIsOverflow(overflowingText, () => {});
@@ -150,7 +153,8 @@ const PageHeader = () => {
                   <span className="more-text">{measureState?.measureName}</span>
                 </div>
               )}
-
+              Hello
+              {!featureFlags.MeasureButtons &&
               <div tw="pr-8" style={{ marginLeft: "auto" }}>
                 <Button
                   style={{ border: "none" }}
@@ -164,9 +168,13 @@ const PageHeader = () => {
                   }}
                 >
                   <DeleteOutlineOutlinedIcon className="page-header-action-icon" />
-                  Delete Measure
+                  Delete Measure123
                 </Button>
-              </div>
+              </div>}
+              {featureFlags.MeasureButtons &&
+              <div tw="pr-8" style={{ marginLeft: "auto" }}>
+                <MeasureActionCenter/>
+              </div>}
             </div>
             <div>
               <p tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0">{`Version ${measureState?.version}`}</p>
