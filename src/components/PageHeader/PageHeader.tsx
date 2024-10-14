@@ -7,6 +7,9 @@ import CreateNewMeasureDialog from "../NewMeasure/CreateNewMeasureDialog";
 import WafDialog from "../WafDialog/WafDialog";
 import MeasureActionCenter from "./MeasureActionCenter/MeasureActionCenter"
 import { Button } from "@madie/madie-design-system/dist/react";
+import SpeedDial, { SpeedDialProps } from '@mui/material/SpeedDial';
+import SpeedDialIcon from '@mui/material/SpeedDialIcon';
+import SpeedDialAction from '@mui/material/SpeedDialAction';
 import {
   measureStore,
   cqlLibraryStore,
@@ -120,6 +123,13 @@ const PageHeader = () => {
       {pathname.includes("edit") && pathname.includes("measures") && (
         <Fade in={measureState?.measureName !== undefined}>
           <div className="details">
+          {featureFlags?.MeasureButtons &&
+              <div tw="pr-8" style={{ position:"relative" }}>
+                <div style={{ position:"absolute",    top:0,
+   right:0}}>
+                <MeasureActionCenter/>
+                </div>
+              </div>}
             <div>
               <Breadcrumbs aria-label="measures">
                 <Link
@@ -136,6 +146,7 @@ const PageHeader = () => {
                   Details
                 </Link>
               </Breadcrumbs>
+
             </div>
             <div>
               <h1
@@ -153,28 +164,24 @@ const PageHeader = () => {
                   <span className="more-text">{measureState?.measureName}</span>
                 </div>
               )}
-              Hello
-              {!featureFlags.MeasureButtons &&
+              {!featureFlags?.MeasureButtons &&
               <div tw="pr-8" style={{ marginLeft: "auto" }}>
                 <Button
                   style={{ border: "none" }}
                   disabled={!canEdit}
                   className="page-header-action-button"
                   variant="outline-filled"
-                  data-testid="delete-measure-button"
+                  data-testId="delete-measure-button"
                   onClick={() => {
                     const event = new Event("delete-measure");
                     window.dispatchEvent(event);
                   }}
                 >
                   <DeleteOutlineOutlinedIcon className="page-header-action-icon" />
-                  Delete Measure123
+                  Delete Measure
                 </Button>
               </div>}
-              {featureFlags.MeasureButtons &&
-              <div tw="pr-8" style={{ marginLeft: "auto" }}>
-                <MeasureActionCenter/>
-              </div>}
+
             </div>
             <div>
               <p tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0">{`Version ${measureState?.version}`}</p>
