@@ -36,7 +36,7 @@ declare module "@madie/madie-util" {
   interface FeatureFlags {
     importTestCases: boolean;
     qiCore6: boolean;
-    MeasureButtons:boolean;
+    MeasureButtons: boolean;
   }
 
   export const cqlLibraryStore: {
