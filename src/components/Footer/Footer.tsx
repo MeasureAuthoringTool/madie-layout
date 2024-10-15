@@ -36,7 +36,7 @@ const Footer = () => {
         <ul>
           <li className="nav-link">
             <a
-              href="https://oncprojectracking.healthit.gov/support/projects/BONNIEMAT/summary"
+              href="https://oncprojectracking.healthit.gov/support/projects/MADIE/summary"
               aria-label="Get Help"
               target="_blank"
             >
@@ -45,7 +45,7 @@ const Footer = () => {
           </li>
           <li className="nav-link">
             <a
-              href="https://www.emeasuretool.cms.gov/madie-mvp"
+              href="https://www.emeasuretool.cms.gov/training-resources"
               target="_blank"
               aria-label="User Guide"
             >
