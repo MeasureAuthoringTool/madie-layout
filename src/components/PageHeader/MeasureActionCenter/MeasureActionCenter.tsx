@@ -35,6 +35,7 @@ const MeasureActionCenter = () => {
         }}
         icon={
           <div
+            data-testid="action-center-actual-icon"
             style={{
               display: "flex",
               alignItems: "center",
