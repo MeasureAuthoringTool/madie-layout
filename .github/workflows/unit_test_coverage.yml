@@ -45,7 +45,7 @@ jobs:
         run: npm ci
 
       - name: Audit dependencies for security vulnerabilities
-        run: npm audit --production
+        run: npm audit --omit=dev --audit-level=${{ secrets.NPM_AUDIT_LEVEL }}
 
       - name: Lint the source code
         run: npm run-script lint
@@ -94,7 +94,8 @@ jobs:
           name: coverage
 
       - name: Upload code coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           file: lcov.info
           fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }} # required
