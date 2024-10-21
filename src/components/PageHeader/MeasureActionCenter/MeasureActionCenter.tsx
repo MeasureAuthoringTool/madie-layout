@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import { SpeedDial, SpeedDialAction } from "@mui/material";
 import { DeleteOutlined as DeleteIcon } from "@mui/icons-material";
@@ -20,7 +20,7 @@ const MeasureActionCenter = () => {
       }}
     >
       <SpeedDial
-        ariaLabel="SpeedDial for actions"
+        ariaLabel="Measure action center"
         data-testid="action-center-button"
         sx={{
           "& .MuiSpeedDial-fab": {
