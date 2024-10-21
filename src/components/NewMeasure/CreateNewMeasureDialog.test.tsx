@@ -164,7 +164,7 @@ describe("Measures Create Dialog", () => {
     expect(ecqmNode.value).toBe("ecqmTitleQdm");
 
     const modelSelect = await getByTestId("measure-model-select");
-    const modelSelectBtn = await within(modelSelect).getByRole("button");
+    const modelSelectBtn = await within(modelSelect).getByRole("combobox");
     userEvent.click(modelSelectBtn);
     const options = await screen.findAllByRole("option");
     expect(options.length).toEqual(2);
@@ -392,7 +392,7 @@ describe("Measures Create Dialog", () => {
     expect(ecqmNode.value).toBe("ecqmTitleQdm");
 
     const modelSelect = await getByTestId("measure-model-select");
-    const modelSelectBtn = await within(modelSelect).getByRole("button");
+    const modelSelectBtn = await within(modelSelect).getByRole("combobox");
     userEvent.click(modelSelectBtn);
     const options = await screen.findAllByRole("option");
     expect(options.length).toEqual(2);
@@ -429,7 +429,7 @@ describe("Measures Create Dialog", () => {
       <CreateNewMeasureDialog open={true} onClose={undefined} />
     );
     const modelSelectDropDown = getByTestId("measure-model-select");
-    const modelSelectBtn = within(modelSelectDropDown).getByRole("button");
+    const modelSelectBtn = within(modelSelectDropDown).getByRole("combobox");
     userEvent.click(modelSelectBtn);
     expect(
       getByTestId("measure-model-option-QI-Core v4.1.1")
@@ -446,7 +446,7 @@ describe("Measures Create Dialog", () => {
       <CreateNewMeasureDialog open={true} onClose={undefined} />
     );
     const modelSelectDropDown = getByTestId("measure-model-select");
-    const modelSelectBtn = within(modelSelectDropDown).getByRole("button");
+    const modelSelectBtn = within(modelSelectDropDown).getByRole("combobox");
     userEvent.click(modelSelectBtn);
     expect(
       getByTestId("measure-model-option-QI-Core v4.1.1")
