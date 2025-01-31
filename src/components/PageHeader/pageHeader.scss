@@ -1,5 +1,6 @@
 .page-header {
-  min-height: 191px;
+  min-height: 162px;
+  padding: 16px 32px 0 32px;
   width: 100%;
   background: linear-gradient(to right, #125496, #1a7d9f);
   &.details {
@@ -7,7 +8,7 @@
     min-height: min-content;
     background: #003366;
     > .details {
-      padding: 24px 64px 31px 64px;
+      padding: 0px 64px 16px 64px;
     }
   }
   > .measures {
@@ -96,7 +97,7 @@
   }
 
   .details {
-    padding: 32px 32px 18px 32px;
+    padding: 0 0 0 32px;
     display: flex;
     flex-direction: column;
     font-family: Rubik, sans-serif;
@@ -179,7 +180,11 @@
   -webkit-box-orient: horizontal;
   overflow: hidden;
   white-space: nowrap;
-  margin: 8px 0px;
+  margin: 4px 0px;
+  padding: 0px 16px;
+}
+.header-metadata-info {
+  padding: 0px 16px;
 }
 
 .more-measures-button {
