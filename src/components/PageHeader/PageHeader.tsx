@@ -186,7 +186,7 @@ const PageHeader = () => {
                 </div>
               )}
             </div>
-            <div>
+            <div className="header-metadata-info">
               <p tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0">{`Version ${measureState?.version}`}</p>
               {[
                 measureState?.model,
