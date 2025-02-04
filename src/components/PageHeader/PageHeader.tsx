@@ -124,7 +124,6 @@ const PageHeader = () => {
       {pathname.includes("edit") && pathname.includes("measures") && (
         <Fade in={measureState?.measureName !== undefined}>
           <div className="details">
-            {featureFlags?.MeasureButtons && (
               <div tw="pr-8" style={{ position: "relative" }}>
                 <div style={{ position: "absolute", top: 0, right: 0 }}>
                   <MeasureActionCenter
@@ -133,7 +132,6 @@ const PageHeader = () => {
                   />
                 </div>
               </div>
-            )}
             <div>
               <Breadcrumbs aria-label="measures">
                 <Link
@@ -167,7 +165,6 @@ const PageHeader = () => {
                   <span className="more-text">{measureState?.measureName}</span>
                 </div>
               )}
-              {!featureFlags?.MeasureButtons && (
                 <div tw="pr-8" style={{ marginLeft: "auto" }}>
                   <Button
                     style={{ border: "none" }}
@@ -184,7 +181,6 @@ const PageHeader = () => {
                     Delete Measure
                   </Button>
                 </div>
-              )}
             </div>
             <div className="header-metadata-info">
               <p tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0">{`Version ${measureState?.version}`}</p>
