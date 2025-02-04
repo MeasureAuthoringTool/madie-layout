@@ -70,6 +70,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
   let modelOptions = Object.keys(Model);
   const featureFlags = useFeatureFlags();
     modelOptions = modelOptions.filter((option) => option !== "QICORE_6_0_0");
+  
 
   async function createMeasure(measure: Measure) {
     const config: ServiceConfig = await getServiceConfig();
