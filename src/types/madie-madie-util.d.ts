@@ -34,7 +34,6 @@ declare module "@madie/madie-util" {
 
   interface FeatureFlags {
     importTestCases: boolean;
-    MeasureButtons: boolean;
   }
 
   export const cqlLibraryStore: {
