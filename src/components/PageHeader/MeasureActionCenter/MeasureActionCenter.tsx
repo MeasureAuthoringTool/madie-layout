@@ -8,6 +8,7 @@ import { MadieDiscardDialog } from "@madie/madie-design-system/dist/react";
 import { Measure } from "@madie/madie-models";
 import { blue, red } from "@mui/material/colors";
 import { RouteHandlerState, routeHandlerStore } from "@madie/madie-util";
+import FeedOutlinedIcon from "@mui/icons-material/FeedOutlined";
 
 interface PropTypes {
   canEdit: boolean;
@@ -65,11 +66,19 @@ const MeasureActionCenter = (props: PropTypes) => {
   const getActionArray = (measure: Measure, canEdit: boolean): any[] => {
     const actions: any[] = [
       {
-        icon: <FileUploadOutlinedIcon sx={{ color: blue[500] }} />,
-        name: "Export Measure",
-        onClick: () => handleActionClick(new Event("export-measure")),
+        icon: <FeedOutlinedIcon sx={{ color: blue[500] }} />,
+        name: routeHandlerState?.canTravel
+          ? `View human readable`
+          : `Save measure to view human readable`,
+        onClick: () => handleActionClick(new Event("view-humanreadable")),
       },
     ];
+
+    actions.push({
+      icon: <FileUploadOutlinedIcon sx={{ color: blue[500] }} />,
+      name: "Export Measure",
+      onClick: () => handleActionClick(new Event("export-measure")),
+    });
 
     if (canEdit) {
       if (measure?.measureMetaData.draft) {

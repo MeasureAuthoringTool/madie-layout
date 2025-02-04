@@ -32,6 +32,7 @@ describe("MeasureActionCenter Component", () => {
     expect(screen.queryByTestId("VersionMeasure")).not.toBeInTheDocument();
     expect(screen.getByTestId("DraftMeasure")).toBeInTheDocument();
     expect(screen.getByTestId("ExportMeasure")).toBeInTheDocument();
+    expect(screen.getByTestId("Viewhumanreadable")).toBeInTheDocument();
   });
 
   it("should trigger delete-measure event when 'Delete Measure' action is clicked", () => {
@@ -74,6 +75,21 @@ describe("MeasureActionCenter Component", () => {
     expect(dispatchEventSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         type: "export-measure",
+      })
+    );
+  });
+
+  it("should trigger view-humanreadable event when 'View human readable' action is clicked", () => {
+    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+    render(<MeasureActionCenter canEdit={true} measure={draftMeasure} />);
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+    const viewHRButton = screen.getByTestId("Viewhumanreadable");
+    userEvent.click(viewHRButton);
+
+    expect(dispatchEventSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "view-humanreadable",
       })
     );
   });
