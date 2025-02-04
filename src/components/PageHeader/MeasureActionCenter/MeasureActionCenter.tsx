@@ -81,7 +81,7 @@ const MeasureActionCenter = (props: PropTypes) => {
     });
 
     if (canEdit) {
-      if (measure?.measureMetaData.draft) {
+      if (measure?.measureMetaData?.draft) {
         actions.push({
           icon: <DeleteOutlinedIcon sx={{ color: red[500] }} />,
           name: "Delete Measure",
@@ -93,7 +93,7 @@ const MeasureActionCenter = (props: PropTypes) => {
           onClick: () => handleActionClick(new Event("version-measure")),
         });
       }
-      if (!measure?.measureMetaData.draft) {
+      if (!measure?.measureMetaData?.draft) {
         actions.push({
           icon: <EditCalendarOutlinedIcon sx={{ color: blue[500] }} />,
           name: "Draft Measure",
