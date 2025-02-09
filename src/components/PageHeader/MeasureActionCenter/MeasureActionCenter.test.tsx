@@ -30,6 +30,7 @@ describe("MeasureActionCenter Component", () => {
     userEvent.click(actionCenterButton);
     expect(screen.queryByTestId("DeleteMeasure")).not.toBeInTheDocument();
     expect(screen.queryByTestId("VersionMeasure")).not.toBeInTheDocument();
+    expect(screen.getByTestId("ShareMeasure")).toBeInTheDocument();
     expect(screen.getByTestId("DraftMeasure")).toBeInTheDocument();
     expect(screen.getByTestId("ExportMeasure")).toBeInTheDocument();
     expect(screen.getByTestId("Viewhumanreadable")).toBeInTheDocument();

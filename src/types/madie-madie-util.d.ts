@@ -37,6 +37,7 @@ declare module "@madie/madie-util" {
     importTestCases: boolean;
     qiCore6: boolean;
     MeasureButtons: boolean;
+    ShareMeasure: boolean;
   }
 
   export const cqlLibraryStore: {
