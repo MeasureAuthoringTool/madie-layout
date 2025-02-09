@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import MeasureActionCenter from "./MeasureActionCenter";
 import { Measure } from "@madie/madie-models";
 import userEvent from "@testing-library/user-event";
+import { useFeatureFlags } from "@madie/madie-util";
 
 const draftMeasure = {
   id: "measure ID",
@@ -18,6 +19,18 @@ const versionedMeasure = {
   measureMetaData: { draft: false },
 } as Measure;
 
+jest.mock("@madie/madie-util", () => ({
+  useFeatureFlags: jest.fn().mockReturnValue({}),
+  routeHandlerStore: {
+    subscribe: () => {
+      return { unsubscribe: () => null };
+    },
+    updateRouteHandlerState: () => null,
+    state: { canTravel: true, pendingPath: "" },
+    initialState: { canTravel: false, pendingPath: "" },
+  },
+}));
+
 describe("MeasureActionCenter Component", () => {
   it("renders the action center", () => {
     render(<MeasureActionCenter canEdit={true} measure={draftMeasure} />);
@@ -25,6 +38,7 @@ describe("MeasureActionCenter Component", () => {
   });
 
   it("should open action center on button click", () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ ShareMeasure: true });
     render(<MeasureActionCenter canEdit={true} measure={versionedMeasure} />);
     const actionCenterButton = screen.getByLabelText("Measure action center");
     userEvent.click(actionCenterButton);

@@ -7,7 +7,11 @@ import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
 import { MadieDiscardDialog } from "@madie/madie-design-system/dist/react";
 import { Measure } from "@madie/madie-models";
 import { blue, red } from "@mui/material/colors";
-import { RouteHandlerState, routeHandlerStore } from "@madie/madie-util";
+import {
+  RouteHandlerState,
+  routeHandlerStore,
+  useFeatureFlags,
+} from "@madie/madie-util";
 import FeedOutlinedIcon from "@mui/icons-material/FeedOutlined";
 
 interface PropTypes {
@@ -20,6 +24,7 @@ const MeasureActionCenter = (props: PropTypes) => {
   const [actions, setActions] = useState<Array<any>>([]);
   const [discardDialogOpen, setDiscardDialogOpen] = useState<boolean>(false);
   const [eventToTrigger, setEventToTrigger] = useState<Event | null>(null);
+  const featureFlags = useFeatureFlags();
 
   const { updateRouteHandlerState } = routeHandlerStore;
   const [routeHandlerState, setRouteHandlerState] = useState<RouteHandlerState>(
@@ -119,11 +124,13 @@ const MeasureActionCenter = (props: PropTypes) => {
         });
       }
 
-      actions.set("share measure", {
-        icon: CustomShareIcon,
-        name: "Share Measure",
-        onClick: () => handleActionClick(new Event("share-measure")),
-      });
+      if (featureFlags?.ShareMeasure) {
+        actions.set("share measure", {
+          icon: CustomShareIcon,
+          name: "Share Measure",
+          onClick: () => handleActionClick(new Event("share-measure")),
+        });
+      }
     }
     // required order to display
     const actionsListOrder = [
