@@ -50,6 +50,20 @@ describe("MeasureActionCenter Component", () => {
     expect(screen.getByTestId("Viewhumanreadable")).toBeInTheDocument();
   });
 
+  it("should render 'Delete Measure' button only for draft measures when canEdit is true", () => {
+    render(<MeasureActionCenter canEdit={true} measure={draftMeasure} />);
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+    expect(screen.getByTestId("DeleteMeasure")).toBeInTheDocument();
+  });
+
+  it("should not render 'Delete Measure' button for versioned measures", () => {
+    render(<MeasureActionCenter canEdit={true} measure={versionedMeasure} />);
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+    expect(screen.queryByTestId("DeleteMeasure")).not.toBeInTheDocument();
+  });
+
   it("should trigger delete-measure event when 'Delete Measure' action is clicked", () => {
     const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
     render(<MeasureActionCenter canEdit={true} measure={draftMeasure} />);
@@ -57,13 +71,13 @@ describe("MeasureActionCenter Component", () => {
     userEvent.click(actionCenterButton);
     const deleteMeasureButton = screen.getByTestId("DeleteMeasure");
     userEvent.click(deleteMeasureButton);
-
     expect(dispatchEventSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         type: "delete-measure",
       })
     );
   });
+
   it("should trigger export-measure event when 'Export Measure' action is clicked", () => {
     const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
     render(<MeasureActionCenter canEdit={true} measure={draftMeasure} />);
@@ -71,7 +85,6 @@ describe("MeasureActionCenter Component", () => {
     userEvent.click(actionCenterButton);
     const exportMeasureButton = screen.getByTestId("ExportMeasure");
     userEvent.click(exportMeasureButton);
-
     expect(dispatchEventSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         type: "export-measure",
@@ -86,7 +99,6 @@ describe("MeasureActionCenter Component", () => {
     userEvent.click(actionCenterButton);
     const exportMeasureButton = screen.getByTestId("ExportMeasure");
     userEvent.click(exportMeasureButton);
-
     expect(dispatchEventSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         type: "export-measure",
@@ -101,7 +113,6 @@ describe("MeasureActionCenter Component", () => {
     userEvent.click(actionCenterButton);
     const viewHRButton = screen.getByTestId("Viewhumanreadable");
     userEvent.click(viewHRButton);
-
     expect(dispatchEventSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         type: "view-humanreadable",
