@@ -120,9 +120,8 @@ describe("MeasureActionCenter Component", () => {
     );
   });
 
-  // fails, a discard dialog should display for canTravel false, but this is not updating the mock correctly
   it("pops discard dialog, emits event for resetting forms on continue", async () => {
-    routeHandlerStore.state.canTravel = false; // Modify the existing mock state
+    routeHandlerStore.state.canTravel = false;
     const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
     render(<MeasureActionCenter canEdit={true} measure={draftMeasure} />);
 
