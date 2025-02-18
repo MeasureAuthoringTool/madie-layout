@@ -1,9 +1,9 @@
 import * as React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import MeasureActionCenter from "./MeasureActionCenter";
 import { Measure } from "@madie/madie-models";
 import userEvent from "@testing-library/user-event";
-import { useFeatureFlags } from "@madie/madie-util";
+import { useFeatureFlags, routeHandlerStore } from "@madie/madie-util";
 
 const draftMeasure = {
   id: "measure ID",
@@ -116,6 +116,33 @@ describe("MeasureActionCenter Component", () => {
     expect(dispatchEventSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         type: "view-humanreadable",
+      })
+    );
+  });
+
+  // fails, a discard dialog should display for canTravel false, but this is not updating the mock correctly
+  it("pops discard dialog, emits event for resetting forms on continue", async () => {
+    routeHandlerStore.state.canTravel = false; // Modify the existing mock state
+    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+    render(<MeasureActionCenter canEdit={true} measure={draftMeasure} />);
+
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+
+    const saveButton = screen.getByTestId("Savemeasuretoviewhumanreadable");
+    expect(saveButton).toBeInTheDocument();
+    userEvent.click(saveButton);
+
+    await waitFor(() => {
+      expect(
+        screen.getByTestId("discard-dialog-continue-button")
+      ).toBeInTheDocument();
+      userEvent.click(screen.getByTestId("discard-dialog-continue-button"));
+    });
+
+    expect(dispatchEventSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "resetAllForms",
       })
     );
   });
