@@ -3,6 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import CqlLibraryActionCenter from "./CqlLibraryActionCenter";
 import { CqlLibrary, Model } from "@madie/madie-models";
 import userEvent from "@testing-library/user-event";
+import { routeHandlerStore } from "@madie/madie-util";
 
 const cqlLibrary = {
   id: "622e1f46d1fd3729d861e6cb",
@@ -25,6 +26,17 @@ const versionedCqlLibrary = {
   lastModifiedAt: null,
   lastModifiedBy: null,
 } as unknown as CqlLibrary;
+
+jest.mock("@madie/madie-util", () => ({
+  routeHandlerStore: {
+    subscribe: () => {
+      return { unsubscribe: () => null };
+    },
+    updateRouteHandlerState: () => null,
+    state: { canTravel: true, pendingPath: "" },
+    initialState: { canTravel: false, pendingPath: "" },
+  },
+}));
 
 describe("CqlLibraryActionCenter Component", () => {
   it("renders the action center", () => {
@@ -69,6 +81,30 @@ describe("CqlLibraryActionCenter Component", () => {
       expect.objectContaining({
         type: "delete-library",
       })
+    );
+  });
+
+  it("pops discard dialog, emits event for resetting forms on continue", async () => {
+    routeHandlerStore.state.canTravel = false;
+    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+    render(<CqlLibraryActionCenter canEdit={true} library={cqlLibrary} />);
+
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    userEvent.click(actionCenterButton);
+
+    const saveButton = screen.getByTestId("DeleteLibrary");
+    expect(saveButton).toBeInTheDocument();
+    userEvent.click(saveButton);
+
+    await waitFor(() => {
+      expect(
+        screen.getByTestId("discard-dialog-continue-button")
+      ).toBeInTheDocument();
+      userEvent.click(screen.getByTestId("discard-dialog-continue-button"));
+    });
+
+    expect(dispatchEventSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ isTrusted: false }, { isTrusted: false })
     );
   });
 });
