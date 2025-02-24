@@ -21,7 +21,7 @@ import "styled-components/macro";
 import "./pageHeader.scss";
 import axios from "../../../api/axios-instance";
 import { useIsOverflow } from "./useIsOverflow";
-import CqlLibraryActionCenter from "./LibraryActionCenter/CqlLibraryActionCenter";
+import CqlLibraryActionCenter from "./CqlLibraryActionCenter/CqlLibraryActionCenter";
 
 const PageHeader = () => {
   const { pathname } = useLocation();

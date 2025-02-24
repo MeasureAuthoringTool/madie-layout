@@ -1,0 +1,74 @@
+import * as React from "react";
+import { render, screen, waitFor } from "@testing-library/react";
+import CqlLibraryActionCenter from "./CqlLibraryActionCenter";
+import { CqlLibrary, Model } from "@madie/madie-models";
+import userEvent from "@testing-library/user-event";
+
+const cqlLibrary = {
+  id: "622e1f46d1fd3729d861e6cb",
+  cqlLibraryName: "TestCqlLibrary1",
+  model: Model.QICORE,
+  draft: true,
+  createdAt: null,
+  createdBy: null,
+  lastModifiedAt: null,
+  lastModifiedBy: null,
+} as unknown as CqlLibrary;
+
+const versionedCqlLibrary = {
+  id: "622e1f46d1fd3729d861e6cb",
+  cqlLibraryName: "TestCqlLibrary1",
+  model: Model.QICORE,
+  draft: false,
+  createdAt: null,
+  createdBy: null,
+  lastModifiedAt: null,
+  lastModifiedBy: null,
+} as unknown as CqlLibrary;
+
+describe("CqlLibraryActionCenter Component", () => {
+  it("renders the action center", () => {
+    render(<CqlLibraryActionCenter canEdit={true} library={cqlLibrary} />);
+    expect(screen.getByTestId("action-center")).toBeInTheDocument();
+  });
+
+  it("should open action center on button click", () => {
+    render(
+      <CqlLibraryActionCenter canEdit={true} library={versionedCqlLibrary} />
+    );
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    userEvent.click(actionCenterButton);
+    expect(screen.queryByTestId("DeleteLibrary")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("VersionLibrary")).not.toBeInTheDocument();
+  });
+
+  it("should render 'Delete Library' button only for draft libraries when canEdit is true", () => {
+    render(<CqlLibraryActionCenter canEdit={true} library={cqlLibrary} />);
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    userEvent.click(actionCenterButton);
+    expect(screen.getByTestId("DeleteLibrary")).toBeInTheDocument();
+  });
+
+  it("should not render 'Delete Library' button for versioned libraries", () => {
+    render(
+      <CqlLibraryActionCenter canEdit={true} library={versionedCqlLibrary} />
+    );
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    userEvent.click(actionCenterButton);
+    expect(screen.queryByTestId("DeleteLibrary")).not.toBeInTheDocument();
+  });
+
+  it("should trigger delete-library event when 'Delete Library' action is clicked", () => {
+    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+    render(<CqlLibraryActionCenter canEdit={true} library={cqlLibrary} />);
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    userEvent.click(actionCenterButton);
+    const deleteLibraryButton = screen.getByTestId("DeleteLibrary");
+    userEvent.click(deleteLibraryButton);
+    expect(dispatchEventSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "delete-library",
+      })
+    );
+  });
+});
