@@ -62,6 +62,8 @@ const MeasureActionCenter = (props: PropTypes) => {
   }, [props, routeHandlerState]);
 
   const onContinue = () => {
+    // we need every formik instance to use useFormikResetOnEvent on init
+    window.dispatchEvent(new Event("resetAllForms"));
     setDiscardDialogOpen(false);
     if (eventToTrigger) {
       window.dispatchEvent(eventToTrigger);
@@ -104,14 +106,14 @@ const MeasureActionCenter = (props: PropTypes) => {
     });
 
     if (canEdit) {
-      if (!measure?.measureMetaData.draft) {
+      if (!measure?.measureMetaData?.draft) {
         actions.set("draft measure", {
           icon: <EditCalendarOutlinedIcon sx={{ color: blue[500] }} />,
           name: "Draft Measure",
           onClick: () => handleActionClick(new Event("draft-measure")),
         });
       }
-      if (measure?.measureMetaData.draft) {
+      if (measure?.measureMetaData?.draft) {
         actions.set("delete measure", {
           icon: <DeleteOutlinedIcon sx={{ color: red[500] }} />,
           name: "Delete Measure",

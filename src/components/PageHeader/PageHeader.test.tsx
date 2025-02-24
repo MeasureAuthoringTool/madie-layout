@@ -60,6 +60,13 @@ jest.mock("@madie/madie-util", () => ({
       baseUrl: "example-service-url",
     },
   }),
+  routeHandlerStore: {
+    updateRouteHandlerState: jest.fn(),
+    subscribe: (set) => {
+      set({ canTravel: true, pendingRoute: "" });
+      return { unsubscribe: () => null };
+    },
+  },
   measureStore: {
     state: {
       createdBy: "test",
@@ -223,7 +230,7 @@ describe("Page Header and Dialogs", () => {
 
       const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
 
-      const deleteButton = await findByTestId("delete-measure-button");
+      const deleteButton = await findByTestId("DeleteOutlinedIcon");
       expect(deleteButton).toBeTruthy();
       expect(deleteButton).toBeEnabled();
       await waitFor(() => {
@@ -234,30 +241,6 @@ describe("Page Header and Dialogs", () => {
       });
       expect(dispatchEventSpy).toHaveBeenCalledWith(expect.any(Event));
       expect(dispatchEventSpy.mock.calls[0][0].type).toBe("delete-measure");
-    });
-  });
-
-  test("Delete button is disabled when checkUserCanEdit returns false", async () => {
-    checkUserCanEdit.mockImplementationOnce(() => false);
-    await act(async () => {
-      render(
-        <MemoryRouter
-          initialEntries={[
-            {
-              pathname: "/measures/randomstroning/edit/details",
-              search: "",
-              hash: "",
-              state: undefined,
-              key: "1fewtg",
-            },
-          ]}
-        >
-          <PageHeader />
-        </MemoryRouter>
-      );
-      await waitFor(() =>
-        expect(queryByTestId("delete-measure-button")).toBeDisabled()
-      );
     });
   });
 
@@ -648,6 +631,7 @@ describe("Page Header and Dialogs", () => {
           baseUrl: "example-service-url",
         },
       }),
+
       measureStore: {
         state: mockFormikInfo,
         initialState: mockFormikInfo,

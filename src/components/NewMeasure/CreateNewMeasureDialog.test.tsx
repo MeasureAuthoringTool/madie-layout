@@ -167,8 +167,8 @@ describe("Measures Create Dialog", () => {
     const modelSelectBtn = await within(modelSelect).getByRole("combobox");
     userEvent.click(modelSelectBtn);
     const options = await screen.findAllByRole("option");
-    expect(options.length).toEqual(2);
-    userEvent.click(options[1]);
+    expect(options.length).toEqual(3);
+    userEvent.click(options[2]);
 
     const measurementPeriodStartNode = getByTestId("measurement-period-start");
     const measurementPeriodStartInput = within(
@@ -395,7 +395,7 @@ describe("Measures Create Dialog", () => {
     const modelSelectBtn = await within(modelSelect).getByRole("combobox");
     userEvent.click(modelSelectBtn);
     const options = await screen.findAllByRole("option");
-    expect(options.length).toEqual(2);
+    expect(options.length).toEqual(3);
     userEvent.click(options[0]);
 
     const measurementPeriodStartNode = getByTestId("measurement-period-start");
@@ -423,25 +423,7 @@ describe("Measures Create Dialog", () => {
     await waitFor(() => expect(submitButton).toBeDisabled());
   }, 10000);
 
-  test("Model dropdown does not show QI-Core v6.0.0", async () => {
-    (useFeatureFlags as jest.Mock).mockReturnValue({ qiCore6: false });
-    const { queryByTestId, getByTestId } = await render(
-      <CreateNewMeasureDialog open={true} onClose={undefined} />
-    );
-    const modelSelectDropDown = getByTestId("measure-model-select");
-    const modelSelectBtn = within(modelSelectDropDown).getByRole("combobox");
-    userEvent.click(modelSelectBtn);
-    expect(
-      getByTestId("measure-model-option-QI-Core v4.1.1")
-    ).toBeInTheDocument();
-    expect(
-      queryByTestId("measure-model-option-QI-Core v6.0.0")
-    ).not.toBeInTheDocument();
-    expect(getByTestId("measure-model-option-QDM v5.6")).toBeInTheDocument();
-  });
-
-  test("Model dropdown shows QI-Core v6.0.0 when feature flag is on", async () => {
-    (useFeatureFlags as jest.Mock).mockReturnValue({ qiCore6: true });
+  test("Model dropdown shows QI-Core v6.0.0", async () => {
     const { getByTestId } = await render(
       <CreateNewMeasureDialog open={true} onClose={undefined} />
     );
