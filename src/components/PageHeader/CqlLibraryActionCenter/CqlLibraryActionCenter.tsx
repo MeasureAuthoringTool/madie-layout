@@ -34,6 +34,8 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
   }, [props, routeHandlerState]);
 
   const onContinue = () => {
+    // we need every formik instance to use useFormikResetOnEvent on init
+    window.dispatchEvent(new Event("resetAllForms"));
     setDiscardDialogOpen(false);
     if (eventToTrigger) {
       window.dispatchEvent(eventToTrigger);
