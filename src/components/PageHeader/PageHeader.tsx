@@ -21,6 +21,7 @@ import "styled-components/macro";
 import "./pageHeader.scss";
 import axios from "../../../api/axios-instance";
 import { useIsOverflow } from "./useIsOverflow";
+import CqlLibraryActionCenter from "./CqlLibraryActionCenter/CqlLibraryActionCenter";
 
 const PageHeader = () => {
   const { pathname } = useLocation();
@@ -77,10 +78,16 @@ const PageHeader = () => {
     setWafOpen(false);
   };
   // dialog utilities just for delete measure
-  const canEdit: boolean = checkUserCanEdit(
+  const measureCanEdit: boolean = checkUserCanEdit(
     measureState?.measureSet?.owner,
     measureState?.measureSet?.acls,
     true // in this context we don't care if it's not a draft; because we still have some actions we can take
+  );
+
+  const libraryCanEdit: boolean = checkUserCanEdit(
+    libraryState?.librarySet?.owner,
+    libraryState?.librarySet?.acls,
+    true
   );
 
   const makeUTCDate = (date) => {
@@ -126,7 +133,10 @@ const PageHeader = () => {
           <div className="details">
             <div tw="pr-8" style={{ position: "relative" }}>
               <div style={{ position: "absolute", top: 0, right: 0 }}>
-                <MeasureActionCenter canEdit={canEdit} measure={measureState} />
+                <MeasureActionCenter
+                  canEdit={measureCanEdit}
+                  measure={measureState}
+                />
               </div>
             </div>
             <div>
@@ -228,6 +238,16 @@ const PageHeader = () => {
       {pathname.includes("edit") && pathname.includes("cql-libraries") && (
         <Fade in={libraryState?.cqlLibraryName !== undefined}>
           <div className="details">
+            {libraryCanEdit && (
+              <div tw="pr-8" style={{ position: "relative" }}>
+                <div style={{ position: "absolute", top: 0, right: 0 }}>
+                  <CqlLibraryActionCenter
+                    canEdit={libraryCanEdit}
+                    library={libraryState}
+                  />
+                </div>
+              </div>
+            )}
             <div>
               <Breadcrumbs aria-label="Libraries">
                 <Link
