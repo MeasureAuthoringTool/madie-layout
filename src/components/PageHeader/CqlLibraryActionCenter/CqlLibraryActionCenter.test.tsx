@@ -44,6 +44,24 @@ describe("CqlLibraryActionCenter Component", () => {
     expect(screen.getByTestId("action-center")).toBeInTheDocument();
   });
 
+  it("should render delete and version library in action center when library is in draft status ", () => {
+    render(<CqlLibraryActionCenter canEdit={true} library={cqlLibrary} />);
+    const actionCenterButton = screen.getByTestId("action-center");
+    userEvent.click(actionCenterButton);
+    expect(screen.queryByTestId("DeleteLibrary")).toBeInTheDocument();
+    expect(screen.queryByTestId("VersionLibrary")).toBeInTheDocument();
+    expect(screen.queryByTestId("DraftLibrary")).not.toBeInTheDocument();
+  });
+
+  it("should render draft library in action center when library is in versioned status ", () => {
+    render(<CqlLibraryActionCenter canEdit={true} library={versionedCqlLibrary} />);
+    const actionCenterButton = screen.getByTestId("action-center");
+    userEvent.click(actionCenterButton);
+    expect(screen.queryByTestId("DraftLibrary")).toBeInTheDocument();
+    expect(screen.queryByTestId("DeleteLibrary")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("VersionLibrary")).not.toBeInTheDocument();
+  });
+
   it("should open action center on button click", () => {
     render(
       <CqlLibraryActionCenter canEdit={true} library={versionedCqlLibrary} />
@@ -80,6 +98,34 @@ describe("CqlLibraryActionCenter Component", () => {
     expect(dispatchEventSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         type: "delete-library",
+      })
+    );
+  });
+
+  it("should trigger version-library event when 'Version Library' action is clicked", () => {
+    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+    render(<CqlLibraryActionCenter canEdit={true} library={cqlLibrary} />);
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    userEvent.click(actionCenterButton);
+    const versionLibraryButton = screen.getByTestId("VersionLibrary");
+    userEvent.click(versionLibraryButton);
+    expect(dispatchEventSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "version-library",
+      })
+    );
+  });
+
+  it("should trigger draft-library event when 'Draft Library' action is clicked", () => {
+    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+    render(<CqlLibraryActionCenter canEdit={true} library={versionedCqlLibrary} />);
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    userEvent.click(actionCenterButton);
+    const draftLibraryButton = screen.getByTestId("DraftLibrary");
+    userEvent.click(draftLibraryButton);
+    expect(dispatchEventSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "draft-library",
       })
     );
   });
