@@ -54,7 +54,9 @@ describe("CqlLibraryActionCenter Component", () => {
   });
 
   it("should render draft library in action center when library is in versioned status ", () => {
-    render(<CqlLibraryActionCenter canEdit={true} library={versionedCqlLibrary} />);
+    render(
+      <CqlLibraryActionCenter canEdit={true} library={versionedCqlLibrary} />
+    );
     const actionCenterButton = screen.getByTestId("action-center");
     userEvent.click(actionCenterButton);
     expect(screen.queryByTestId("DraftLibrary")).toBeInTheDocument();
@@ -118,7 +120,9 @@ describe("CqlLibraryActionCenter Component", () => {
 
   it("should trigger draft-library event when 'Draft Library' action is clicked", () => {
     const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
-    render(<CqlLibraryActionCenter canEdit={true} library={versionedCqlLibrary} />);
+    render(
+      <CqlLibraryActionCenter canEdit={true} library={versionedCqlLibrary} />
+    );
     const actionCenterButton = screen.getByLabelText("Library action center");
     userEvent.click(actionCenterButton);
     const draftLibraryButton = screen.getByTestId("DraftLibrary");
