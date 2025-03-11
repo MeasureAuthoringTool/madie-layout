@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { SpeedDial, SpeedDialAction } from "@mui/material";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
+import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
+import EditCalendarOutlinedIcon from "@mui/icons-material/EditCalendarOutlined";
 import { MadieDiscardDialog } from "@madie/madie-design-system/dist/react";
 import { CqlLibrary } from "@madie/madie-models";
 import { blue, red } from "@mui/material/colors";
@@ -87,6 +89,18 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
           icon: <DeleteOutlinedIcon sx={{ color: red[500] }} />,
           name: "Delete Library",
           onClick: () => handleActionClick(new Event("delete-library")),
+        });
+        actions.set("version library", {
+          icon: <AccountTreeOutlinedIcon sx={{ color: blue[500] }} />,
+          name: "Version Library",
+          onClick: () => handleActionClick(new Event("version-library")),
+        });
+      }
+      if (!library?.draft) {
+        actions.set("draft library", {
+          icon: <EditCalendarOutlinedIcon sx={{ color: blue[500] }} />,
+          name: "Draft Library",
+          onClick: () => handleActionClick(new Event("draft-library")),
         });
       }
     }
