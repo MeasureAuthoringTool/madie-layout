@@ -44,7 +44,7 @@ describe("MeasureActionCenter Component", () => {
     userEvent.click(actionCenterButton);
     expect(screen.queryByTestId("DeleteMeasure")).not.toBeInTheDocument();
     expect(screen.queryByTestId("VersionMeasure")).not.toBeInTheDocument();
-    expect(screen.getByTestId("ShareMeasure")).toBeInTheDocument();
+    expect(screen.getByTestId("Share/Unshare")).toBeInTheDocument();
     expect(screen.getByTestId("DraftMeasure")).toBeInTheDocument();
     expect(screen.getByTestId("ExportMeasure")).toBeInTheDocument();
     expect(screen.getByTestId("Viewhumanreadable")).toBeInTheDocument();
@@ -116,6 +116,56 @@ describe("MeasureActionCenter Component", () => {
     expect(dispatchEventSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         type: "view-humanreadable",
+      })
+    );
+  });
+
+  it("should trigger share-measure event when 'Share With' action is clicked", () => {
+    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+    render(<MeasureActionCenter canEdit={true} measure={draftMeasure} />);
+
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+
+    const shareButton = screen.getByTestId("share-action-btn");
+    userEvent.click(shareButton);
+
+    const shareWithMenuItem = screen.getByTestId("Share With-option");
+    const unsharehMenuItem = screen.getByTestId("Unshare-option");
+
+    expect(shareWithMenuItem).toBeInTheDocument();
+    expect(unsharehMenuItem).toBeInTheDocument();
+
+    userEvent.click(screen.getByRole("menuitem", { name: "Share With" }));
+
+    expect(dispatchEventSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "share-measure",
+      })
+    );
+  });
+
+  it("should trigger unshare-measure event when 'Unshare' action is clicked", () => {
+    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+    render(<MeasureActionCenter canEdit={true} measure={draftMeasure} />);
+
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+
+    const shareButton = screen.getByTestId("share-action-btn");
+    userEvent.click(shareButton);
+
+    const shareWithMenuItem = screen.getByTestId("Share With-option");
+    const unsharehMenuItem = screen.getByTestId("Unshare-option");
+
+    expect(shareWithMenuItem).toBeInTheDocument();
+    expect(unsharehMenuItem).toBeInTheDocument();
+
+    userEvent.click(screen.getByRole("menuitem", { name: "Unshare" }));
+
+    expect(dispatchEventSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "unshare-measure",
       })
     );
   });
