@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { SpeedDial, SpeedDialAction } from "@mui/material";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import { MadieDiscardDialog } from "@madie/madie-design-system/dist/react";
 import { CqlLibrary } from "@madie/madie-models";
 import { blue, red } from "@mui/material/colors";
 import { RouteHandlerState, routeHandlerStore } from "@madie/madie-util";
+import useCqlLibraryServiceApi from "../../../../api/useCqlLibraryServiceApi";
 
 interface PropTypes {
   canEdit: boolean;
@@ -16,7 +17,8 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
   const [actions, setActions] = useState<Array<any>>([]);
   const [discardDialogOpen, setDiscardDialogOpen] = useState<boolean>(false);
   const [eventToTrigger, setEventToTrigger] = useState<Event | null>(null);
-
+  const [owner, setOwner] = useState<string[]>([]);
+  const cqlLibraryServiceApi = useRef(useCqlLibraryServiceApi()).current;
   const { updateRouteHandlerState } = routeHandlerStore;
   const [routeHandlerState, setRouteHandlerState] = useState<RouteHandlerState>(
     routeHandlerStore.state
@@ -28,6 +30,21 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
       subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    const getAllOwners = async () => {
+        if (props.library) {
+          return await cqlLibraryServiceApi.fetchAllOwners(
+            [props.library.librarySetId])
+        }
+        const owners = await getAllOwners();
+        setOwner(owners[0]);
+        }
+      
+    
+    getAllOwners()
+  }, [props.library]);
+  
 
   useEffect(() => {
     setActions(getActionArray(props.library, props.canEdit));
@@ -77,6 +94,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
     const actionsListOrder = [
       "draft library",
       "version library",
+      "share library",
       "delete library",
     ];
     return actionsListOrder.map((key) => actions.get(key)).filter(Boolean);
