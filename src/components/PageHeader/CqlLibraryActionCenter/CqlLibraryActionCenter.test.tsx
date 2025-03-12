@@ -4,6 +4,7 @@ import CqlLibraryActionCenter from "./CqlLibraryActionCenter";
 import { CqlLibrary, Model } from "@madie/madie-models";
 import userEvent from "@testing-library/user-event";
 import { routeHandlerStore } from "@madie/madie-util";
+import useCqlLibraryServiceApi from "../../../../api/useCqlLibraryServiceApi";
 
 const cqlLibrary = {
   id: "622e1f46d1fd3729d861e6cb",
@@ -30,7 +31,7 @@ const mockUser = "test user";
 jest.mock("../../../../api/useCqlLibraryServiceApi", () => ({
   __esModule: true,
   default: () => ({
-    fetchAllOwners: jest.fn().mockResolvedValue(["owner1"]),
+    fetchAllOwners: jest.fn().mockResolvedValue(["test user"]),
   }),
 }));
 
@@ -95,6 +96,25 @@ describe("CqlLibraryActionCenter Component", () => {
     const actionCenterButton = screen.getByLabelText("Library action center");
     userEvent.click(actionCenterButton);
     expect(screen.getByTestId("DeleteLibrary")).toBeInTheDocument();
+  });
+
+  it("should render 'Share Library' button when canEdit is true and owner matches", async () => {
+    render(<CqlLibraryActionCenter canEdit={true} library={cqlLibrary} />);
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    userEvent.click(actionCenterButton);
+    const sharebutton = await screen.findByTestId("ShareLibrary");
+    expect(sharebutton).toBeInTheDocument();
+  });
+
+  it("should not render 'Share Library' button when owner doesn't match", () => {
+    jest.spyOn(require("@madie/madie-util"), "useOktaTokens").mockReturnValue({
+      getAccessToken: () => "test.jwt",
+      getUserName: () => "bad user",
+    });
+    render(<CqlLibraryActionCenter canEdit={true} library={cqlLibrary} />);
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    userEvent.click(actionCenterButton);
+    expect(screen.queryByTestId("ShareLibrary")).not.toBeInTheDocument();
   });
 
   it("should not render 'Delete Library' button for versioned libraries", () => {

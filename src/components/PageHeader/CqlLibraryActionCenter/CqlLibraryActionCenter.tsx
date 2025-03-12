@@ -57,7 +57,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
 
   useEffect(() => {
     setActions(getActionArray(props.library, props.canEdit));
-  }, [props, routeHandlerState]);
+  }, [props, routeHandlerState, owner]);
 
   const onContinue = () => {
     // we need every formik instance to use useFormikResetOnEvent on init
@@ -111,7 +111,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
           onClick: () => handleActionClick(new Event("draft-library")),
         });
       }
-      if (owner == username) {
+      if (owner && owner == username) {
         actions.set("share library", {
           icon: <ShareIcon color="#2196f3" />,
           name: "Share Library",
