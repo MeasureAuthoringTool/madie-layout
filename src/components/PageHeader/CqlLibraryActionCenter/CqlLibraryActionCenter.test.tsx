@@ -26,6 +26,13 @@ const versionedCqlLibrary = {
   lastModifiedAt: null,
   lastModifiedBy: null,
 } as unknown as CqlLibrary;
+const mockUser = "test user";
+jest.mock("../../../../api/useCqlLibraryServiceApi", () => ({
+  __esModule: true,
+  default: () => ({
+    fetchAllOwners: jest.fn().mockResolvedValue(["owner1"]),
+  }),
+}));
 
 jest.mock("@madie/madie-util", () => ({
   routeHandlerStore: {
@@ -36,6 +43,15 @@ jest.mock("@madie/madie-util", () => ({
     state: { canTravel: true, pendingPath: "" },
     initialState: { canTravel: false, pendingPath: "" },
   },
+  useOktaTokens: () => ({
+    getAccessToken: () => "test.jwt",
+    getUserName: () => mockUser,
+  }),
+  useServiceConfig: () => ({
+    cqlLibraryService: {
+      baseUrl: "test-cql-library-service-url",
+    },
+  }),
 }));
 
 describe("CqlLibraryActionCenter Component", () => {

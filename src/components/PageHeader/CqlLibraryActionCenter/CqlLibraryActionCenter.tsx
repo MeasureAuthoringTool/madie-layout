@@ -49,7 +49,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
       };
 
       const owners = await getOwners();
-      setOwner(owners[0]);
+      setOwner(owners?.length > 0 ? owners[0] : null);
     };
 
     getAllOwners();
