@@ -7,7 +7,6 @@ import useOktaTokens from "../hooks/useOktaTokens";
 export class CqlLibraryServiceApi {
   constructor(private baseUrl: string, private getAccessToken: () => string) {}
 
-
   async fetchAllOwners(librarySetIds: string[]): Promise<any> {
     const idsParam = librarySetIds.join(",");
     try {
