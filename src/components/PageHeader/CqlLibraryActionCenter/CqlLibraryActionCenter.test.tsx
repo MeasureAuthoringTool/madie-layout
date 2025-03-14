@@ -3,7 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import CqlLibraryActionCenter from "./CqlLibraryActionCenter";
 import { CqlLibrary, Model } from "@madie/madie-models";
 import userEvent from "@testing-library/user-event";
-import { routeHandlerStore } from "@madie/madie-util";
+import { useFeatureFlags, routeHandlerStore } from "@madie/madie-util";
 import useCqlLibraryServiceApi from "../../../../api/useCqlLibraryServiceApi";
 
 const cqlLibrary = {
@@ -36,6 +36,7 @@ jest.mock("../../../../api/useCqlLibraryServiceApi", () => ({
 }));
 
 jest.mock("@madie/madie-util", () => ({
+  useFeatureFlags: jest.fn().mockReturnValue({}),
   routeHandlerStore: {
     subscribe: () => {
       return { unsubscribe: () => null };
@@ -99,6 +100,7 @@ describe("CqlLibraryActionCenter Component", () => {
   });
 
   it("should render 'Share Library' button when canEdit is true and owner matches", async () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ ShareLibrary: true });
     render(<CqlLibraryActionCenter canEdit={true} library={cqlLibrary} />);
     const actionCenterButton = screen.getByLabelText("Library action center");
     userEvent.click(actionCenterButton);
@@ -107,6 +109,7 @@ describe("CqlLibraryActionCenter Component", () => {
   });
 
   it("should not render 'Share Library' button when owner doesn't match", () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ ShareLibrary: true });
     jest.spyOn(require("@madie/madie-util"), "useOktaTokens").mockReturnValue({
       getAccessToken: () => "test.jwt",
       getUserName: () => "bad user",

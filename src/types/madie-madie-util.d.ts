@@ -33,6 +33,7 @@ declare module "@madie/madie-util" {
   }
 
   interface FeatureFlags {
+    ShareLibrary: boolean;
     importTestCases: boolean;
     ShareMeasure: boolean;
   }

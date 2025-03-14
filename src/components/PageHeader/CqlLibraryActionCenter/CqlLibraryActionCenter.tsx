@@ -10,6 +10,7 @@ import {
   RouteHandlerState,
   routeHandlerStore,
   useOktaTokens,
+  useFeatureFlags,
 } from "@madie/madie-util";
 import useCqlLibraryServiceApi from "../../../../api/useCqlLibraryServiceApi";
 import ShareIcon from "../shareAction/ShareIcon";
@@ -30,7 +31,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
   const [routeHandlerState, setRouteHandlerState] = useState<RouteHandlerState>(
     routeHandlerStore.state
   );
-
+  const featureFlags = useFeatureFlags();
   useEffect(() => {
     const subscription = routeHandlerStore.subscribe(setRouteHandlerState);
     return () => {
@@ -111,7 +112,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
           onClick: () => handleActionClick(new Event("draft-library")),
         });
       }
-      if (owner && owner == username) {
+      if (owner && owner == username && featureFlags.ShareLibrary) {
         actions.set("share library", {
           icon: <ShareIcon color="#2196f3" />,
           name: "Share Library",
