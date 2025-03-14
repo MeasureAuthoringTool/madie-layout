@@ -11,7 +11,7 @@ export class CqlLibraryServiceApi {
     const idsParam = librarySetIds.join(",");
     try {
       const response = await axios.get<any>(
-        `${this.baseUrl}/cql-libraries/getOwners`,
+        `${this.baseUrl}/cql-libraries/getAllOwners`,
         {
           headers: {
             Authorization: `Bearer ${this.getAccessToken()}`,
