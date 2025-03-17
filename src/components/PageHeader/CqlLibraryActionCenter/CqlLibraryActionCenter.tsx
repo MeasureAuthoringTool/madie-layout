@@ -10,6 +10,7 @@ import { RouteHandlerState, routeHandlerStore } from "@madie/madie-util";
 
 interface PropTypes {
   canEdit: boolean;
+  canDelete: boolean;
   library: CqlLibrary;
 }
 
@@ -32,7 +33,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
   }, []);
 
   useEffect(() => {
-    setActions(getActionArray(props.library, props.canEdit));
+    setActions(getActionArray(props.library, props.canEdit, props.canDelete));
   }, [props, routeHandlerState]);
 
   const onContinue = () => {
@@ -63,16 +64,22 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
     }
   };
 
-  const getActionArray = (library: CqlLibrary, canEdit: boolean): any[] => {
+  const getActionArray = (
+    library: CqlLibrary,
+    canEdit: boolean,
+    canDelete: boolean
+  ): any[] => {
     const actions = new Map<string, any>();
 
     if (canEdit) {
       if (library?.draft) {
-        actions.set("delete library", {
-          icon: <DeleteOutlinedIcon sx={{ color: red[500] }} />,
-          name: "Delete Library",
-          onClick: () => handleActionClick(new Event("delete-library")),
-        });
+        if (canDelete) {
+          actions.set("delete library", {
+            icon: <DeleteOutlinedIcon sx={{ color: red[500] }} />,
+            name: "Delete Library",
+            onClick: () => handleActionClick(new Event("delete-library")),
+          });
+        }
         actions.set("version library", {
           icon: <AccountTreeOutlinedIcon sx={{ color: blue[500] }} />,
           name: "Version Library",
