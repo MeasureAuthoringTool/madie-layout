@@ -18,6 +18,7 @@ import ShareAction, { SharedOptions } from "../shareAction/ShareAction";
 interface PropTypes {
   canEdit: boolean;
   measure: Measure;
+  canDelete: boolean;
 }
 
 const MeasureActionCenter = (props: PropTypes) => {
@@ -40,7 +41,7 @@ const MeasureActionCenter = (props: PropTypes) => {
   }, []);
 
   useEffect(() => {
-    setActions(getActionArray(props.measure, props.canEdit));
+    setActions(getActionArray(props.measure, props.canEdit, props.canDelete));
   }, [props, routeHandlerState]);
 
   const onContinue = () => {
@@ -71,7 +72,11 @@ const MeasureActionCenter = (props: PropTypes) => {
     }
   };
 
-  const getActionArray = (measure: Measure, canEdit: boolean): any[] => {
+  const getActionArray = (
+    measure: Measure,
+    canEdit: boolean,
+    canDelete: boolean
+  ): any[] => {
     const actions = new Map<string, any>();
 
     actions.set("human readable", {
@@ -95,7 +100,7 @@ const MeasureActionCenter = (props: PropTypes) => {
           onClick: () => handleActionClick(new Event("draft-measure")),
         });
       }
-      if (measure?.measureMetaData?.draft) {
+      if (measure?.measureMetaData?.draft && canDelete) {
         actions.set("delete measure", {
           icon: <DeleteOutlinedIcon sx={{ color: red[500] }} />,
           name: "Delete Measure",
