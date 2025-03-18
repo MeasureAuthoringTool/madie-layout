@@ -15,7 +15,7 @@ import {
   featureFlagsStore,
   checkUserCanEdit,
   useFeatureFlags,
-  wafIntercept,
+  checkUserCanDelete,
 } from "@madie/madie-util";
 import "twin.macro";
 import "styled-components/macro";
@@ -90,6 +90,11 @@ const PageHeader = () => {
     libraryState?.librarySet?.owner,
     libraryState?.librarySet?.acls,
     true
+  );
+
+  const libraryCanDelete: boolean = checkUserCanDelete(
+    libraryState?.librarySet?.owner,
+    libraryState?.draft
   );
 
   const makeUTCDate = (date) => {
@@ -247,6 +252,7 @@ const PageHeader = () => {
                     <CqlLibraryActionCenter
                       canEdit={libraryCanEdit}
                       library={libraryState}
+                      canDelete={libraryCanDelete}
                     />
                   </ApiContextProvider>
                 </div>
