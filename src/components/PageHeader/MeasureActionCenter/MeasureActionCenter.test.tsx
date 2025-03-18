@@ -1,15 +1,26 @@
 import * as React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import MeasureActionCenter from "./MeasureActionCenter";
-import { Measure } from "@madie/madie-models";
+import { Measure, MeasureSet } from "@madie/madie-models";
 import userEvent from "@testing-library/user-event";
-import { useFeatureFlags, routeHandlerStore } from "@madie/madie-util";
+import {
+  useFeatureFlags,
+  routeHandlerStore,
+  checkUserCanEdit,
+} from "@madie/madie-util";
+
+const mockMeasureSet = {
+  cmsId: "124",
+  measureSetId: "1-2-3-4",
+  owner: "testuser@example.com",
+} as unknown as MeasureSet;
 
 const draftMeasure = {
   id: "measure ID",
   createdBy: "testuser@example.com",
   model: "QI-Core v4.1.1",
   measureMetaData: { draft: true },
+  measureSet: mockMeasureSet,
 } as Measure;
 
 const versionedMeasure = {
@@ -17,6 +28,7 @@ const versionedMeasure = {
   createdBy: "testuser@example.com",
   model: "QI-Core v4.1.1",
   measureMetaData: { draft: false },
+  measureSet: mockMeasureSet,
 } as Measure;
 
 jest.mock("@madie/madie-util", () => ({
@@ -29,6 +41,7 @@ jest.mock("@madie/madie-util", () => ({
     state: { canTravel: true, pendingPath: "" },
     initialState: { canTravel: false, pendingPath: "" },
   },
+  checkUserCanEdit: jest.fn().mockImplementation(() => true),
 }));
 
 describe("MeasureActionCenter Component", () => {
@@ -118,6 +131,25 @@ describe("MeasureActionCenter Component", () => {
         type: "view-humanreadable",
       })
     );
+  });
+
+  it("should render Share button if the user is the owner of the measure", () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ ShareMeasure: true });
+    render(<MeasureActionCenter canEdit={true} measure={draftMeasure} />);
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+    expect(screen.getByTestId("Share/Unshare")).toBeInTheDocument();
+  });
+
+  it("should render Share button if the user is not the owner of the measure", () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ ShareMeasure: true });
+    (checkUserCanEdit as jest.Mock).mockImplementationOnce(() => false);
+    render(<MeasureActionCenter canEdit={true} measure={draftMeasure} />);
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+
+    const shareButton = screen.queryByTestId("Share/Unshare");
+    expect(shareButton).toBeNull();
   });
 
   it("should trigger share-measure event when 'Share With' action is clicked", () => {
