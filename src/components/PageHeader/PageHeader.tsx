@@ -97,6 +97,11 @@ const PageHeader = () => {
     true
   );
 
+  const libraryCanDelete: boolean = checkUserCanDelete(
+    libraryState?.librarySet?.owner,
+    libraryState?.draft
+  );
+
   const makeUTCDate = (date) => {
     return `${
       date.getUTCMonth() + 1
@@ -253,6 +258,7 @@ const PageHeader = () => {
                     <CqlLibraryActionCenter
                       canEdit={libraryCanEdit}
                       library={libraryState}
+                      canDelete={libraryCanDelete}
                     />
                   </ApiContextProvider>
                 </div>
