@@ -7,7 +7,8 @@ import CreateNewMeasureDialog from "../NewMeasure/CreateNewMeasureDialog";
 import WafDialog from "../WafDialog/WafDialog";
 import MeasureActionCenter from "./MeasureActionCenter/MeasureActionCenter";
 import { Button } from "@madie/madie-design-system/dist/react";
-
+import { ApiContextProvider } from "../../../api/ServiceContext";
+import useGetServiceConfig from "../../../config/useGetServiceConfig";
 import {
   measureStore,
   cqlLibraryStore,
@@ -44,6 +45,7 @@ const PageHeader = () => {
   const [wafOpen, setWafOpen] = useState<boolean>(false);
   const [wafSupportId, setWafSupportId] = useState<string>("");
   const [libraryState, setLibraryState] = useState<any>(cqlLibraryStore.state);
+  const { config } = useGetServiceConfig();
   useEffect(() => {
     const subscription = cqlLibraryStore.subscribe(setLibraryState);
     return () => {
@@ -246,11 +248,13 @@ const PageHeader = () => {
             {libraryCanEdit && (
               <div tw="pr-8" style={{ position: "relative" }}>
                 <div style={{ position: "absolute", top: 0, right: 0 }}>
-                  <CqlLibraryActionCenter
-                    canEdit={libraryCanEdit}
-                    library={libraryState}
-                    canDelete={libraryCanDelete}
-                  />
+                  <ApiContextProvider value={config}>
+                    <CqlLibraryActionCenter
+                      canEdit={libraryCanEdit}
+                      library={libraryState}
+                      canDelete={libraryCanDelete}
+                    />
+                  </ApiContextProvider>
                 </div>
               </div>
             )}

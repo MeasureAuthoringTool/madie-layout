@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { SpeedDial, SpeedDialAction } from "@mui/material";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
@@ -6,12 +6,19 @@ import EditCalendarOutlinedIcon from "@mui/icons-material/EditCalendarOutlined";
 import { MadieDiscardDialog } from "@madie/madie-design-system/dist/react";
 import { CqlLibrary } from "@madie/madie-models";
 import { blue, red } from "@mui/material/colors";
-import { RouteHandlerState, routeHandlerStore } from "@madie/madie-util";
+import {
+  RouteHandlerState,
+  routeHandlerStore,
+  useOktaTokens,
+  useFeatureFlags,
+} from "@madie/madie-util";
+import useCqlLibraryServiceApi from "../../../../api/useCqlLibraryServiceApi";
+import ShareIcon from "../shareAction/ShareIcon";
 
 interface PropTypes {
   canEdit: boolean;
-  canDelete: boolean;
   library: CqlLibrary;
+  canDelete: boolean;
 }
 
 const CqlLibraryActionCenter = (props: PropTypes) => {
@@ -19,12 +26,13 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
   const [actions, setActions] = useState<Array<any>>([]);
   const [discardDialogOpen, setDiscardDialogOpen] = useState<boolean>(false);
   const [eventToTrigger, setEventToTrigger] = useState<Event | null>(null);
-
+  const [owner, setOwner] = useState<string>();
+  const cqlLibraryServiceApi = useRef(useCqlLibraryServiceApi()).current;
   const { updateRouteHandlerState } = routeHandlerStore;
   const [routeHandlerState, setRouteHandlerState] = useState<RouteHandlerState>(
     routeHandlerStore.state
   );
-
+  const featureFlags = useFeatureFlags();
   useEffect(() => {
     const subscription = routeHandlerStore.subscribe(setRouteHandlerState);
     return () => {
@@ -33,8 +41,25 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
   }, []);
 
   useEffect(() => {
+    const getAllOwners = async () => {
+      const getOwners = async () => {
+        if (props.library) {
+          return await cqlLibraryServiceApi.fetchAllOwners([
+            props.library.librarySetId,
+          ]);
+        }
+      };
+
+      const owners = await getOwners();
+      setOwner(owners?.length > 0 ? owners[0] : null);
+    };
+
+    getAllOwners();
+  }, [props.library]);
+
+  useEffect(() => {
     setActions(getActionArray(props.library, props.canEdit, props.canDelete));
-  }, [props, routeHandlerState]);
+  }, [props, routeHandlerState, owner]);
 
   const onContinue = () => {
     // we need every formik instance to use useFormikResetOnEvent on init
@@ -63,7 +88,8 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
       setDiscardDialogOpen(true);
     }
   };
-
+  const { getUserName } = useOktaTokens();
+  const username = getUserName();
   const getActionArray = (
     library: CqlLibrary,
     canEdit: boolean,
@@ -93,11 +119,19 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
           onClick: () => handleActionClick(new Event("draft-library")),
         });
       }
+      if (owner && owner == username && featureFlags.ShareLibrary) {
+        actions.set("share library", {
+          icon: <ShareIcon color="#2196f3" />,
+          name: "Share Library",
+          onClick: () => handleActionClick(new Event("share-library")),
+        });
+      }
     }
     // required order to display
     const actionsListOrder = [
       "draft library",
       "version library",
+      "share library",
       "delete library",
     ];
     return actionsListOrder.map((key) => actions.get(key)).filter(Boolean);
