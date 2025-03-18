@@ -58,12 +58,24 @@ jest.mock("@madie/madie-util", () => ({
 
 describe("CqlLibraryActionCenter Component", () => {
   it("renders the action center", () => {
-    render(<CqlLibraryActionCenter canEdit={true} library={cqlLibrary} />);
+    render(
+      <CqlLibraryActionCenter
+        canEdit={true}
+        library={cqlLibrary}
+        canDelete={false}
+      />
+    );
     expect(screen.getByTestId("action-center")).toBeInTheDocument();
   });
 
   it("should render delete and version library in action center when library is in draft status ", () => {
-    render(<CqlLibraryActionCenter canEdit={true} library={cqlLibrary} />);
+    render(
+      <CqlLibraryActionCenter
+        canEdit={true}
+        library={cqlLibrary}
+        canDelete={true}
+      />
+    );
     const actionCenterButton = screen.getByTestId("action-center");
     userEvent.click(actionCenterButton);
     expect(screen.queryByTestId("DeleteLibrary")).toBeInTheDocument();
@@ -73,7 +85,11 @@ describe("CqlLibraryActionCenter Component", () => {
 
   it("should render draft library in action center when library is in versioned status ", () => {
     render(
-      <CqlLibraryActionCenter canEdit={true} library={versionedCqlLibrary} />
+      <CqlLibraryActionCenter
+        canEdit={true}
+        library={versionedCqlLibrary}
+        canDelete={true}
+      />
     );
     const actionCenterButton = screen.getByTestId("action-center");
     userEvent.click(actionCenterButton);
@@ -84,7 +100,11 @@ describe("CqlLibraryActionCenter Component", () => {
 
   it("should open action center on button click", () => {
     render(
-      <CqlLibraryActionCenter canEdit={true} library={versionedCqlLibrary} />
+      <CqlLibraryActionCenter
+        canEdit={true}
+        library={versionedCqlLibrary}
+        canDelete={true}
+      />
     );
     const actionCenterButton = screen.getByLabelText("Library action center");
     userEvent.click(actionCenterButton);
@@ -93,7 +113,13 @@ describe("CqlLibraryActionCenter Component", () => {
   });
 
   it("should render 'Delete Library' button only for draft libraries when canEdit is true", () => {
-    render(<CqlLibraryActionCenter canEdit={true} library={cqlLibrary} />);
+    render(
+      <CqlLibraryActionCenter
+        canEdit={true}
+        library={cqlLibrary}
+        canDelete={true}
+      />
+    );
     const actionCenterButton = screen.getByLabelText("Library action center");
     userEvent.click(actionCenterButton);
     expect(screen.getByTestId("DeleteLibrary")).toBeInTheDocument();
@@ -122,7 +148,11 @@ describe("CqlLibraryActionCenter Component", () => {
 
   it("should not render 'Delete Library' button for versioned libraries", () => {
     render(
-      <CqlLibraryActionCenter canEdit={true} library={versionedCqlLibrary} />
+      <CqlLibraryActionCenter
+        canEdit={true}
+        library={versionedCqlLibrary}
+        canDelete={true}
+      />
     );
     const actionCenterButton = screen.getByLabelText("Library action center");
     userEvent.click(actionCenterButton);
@@ -131,7 +161,13 @@ describe("CqlLibraryActionCenter Component", () => {
 
   it("should trigger delete-library event when 'Delete Library' action is clicked", () => {
     const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
-    render(<CqlLibraryActionCenter canEdit={true} library={cqlLibrary} />);
+    render(
+      <CqlLibraryActionCenter
+        canEdit={true}
+        library={cqlLibrary}
+        canDelete={true}
+      />
+    );
     const actionCenterButton = screen.getByLabelText("Library action center");
     userEvent.click(actionCenterButton);
     const deleteLibraryButton = screen.getByTestId("DeleteLibrary");
@@ -145,7 +181,13 @@ describe("CqlLibraryActionCenter Component", () => {
 
   it("should trigger version-library event when 'Version Library' action is clicked", () => {
     const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
-    render(<CqlLibraryActionCenter canEdit={true} library={cqlLibrary} />);
+    render(
+      <CqlLibraryActionCenter
+        canEdit={true}
+        library={cqlLibrary}
+        canDelete={false}
+      />
+    );
     const actionCenterButton = screen.getByLabelText("Library action center");
     userEvent.click(actionCenterButton);
     const versionLibraryButton = screen.getByTestId("VersionLibrary");
@@ -160,7 +202,11 @@ describe("CqlLibraryActionCenter Component", () => {
   it("should trigger draft-library event when 'Draft Library' action is clicked", () => {
     const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
     render(
-      <CqlLibraryActionCenter canEdit={true} library={versionedCqlLibrary} />
+      <CqlLibraryActionCenter
+        canEdit={true}
+        library={versionedCqlLibrary}
+        canDelete={true}
+      />
     );
     const actionCenterButton = screen.getByLabelText("Library action center");
     userEvent.click(actionCenterButton);
@@ -176,7 +222,13 @@ describe("CqlLibraryActionCenter Component", () => {
   it("pops discard dialog, emits event for resetting forms on continue", async () => {
     routeHandlerStore.state.canTravel = false;
     const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
-    render(<CqlLibraryActionCenter canEdit={true} library={cqlLibrary} />);
+    render(
+      <CqlLibraryActionCenter
+        canEdit={true}
+        library={cqlLibrary}
+        canDelete={true}
+      />
+    );
 
     const actionCenterButton = screen.getByLabelText("Library action center");
     userEvent.click(actionCenterButton);

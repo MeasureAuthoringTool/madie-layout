@@ -110,6 +110,7 @@ jest.mock("@madie/madie-util", () => ({
   }),
   checkUserCanEdit: jest.fn().mockImplementation(() => true),
   useFeatureFlags: jest.fn().mockReturnValue({ qdm: false }),
+  checkUserCanDelete: jest.fn().mockImplementation(() => true),
 }));
 
 jest.mock("../../../config/useGetServiceConfig");
