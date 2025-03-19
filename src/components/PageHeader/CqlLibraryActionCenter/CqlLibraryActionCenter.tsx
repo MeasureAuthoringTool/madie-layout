@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { SpeedDial, SpeedDialAction } from "@mui/material";
+import { SpeedDial, SpeedDialAction, Menu, MenuItem } from "@mui/material";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
 import EditCalendarOutlinedIcon from "@mui/icons-material/EditCalendarOutlined";
@@ -32,6 +32,8 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
   const [routeHandlerState, setRouteHandlerState] = useState<RouteHandlerState>(
     routeHandlerStore.state
   );
+  const [shareAnchorEl, setShareAnchorEl] = useState<null | HTMLElement>(null);
+  const shareMenuOpen = Boolean(shareAnchorEl);
   const featureFlags = useFeatureFlags();
   useEffect(() => {
     const subscription = routeHandlerStore.subscribe(setRouteHandlerState);
@@ -123,7 +125,10 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
         actions.set("share library", {
           icon: <ShareIcon color="#2196f3" />,
           name: "Share Library",
-          onClick: () => handleActionClick(new Event("share-library")),
+          onClick: (event: React.MouseEvent<HTMLElement>) => {
+            setOpen(false);
+            setShareAnchorEl(event.currentTarget);
+          },
         });
       }
     }
@@ -188,9 +193,9 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
             icon={action.icon}
             tooltipTitle={action.name}
             data-testid={action.name.replace(/\s/g, "")}
-            onClick={() => {
+            onClick={(event: React.MouseEvent<HTMLElement>) => {
               setOpen(false);
-              action.onClick();
+              action.onClick(event);
             }}
             sx={{
               boxShadow: "none",
@@ -207,6 +212,31 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
         onContinue={onContinue}
         onClose={onClose}
       />
+      <Menu
+        anchorEl={shareAnchorEl}
+        open={shareMenuOpen}
+        onClose={() => setShareAnchorEl(null)}
+        data-testid="share-menu"
+      >
+        <MenuItem
+          data-testid="Share With-option"
+          onClick={() => {
+            setShareAnchorEl(null);
+            handleActionClick(new Event("library-share"));
+          }}
+        >
+          Share With
+        </MenuItem>
+        <MenuItem
+          data-testid="Unshare-option"
+          onClick={() => {
+            setShareAnchorEl(null);
+            handleActionClick(new Event("library-unshare"));
+          }}
+        >
+          Unshare
+        </MenuItem>
+      </Menu>
     </div>
   );
 };
