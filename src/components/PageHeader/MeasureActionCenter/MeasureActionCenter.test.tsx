@@ -189,7 +189,7 @@ describe("MeasureActionCenter Component", () => {
     expect(screen.getByTestId("Share/Unshare")).toBeInTheDocument();
   });
 
-  it("should render Share button if the user is not the owner of the measure", () => {
+  it("should not render Share button if the user is not the owner of the measure", () => {
     (useFeatureFlags as jest.Mock).mockReturnValue({ ShareMeasure: true });
     (checkUserCanEdit as jest.Mock).mockImplementationOnce(() => false);
     render(<MeasureActionCenter canEdit={true} measure={draftMeasure} />);
