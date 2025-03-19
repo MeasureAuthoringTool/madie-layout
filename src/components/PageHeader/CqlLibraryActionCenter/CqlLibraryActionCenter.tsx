@@ -1,16 +1,24 @@
-import React, { useState, useEffect } from "react";
-import { SpeedDial, SpeedDialAction } from "@mui/material";
+import React, { useState, useEffect, useRef } from "react";
+import { SpeedDial, SpeedDialAction, Menu, MenuItem } from "@mui/material";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
 import EditCalendarOutlinedIcon from "@mui/icons-material/EditCalendarOutlined";
 import { MadieDiscardDialog } from "@madie/madie-design-system/dist/react";
 import { CqlLibrary } from "@madie/madie-models";
 import { blue, red } from "@mui/material/colors";
-import { RouteHandlerState, routeHandlerStore } from "@madie/madie-util";
+import {
+  RouteHandlerState,
+  routeHandlerStore,
+  useOktaTokens,
+  useFeatureFlags,
+} from "@madie/madie-util";
+import useCqlLibraryServiceApi from "../../../../api/useCqlLibraryServiceApi";
+import ShareIcon from "../shareAction/ShareIcon";
 
 interface PropTypes {
   canEdit: boolean;
   library: CqlLibrary;
+  canDelete: boolean;
 }
 
 const CqlLibraryActionCenter = (props: PropTypes) => {
@@ -18,12 +26,15 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
   const [actions, setActions] = useState<Array<any>>([]);
   const [discardDialogOpen, setDiscardDialogOpen] = useState<boolean>(false);
   const [eventToTrigger, setEventToTrigger] = useState<Event | null>(null);
-
+  const [owner, setOwner] = useState<string>();
+  const cqlLibraryServiceApi = useRef(useCqlLibraryServiceApi()).current;
   const { updateRouteHandlerState } = routeHandlerStore;
   const [routeHandlerState, setRouteHandlerState] = useState<RouteHandlerState>(
     routeHandlerStore.state
   );
-
+  const [shareAnchorEl, setShareAnchorEl] = useState<null | HTMLElement>(null);
+  const shareMenuOpen = Boolean(shareAnchorEl);
+  const featureFlags = useFeatureFlags();
   useEffect(() => {
     const subscription = routeHandlerStore.subscribe(setRouteHandlerState);
     return () => {
@@ -32,8 +43,25 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
   }, []);
 
   useEffect(() => {
-    setActions(getActionArray(props.library, props.canEdit));
-  }, [props, routeHandlerState]);
+    const getAllOwners = async () => {
+      const getOwners = async () => {
+        if (props.library) {
+          return await cqlLibraryServiceApi.fetchAllOwners([
+            props.library.librarySetId,
+          ]);
+        }
+      };
+
+      const owners = await getOwners();
+      setOwner(owners?.length > 0 ? owners[0] : null);
+    };
+
+    getAllOwners();
+  }, [props.library]);
+
+  useEffect(() => {
+    setActions(getActionArray(props.library, props.canEdit, props.canDelete));
+  }, [props, routeHandlerState, owner]);
 
   const onContinue = () => {
     // we need every formik instance to use useFormikResetOnEvent on init
@@ -62,17 +90,24 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
       setDiscardDialogOpen(true);
     }
   };
-
-  const getActionArray = (library: CqlLibrary, canEdit: boolean): any[] => {
+  const { getUserName } = useOktaTokens();
+  const username = getUserName();
+  const getActionArray = (
+    library: CqlLibrary,
+    canEdit: boolean,
+    canDelete: boolean
+  ): any[] => {
     const actions = new Map<string, any>();
 
     if (canEdit) {
       if (library?.draft) {
-        actions.set("delete library", {
-          icon: <DeleteOutlinedIcon sx={{ color: red[500] }} />,
-          name: "Delete Library",
-          onClick: () => handleActionClick(new Event("delete-library")),
-        });
+        if (canDelete) {
+          actions.set("delete library", {
+            icon: <DeleteOutlinedIcon sx={{ color: red[500] }} />,
+            name: "Delete Library",
+            onClick: () => handleActionClick(new Event("delete-library")),
+          });
+        }
         actions.set("version library", {
           icon: <AccountTreeOutlinedIcon sx={{ color: blue[500] }} />,
           name: "Version Library",
@@ -86,11 +121,22 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
           onClick: () => handleActionClick(new Event("draft-library")),
         });
       }
+      if (owner && owner == username && featureFlags.ShareLibrary) {
+        actions.set("share library", {
+          icon: <ShareIcon color="#2196f3" />,
+          name: "Share Library",
+          onClick: (event: React.MouseEvent<HTMLElement>) => {
+            setOpen(false);
+            setShareAnchorEl(event.currentTarget);
+          },
+        });
+      }
     }
     // required order to display
     const actionsListOrder = [
       "draft library",
       "version library",
+      "share library",
       "delete library",
     ];
     return actionsListOrder.map((key) => actions.get(key)).filter(Boolean);
@@ -147,9 +193,9 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
             icon={action.icon}
             tooltipTitle={action.name}
             data-testid={action.name.replace(/\s/g, "")}
-            onClick={() => {
+            onClick={(event: React.MouseEvent<HTMLElement>) => {
               setOpen(false);
-              action.onClick();
+              action.onClick(event);
             }}
             sx={{
               boxShadow: "none",
@@ -166,6 +212,31 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
         onContinue={onContinue}
         onClose={onClose}
       />
+      <Menu
+        anchorEl={shareAnchorEl}
+        open={shareMenuOpen}
+        onClose={() => setShareAnchorEl(null)}
+        data-testid="share-menu"
+      >
+        <MenuItem
+          data-testid="Share With-option"
+          onClick={() => {
+            setShareAnchorEl(null);
+            handleActionClick(new Event("library-share"));
+          }}
+        >
+          Share With
+        </MenuItem>
+        <MenuItem
+          data-testid="Unshare-option"
+          onClick={() => {
+            setShareAnchorEl(null);
+            handleActionClick(new Event("library-unshare"));
+          }}
+        >
+          Unshare
+        </MenuItem>
+      </Menu>
     </div>
   );
 };

@@ -33,6 +33,7 @@ declare module "@madie/madie-util" {
   }
 
   interface FeatureFlags {
+    ShareLibrary: boolean;
     importTestCases: boolean;
     ShareMeasure: boolean;
   }
@@ -88,6 +89,10 @@ declare module "@madie/madie-util" {
   export function checkUserCanEdit(
     createdBy: string,
     acls: Array<Acl>,
+    draft?: boolean
+  ): boolean;
+  export function checkUserCanDelete(
+    createdBy: string,
     draft?: boolean
   ): boolean;
   export function useOnClickOutside(ref: any, handler: any): void;

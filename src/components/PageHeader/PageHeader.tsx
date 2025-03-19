@@ -7,14 +7,15 @@ import CreateNewMeasureDialog from "../NewMeasure/CreateNewMeasureDialog";
 import WafDialog from "../WafDialog/WafDialog";
 import MeasureActionCenter from "./MeasureActionCenter/MeasureActionCenter";
 import { Button } from "@madie/madie-design-system/dist/react";
-
+import { ApiContextProvider } from "../../../api/ServiceContext";
+import useGetServiceConfig from "../../../config/useGetServiceConfig";
 import {
   measureStore,
   cqlLibraryStore,
   featureFlagsStore,
   checkUserCanEdit,
   useFeatureFlags,
-  wafIntercept,
+  checkUserCanDelete,
 } from "@madie/madie-util";
 import "twin.macro";
 import "styled-components/macro";
@@ -44,6 +45,7 @@ const PageHeader = () => {
   const [wafOpen, setWafOpen] = useState<boolean>(false);
   const [wafSupportId, setWafSupportId] = useState<string>("");
   const [libraryState, setLibraryState] = useState<any>(cqlLibraryStore.state);
+  const { config } = useGetServiceConfig();
   useEffect(() => {
     const subscription = cqlLibraryStore.subscribe(setLibraryState);
     return () => {
@@ -84,10 +86,20 @@ const PageHeader = () => {
     true // in this context we don't care if it's not a draft; because we still have some actions we can take
   );
 
+  const measureCanDelete: boolean = checkUserCanDelete(
+    measureState?.measureSet?.owner,
+    measureState?.measureMetadata?.draft
+  );
+
   const libraryCanEdit: boolean = checkUserCanEdit(
     libraryState?.librarySet?.owner,
     libraryState?.librarySet?.acls,
     true
+  );
+
+  const libraryCanDelete: boolean = checkUserCanDelete(
+    libraryState?.librarySet?.owner,
+    libraryState?.draft
   );
 
   const makeUTCDate = (date) => {
@@ -136,6 +148,7 @@ const PageHeader = () => {
                 <MeasureActionCenter
                   canEdit={measureCanEdit}
                   measure={measureState}
+                  canDelete={measureCanDelete}
                 />
               </div>
             </div>
@@ -241,10 +254,13 @@ const PageHeader = () => {
             {libraryCanEdit && (
               <div tw="pr-8" style={{ position: "relative" }}>
                 <div style={{ position: "absolute", top: 0, right: 0 }}>
-                  <CqlLibraryActionCenter
-                    canEdit={libraryCanEdit}
-                    library={libraryState}
-                  />
+                  <ApiContextProvider value={config}>
+                    <CqlLibraryActionCenter
+                      canEdit={libraryCanEdit}
+                      library={libraryState}
+                      canDelete={libraryCanDelete}
+                    />
+                  </ApiContextProvider>
                 </div>
               </div>
             )}

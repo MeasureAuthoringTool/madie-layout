@@ -1,6 +1,4 @@
 import "@testing-library/jest-dom";
-// NOTE: jest-dom adds handy assertions to Jest and is recommended, but not required
-
 import * as React from "react";
 import {
   screen,
@@ -9,7 +7,7 @@ import {
   waitFor,
   within,
 } from "@testing-library/react";
-import { MemoryRouter, Route } from "react-router";
+import { MemoryRouter } from "react-router";
 import { act, Simulate } from "react-dom/test-utils";
 import { describe, expect, test } from "@jest/globals";
 import userEvent from "@testing-library/user-event";
@@ -17,24 +15,13 @@ import { mockLibraryName, mockMeasureName } from "../NewMeasure/bulkCreate";
 import axios from "../../../api/axios-instance";
 import PageHeader from "../PageHeader/PageHeader";
 import { Model } from "@madie/madie-models/dist/Model";
-import { checkUserCanEdit } from "@madie/madie-util";
+import useGetServiceConfig from "../../../config/useGetServiceConfig";
 
+// First, define all mock data
 const mockLib = mockLibraryName();
 const mockName = mockMeasureName();
+const mockUser = "test user";
 
-const mockFormikInfo = {
-  measureName: mockName,
-  createdBy: "test",
-  model: Model.QICORE.valueOf(),
-  cqlLibraryName: mockLib,
-  ecqmTitle: "ecqmTitle",
-  measurementPeriodStart: "01/05/2022",
-  measurementPeriodEnd: "03/07/2022",
-  active: true,
-  measureMetaData: {
-    draft: true,
-  },
-};
 const mockLibraryInfo = {
   id: "randomstring",
   cqlLibraryName: "H1Z1",
@@ -54,10 +41,28 @@ const mockLibraryInfo = {
   experimental: false,
 };
 
+const mockFormikInfo = {
+  measureName: mockName,
+  createdBy: "test",
+  model: Model.QICORE.valueOf(),
+  cqlLibraryName: mockLib,
+  ecqmTitle: "ecqmTitle",
+  measurementPeriodStart: "01/05/2022",
+  measurementPeriodEnd: "03/07/2022",
+  active: true,
+  measureMetaData: {
+    draft: true,
+  },
+};
+
+// Then, define all mocks
 jest.mock("@madie/madie-util", () => ({
   getServiceConfig: () => ({
     measureService: {
       baseUrl: "example-service-url",
+    },
+    cqlLibraryService: {
+      baseUrl: "test-cql-library-service-url",
     },
   }),
   routeHandlerStore: {
@@ -83,8 +88,8 @@ jest.mock("@madie/madie-util", () => ({
     unsubscribe: () => null,
   },
   cqlLibraryStore: {
-    state: null,
-    initialState: null,
+    // state: mockLibraryInfo,
+    // initialState: mockLibraryInfo,
     subscribe: (set) => {
       set(mockLibraryInfo);
       return { unsubscribe: () => null };
@@ -101,9 +106,34 @@ jest.mock("@madie/madie-util", () => ({
   },
   useOktaTokens: () => ({
     getAccessToken: () => "test.jwt",
+    getUserName: () => mockUser,
   }),
   checkUserCanEdit: jest.fn().mockImplementation(() => true),
   useFeatureFlags: jest.fn().mockReturnValue({ qdm: false }),
+  checkUserCanDelete: jest.fn().mockImplementation(() => true),
+}));
+
+jest.mock("../../../config/useGetServiceConfig");
+const useGetServiceConfigMock = useGetServiceConfig as jest.Mock;
+useGetServiceConfigMock.mockImplementation(() => {
+  return {
+    config: {
+      cqlLibraryService: {
+        baseUrl: "test-cql-library-service-url",
+        fetchAllOwners: jest.fn().mockResolvedValue(["owner1", "owner2"]),
+      },
+      measureService: {
+        baseUrl: "example-service-url",
+      },
+    },
+  };
+});
+
+jest.mock("../../../api/useCqlLibraryServiceApi", () => ({
+  __esModule: true,
+  default: () => ({
+    fetchAllOwners: jest.fn().mockResolvedValue(["owner1"]),
+  }),
 }));
 
 jest.mock("../../../api/axios-instance");
@@ -643,6 +673,7 @@ describe("Page Header and Dialogs", () => {
       },
       useOktaTokens: () => ({
         getAccessToken: () => "test.jwt",
+        getUserName: () => mockUser,
       }),
     }));
 
