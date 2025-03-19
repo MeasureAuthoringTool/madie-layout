@@ -86,6 +86,11 @@ const PageHeader = () => {
     true // in this context we don't care if it's not a draft; because we still have some actions we can take
   );
 
+  const measureCanDelete: boolean = checkUserCanDelete(
+    measureState?.measureSet?.owner,
+    measureState?.measureMetadata?.draft
+  );
+
   const libraryCanEdit: boolean = checkUserCanEdit(
     libraryState?.librarySet?.owner,
     libraryState?.librarySet?.acls,
@@ -143,6 +148,7 @@ const PageHeader = () => {
                 <MeasureActionCenter
                   canEdit={measureCanEdit}
                   measure={measureState}
+                  canDelete={measureCanDelete}
                 />
               </div>
             </div>
