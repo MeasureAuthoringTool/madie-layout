@@ -11,6 +11,7 @@ import {
   RouteHandlerState,
   routeHandlerStore,
   useFeatureFlags,
+  checkUserCanEdit,
 } from "@madie/madie-util";
 import FeedOutlinedIcon from "@mui/icons-material/FeedOutlined";
 import ShareAction, { SharedOptions } from "../shareAction/ShareAction";
@@ -20,6 +21,15 @@ interface PropTypes {
   measure: Measure;
   canDelete: boolean;
 }
+
+const isOwnerOfSelectedMeasure = (measures) => {
+  return (
+    measures &&
+    measures.every((measure) => {
+      return checkUserCanEdit(measure?.measureSet?.owner, []);
+    })
+  );
+};
 
 const MeasureActionCenter = (props: PropTypes) => {
   const [open, setOpen] = useState(false);
@@ -113,7 +123,7 @@ const MeasureActionCenter = (props: PropTypes) => {
         });
       }
 
-      if (featureFlags?.ShareMeasure) {
+      if (featureFlags?.ShareMeasure && isOwnerOfSelectedMeasure([measure])) {
         actions.set("share/unshare measure", {
           icon: (
             <ShareAction
