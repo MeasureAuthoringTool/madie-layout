@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { SpeedDial, SpeedDialAction } from "@mui/material";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import EditCalendarOutlinedIcon from "@mui/icons-material/EditCalendarOutlined";
-import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
 import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
 import { MadieDiscardDialog } from "@madie/madie-design-system/dist/react";
 import { Measure } from "@madie/madie-models";
@@ -15,6 +14,7 @@ import {
 } from "@madie/madie-util";
 import FeedOutlinedIcon from "@mui/icons-material/FeedOutlined";
 import ShareAction, { SharedOptions } from "../shareAction/ShareAction";
+import ExportAction from "../exportAction/ExportAction";
 
 interface PropTypes {
   canEdit: boolean;
@@ -97,9 +97,19 @@ const MeasureActionCenter = (props: PropTypes) => {
       onClick: () => handleActionClick(new Event("view-humanreadable")),
     });
     actions.set("export measure", {
-      icon: <FileUploadOutlinedIcon sx={{ color: blue[500] }} />,
+      icon: (
+        <ExportAction
+          measures={[measure]}
+          onClick={(exportType: string) => {
+            const elmErrorSeverity = exportType === "Export" ? "Info" : "Error";
+            const event = new CustomEvent("export-measure", {
+              detail: { elmErrorSeverity },
+            });
+            handleActionClick(event);
+          }}
+        />
+      ),
       name: "Export Measure",
-      onClick: () => handleActionClick(new Event("export-measure")),
     });
 
     if (canEdit) {
