@@ -99,7 +99,6 @@ const MeasureActionCenter = (props: PropTypes) => {
     actions.set("export measure", {
       icon: (
         <ExportAction
-          measures={[measure]}
           onClick={(exportType: string) => {
             const elmErrorSeverity = exportType === "Export" ? "Info" : "Error";
             const event = new CustomEvent("export-measure", {
