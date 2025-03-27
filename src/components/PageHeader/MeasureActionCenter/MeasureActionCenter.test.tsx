@@ -45,6 +45,14 @@ jest.mock("@madie/madie-util", () => ({
 }));
 
 describe("MeasureActionCenter Component", () => {
+  let dispatchEventSpy: jest.SpyInstance<boolean, [event: Event]>;
+  beforeEach(() => {
+    dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+  });
+  afterEach(() => {
+    dispatchEventSpy.mockRestore();
+  });
+
   it("renders the action center", () => {
     render(
       <MeasureActionCenter
@@ -102,7 +110,6 @@ describe("MeasureActionCenter Component", () => {
   });
 
   it("should trigger delete-measure event when 'Delete Measure' action is clicked", () => {
-    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
     render(
       <MeasureActionCenter
         canEdit={true}
@@ -121,8 +128,7 @@ describe("MeasureActionCenter Component", () => {
     );
   });
 
-  it("should trigger export-measure event when 'Export Measure' action is clicked", () => {
-    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+  it("should trigger export-measure event when 'Export Measure For Publishing' action is clicked", async () => {
     render(
       <MeasureActionCenter
         canEdit={true}
@@ -132,17 +138,22 @@ describe("MeasureActionCenter Component", () => {
     );
     const actionCenterButton = screen.getByLabelText("Measure action center");
     userEvent.click(actionCenterButton);
-    const exportMeasureButton = screen.getByTestId("ExportMeasure");
-    userEvent.click(exportMeasureButton);
-    expect(dispatchEventSpy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        type: "export-measure",
-      })
-    );
+
+    const exportIcon = screen.getByTestId("export-action-btn");
+    userEvent.click(exportIcon);
+
+    const exportForPublishingButton = await screen.findByRole("button", {
+      name: "Export for Publishing",
+    });
+    userEvent.click(exportForPublishingButton);
+
+    const event = dispatchEventSpy.mock.calls[0][0] as CustomEvent;
+    expect(event).toBeInstanceOf(CustomEvent);
+    expect(event.detail).toEqual({ elmErrorSeverity: "Error" });
+    expect(event.type).toEqual("export-measure");
   });
 
-  it("should display discard dialog when a user has unsaved changes", () => {
-    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+  it("should trigger export-measure event when 'Export Measure' action is clicked", async () => {
     render(
       <MeasureActionCenter
         canEdit={true}
@@ -152,8 +163,40 @@ describe("MeasureActionCenter Component", () => {
     );
     const actionCenterButton = screen.getByLabelText("Measure action center");
     userEvent.click(actionCenterButton);
-    const exportMeasureButton = screen.getByTestId("ExportMeasure");
-    userEvent.click(exportMeasureButton);
+
+    const exportIcon = screen.getByTestId("export-action-btn");
+    userEvent.click(exportIcon);
+
+    const exportButton = await screen.findByRole("button", {
+      name: "Export",
+    });
+    userEvent.click(exportButton);
+
+    const event = dispatchEventSpy.mock.calls[0][0] as CustomEvent;
+    expect(event).toBeInstanceOf(CustomEvent);
+    expect(event.detail).toEqual({ elmErrorSeverity: "Info" });
+    expect(event.type).toEqual("export-measure");
+  });
+
+  it("should display discard dialog when a user has unsaved changes", async () => {
+    render(
+      <MeasureActionCenter
+        canEdit={true}
+        measure={draftMeasure}
+        canDelete={false}
+      />
+    );
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+
+    const exportIcon = screen.getByTestId("export-action-btn");
+    userEvent.click(exportIcon);
+
+    const exportForPublishingButton = await screen.findByRole("button", {
+      name: "Export for Publishing",
+    });
+
+    userEvent.click(exportForPublishingButton);
     expect(dispatchEventSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         type: "export-measure",
@@ -162,7 +205,6 @@ describe("MeasureActionCenter Component", () => {
   });
 
   it("should trigger view-humanreadable event when 'View human readable' action is clicked", () => {
-    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
     render(
       <MeasureActionCenter
         canEdit={true}
@@ -183,7 +225,13 @@ describe("MeasureActionCenter Component", () => {
 
   it("should render Share button if the user is the owner of the measure", () => {
     (useFeatureFlags as jest.Mock).mockReturnValue({ ShareMeasure: true });
-    render(<MeasureActionCenter canEdit={true} measure={draftMeasure} />);
+    render(
+      <MeasureActionCenter
+        canEdit={true}
+        measure={draftMeasure}
+        canDelete={false}
+      />
+    );
     const actionCenterButton = screen.getByLabelText("Measure action center");
     userEvent.click(actionCenterButton);
     expect(screen.getByTestId("Share/Unshare")).toBeInTheDocument();
@@ -192,7 +240,13 @@ describe("MeasureActionCenter Component", () => {
   it("should not render Share button if the user is not the owner of the measure", () => {
     (useFeatureFlags as jest.Mock).mockReturnValue({ ShareMeasure: true });
     (checkUserCanEdit as jest.Mock).mockImplementationOnce(() => false);
-    render(<MeasureActionCenter canEdit={true} measure={draftMeasure} />);
+    render(
+      <MeasureActionCenter
+        canEdit={true}
+        measure={draftMeasure}
+        canDelete={false}
+      />
+    );
     const actionCenterButton = screen.getByLabelText("Measure action center");
     userEvent.click(actionCenterButton);
 
@@ -201,7 +255,6 @@ describe("MeasureActionCenter Component", () => {
   });
 
   it("should trigger share-measure event when 'Share With' action is clicked", () => {
-    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
     render(
       <MeasureActionCenter
         canEdit={true}
@@ -232,7 +285,6 @@ describe("MeasureActionCenter Component", () => {
   });
 
   it("should trigger unshare-measure event when 'Unshare' action is clicked", () => {
-    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
     render(
       <MeasureActionCenter
         canEdit={true}
@@ -264,7 +316,6 @@ describe("MeasureActionCenter Component", () => {
 
   it("pops discard dialog, emits event for resetting forms on continue", async () => {
     routeHandlerStore.state.canTravel = false;
-    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
     render(
       <MeasureActionCenter
         canEdit={true}
