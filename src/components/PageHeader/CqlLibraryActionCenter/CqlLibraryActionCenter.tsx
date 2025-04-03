@@ -222,7 +222,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
           data-testid="Share With-option"
           onClick={() => {
             setShareAnchorEl(null);
-            handleActionClick(new Event("library-share"));
+            handleActionClick(new Event("share-library"));
           }}
         >
           Share With
@@ -231,7 +231,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
           data-testid="Unshare-option"
           onClick={() => {
             setShareAnchorEl(null);
-            handleActionClick(new Event("library-unshare"));
+            handleActionClick(new Event("unshare-library"));
           }}
         >
           Unshare
