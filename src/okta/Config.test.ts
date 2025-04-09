@@ -10,6 +10,8 @@ describe("Config component", () => {
       baseUrl: "https://dev-Example.okta.com",
       issuerUrl: "https://dev-Example.okta.com/oauth2/authzServerId",
       clientId: "0oa1t055g23yx2o5d7",
+      scopes: ["email", "profile"],
+      useClassicEngine: false,
     };
 
     mockedAxios.get.mockResolvedValue({ data: { ...oktaEnvConfig } });
@@ -20,6 +22,29 @@ describe("Config component", () => {
       issuer: "https://dev-Example.okta.com/oauth2/authzServerId",
       clientId: "0oa1t055g23yx2o5d7",
       redirectUri: window.location.origin + "/login/callback",
+      scopes: ["email", "profile"],
+      useClassicEngine: false,
+    });
+  });
+
+  it("should not use classic engine if config not provided", async () => {
+    const oktaEnvConfig = {
+      baseUrl: "https://dev-Example.okta.com",
+      issuerUrl: "https://dev-Example.okta.com/oauth2/authzServerId",
+      clientId: "0oa1t055g23yx2o5d7",
+      scopes: ["email", "profile"],
+    };
+
+    mockedAxios.get.mockResolvedValue({ data: { ...oktaEnvConfig } });
+
+    const result = await getOktaConfig();
+    expect(result).toEqual({
+      baseUrl: "https://dev-Example.okta.com",
+      issuer: "https://dev-Example.okta.com/oauth2/authzServerId",
+      clientId: "0oa1t055g23yx2o5d7",
+      redirectUri: window.location.origin + "/login/callback",
+      scopes: ["email", "profile"],
+      useClassicEngine: false,
     });
   });
 

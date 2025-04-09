@@ -6,6 +6,7 @@ export interface OktaConfig {
   clientId: string;
   redirectUri: string;
   scopes: string[];
+  useClassicEngine: boolean;
 }
 
 interface OktaEnvConfig {
@@ -13,6 +14,7 @@ interface OktaEnvConfig {
   issuerUrl: string;
   clientId: string;
   scopes: string[];
+  useClassicEngine: boolean;
 }
 
 export async function getOktaConfig(): Promise<OktaConfig> {
@@ -34,5 +36,6 @@ export async function getOktaConfig(): Promise<OktaConfig> {
     clientId: `${oktaEnvConfig.clientId}`,
     redirectUri: window.location.origin + "/login/callback",
     scopes: oktaEnvConfig.scopes,
+    useClassicEngine: oktaEnvConfig.useClassicEngine || false,
   };
 }
