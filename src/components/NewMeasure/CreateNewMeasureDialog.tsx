@@ -244,6 +244,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
           onBlur={() => {
             onBlur("measureName");
           }}
+          maxLength={500}
         />
       </Box>
 
@@ -278,6 +279,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
           onBlur={() => {
             onBlur("cqlLibraryName");
           }}
+          maxLength={64}
         />
       </Box>
 
@@ -298,6 +300,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
           size="small"
           error={formik.touched.ecqmTitle && Boolean(formik.errors.ecqmTitle)}
           {...formik.getFieldProps("ecqmTitle")}
+          maxLength={32}
         />
       </Box>
 
