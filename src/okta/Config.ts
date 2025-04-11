@@ -5,12 +5,16 @@ export interface OktaConfig {
   issuer: string;
   clientId: string;
   redirectUri: string;
+  scopes: string[];
+  useClassicEngine: boolean;
 }
 
 interface OktaEnvConfig {
   baseUrl: string;
   issuerUrl: string;
   clientId: string;
+  scopes: string[];
+  useClassicEngine: boolean;
 }
 
 export async function getOktaConfig(): Promise<OktaConfig> {
@@ -31,5 +35,7 @@ export async function getOktaConfig(): Promise<OktaConfig> {
     issuer: `${oktaEnvConfig.issuerUrl}`,
     clientId: `${oktaEnvConfig.clientId}`,
     redirectUri: window.location.origin + "/login/callback",
+    scopes: oktaEnvConfig.scopes,
+    useClassicEngine: oktaEnvConfig.useClassicEngine || false,
   };
 }
