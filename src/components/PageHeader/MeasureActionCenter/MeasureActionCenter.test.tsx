@@ -46,9 +46,11 @@ jest.mock("@madie/madie-util", () => ({
 
 describe("MeasureActionCenter Component", () => {
   let dispatchEventSpy: jest.SpyInstance<boolean, [event: Event]>;
+
   beforeEach(() => {
     dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
   });
+
   afterEach(() => {
     dispatchEventSpy.mockRestore();
   });
@@ -315,6 +317,7 @@ describe("MeasureActionCenter Component", () => {
   });
 
   it("pops discard dialog, emits event for resetting forms on continue", async () => {
+    const setTimeoutSpy = jest.spyOn(global, "setTimeout");
     routeHandlerStore.state.canTravel = false;
     render(
       <MeasureActionCenter
@@ -337,6 +340,11 @@ describe("MeasureActionCenter Component", () => {
       ).toBeInTheDocument();
       userEvent.click(screen.getByTestId("discard-dialog-continue-button"));
     });
+    await waitFor(() => {
+      expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 350);
+    });
+
+    setTimeoutSpy.mockRestore();
 
     expect(dispatchEventSpy).toHaveBeenCalledWith(
       expect.objectContaining({

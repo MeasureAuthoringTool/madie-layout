@@ -58,7 +58,7 @@ const MeasureActionCenter = (props: PropTypes) => {
     // we need every formik instance to use useFormikResetOnEvent on init
     setDiscardDialogOpen(false);
     window.dispatchEvent(new Event("resetAllForms"));
-    await new Promise((resolve) => setTimeout(resolve, 250)); // Add a delay
+    await new Promise((resolve) => setTimeout(resolve, 350)); // Add a delay
     if (eventToTrigger) {
       window.dispatchEvent(eventToTrigger);
     }
