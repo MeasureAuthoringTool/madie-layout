@@ -338,18 +338,23 @@ describe("MeasureActionCenter Component", () => {
       expect(
         screen.getByTestId("discard-dialog-continue-button")
       ).toBeInTheDocument();
-      userEvent.click(screen.getByTestId("discard-dialog-continue-button"));
-    });
-    await waitFor(() => {
-      expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 350);
     });
 
-    setTimeoutSpy.mockRestore();
+    userEvent.click(screen.getByTestId("discard-dialog-continue-button"));
 
+    // Wait for the timeout to complete
+    await new Promise((resolve) => setTimeout(resolve, 350));
+
+    // Assert that the timeout was called
+    expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 350);
+
+    // Assert that the event was dispatched after the timeout
     expect(dispatchEventSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         type: "resetAllForms",
       })
     );
+
+    setTimeoutSpy.mockRestore();
   });
 });
