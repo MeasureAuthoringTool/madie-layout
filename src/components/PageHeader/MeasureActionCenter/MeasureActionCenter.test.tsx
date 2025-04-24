@@ -302,6 +302,7 @@ describe("MeasureActionCenter Component", () => {
   });
 
   it("should trigger share-measure event when 'Share With' action is clicked", () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ ShareMeasure: true });
     render(
       <MeasureActionCenter
         canEdit={true}
@@ -317,10 +318,10 @@ describe("MeasureActionCenter Component", () => {
     userEvent.click(shareButton);
 
     const shareWithMenuItem = screen.getByTestId("Share With-option");
-    const unsharehMenuItem = screen.getByTestId("Unshare-option");
+    const unshareMenuItem = screen.getByTestId("Unshare-option");
 
     expect(shareWithMenuItem).toBeInTheDocument();
-    expect(unsharehMenuItem).toBeInTheDocument();
+    expect(unshareMenuItem).toBeInTheDocument();
 
     userEvent.click(screen.getByRole("menuitem", { name: "Share With" }));
 
@@ -332,6 +333,7 @@ describe("MeasureActionCenter Component", () => {
   });
 
   it("should trigger unshare-measure event when 'Unshare' action is clicked", () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ ShareMeasure: true });
     render(
       <MeasureActionCenter
         canEdit={true}
