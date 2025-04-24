@@ -120,35 +120,38 @@ const MeasureActionCenter = (props: PropTypes) => {
           onClick: () => handleActionClick(new Event("draft-measure")),
         });
       }
-      if (measure?.measureMetaData?.draft && canDelete) {
-        actions.set("delete measure", {
-          icon: <DeleteOutlinedIcon sx={{ color: red[500] }} />,
-          name: "Delete Measure",
-          onClick: () => handleActionClick(new Event("delete-measure")),
-        });
+      if (measure?.measureMetaData?.draft) {
         actions.set("version measure", {
           icon: <AccountTreeOutlinedIcon sx={{ color: blue[500] }} />,
           name: "Version Measure",
           onClick: () => handleActionClick(new Event("version-measure")),
         });
-      }
 
-      if (featureFlags?.ShareMeasure && isOwnerOfSelectedMeasure([measure])) {
-        actions.set("share/unshare measure", {
-          icon: (
-            <ShareAction
-              onClick={(option: string) => {
-                if (option === SharedOptions.SHARE_WITH) {
-                  handleActionClick(new Event("share-measure"));
-                } else if (option === SharedOptions.UNSHARE) {
-                  handleActionClick(new Event("unshare-measure"));
-                }
-              }}
-            />
-          ),
-          name: "Share/Unshare",
-        });
+        if (canDelete) {
+          actions.set("delete measure", {
+            icon: <DeleteOutlinedIcon sx={{ color: red[500] }} />,
+            name: "Delete Measure",
+            onClick: () => handleActionClick(new Event("delete-measure")),
+          });
+        }
       }
+    }
+
+    if (featureFlags?.ShareMeasure && isOwnerOfSelectedMeasure([measure])) {
+      actions.set("share/unshare measure", {
+        icon: (
+          <ShareAction
+            onClick={(option: string) => {
+              if (option === SharedOptions.SHARE_WITH) {
+                handleActionClick(new Event("share-measure"));
+              } else if (option === SharedOptions.UNSHARE) {
+                handleActionClick(new Event("unshare-measure"));
+              }
+            }}
+          />
+        ),
+        name: "Share/Unshare",
+      });
     }
     // required order to display
     const actionsListOrder = [
