@@ -1,7 +1,6 @@
 import React from "react";
 import { IconButton, Menu, MenuItem } from "@mui/material";
 import ShareIcon from "./ShareIcon";
-import { blue } from "@mui/material/colors";
 
 export enum SharedOptions {
   SHARE_WITH = "Share With",
@@ -35,7 +34,7 @@ const ShareAction = (props: PropTypes) => {
   return (
     <span>
       <IconButton onClick={handleClick} data-testid="share-action-btn">
-        <ShareIcon color={blue[500]} />
+        <ShareIcon />
       </IconButton>
 
       <Menu

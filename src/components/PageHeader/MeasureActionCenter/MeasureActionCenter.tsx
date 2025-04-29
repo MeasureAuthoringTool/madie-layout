@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { SpeedDial, SpeedDialAction } from "@mui/material";
+import { SpeedDial, SpeedDialAction, IconButton } from "@mui/material";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import EditCalendarOutlinedIcon from "@mui/icons-material/EditCalendarOutlined";
 import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
@@ -91,7 +91,11 @@ const MeasureActionCenter = (props: PropTypes) => {
     const actions = new Map<string, any>();
 
     actions.set("human readable", {
-      icon: <FeedOutlinedIcon sx={{ color: blue[500] }} />,
+      icon: (
+        <IconButton>
+          <FeedOutlinedIcon />
+        </IconButton>
+      ),
       name: routeHandlerState?.canTravel
         ? `View human readable`
         : `Save measure to view human readable`,
@@ -115,21 +119,33 @@ const MeasureActionCenter = (props: PropTypes) => {
     if (canEdit) {
       if (!measure?.measureMetaData?.draft) {
         actions.set("draft measure", {
-          icon: <EditCalendarOutlinedIcon sx={{ color: blue[500] }} />,
+          icon: (
+            <IconButton>
+              <EditCalendarOutlinedIcon />
+            </IconButton>
+          ),
           name: "Draft Measure",
           onClick: () => handleActionClick(new Event("draft-measure")),
         });
       }
       if (measure?.measureMetaData?.draft) {
         actions.set("version measure", {
-          icon: <AccountTreeOutlinedIcon sx={{ color: blue[500] }} />,
+          icon: (
+            <IconButton>
+              <AccountTreeOutlinedIcon />
+            </IconButton>
+          ),
           name: "Version Measure",
           onClick: () => handleActionClick(new Event("version-measure")),
         });
 
         if (canDelete) {
           actions.set("delete measure", {
-            icon: <DeleteOutlinedIcon sx={{ color: red[500] }} />,
+            icon: (
+              <IconButton className="DeleteClass">
+                <DeleteOutlinedIcon />
+              </IconButton>
+            ),
             name: "Delete Measure",
             onClick: () => handleActionClick(new Event("delete-measure")),
           });
