@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import { SpeedDial, SpeedDialAction, Menu, MenuItem } from "@mui/material";
+import {
+  SpeedDial,
+  SpeedDialAction,
+  Menu,
+  MenuItem,
+  IconButton,
+} from "@mui/material";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
 import EditCalendarOutlinedIcon from "@mui/icons-material/EditCalendarOutlined";
@@ -103,27 +109,43 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
       if (library?.draft) {
         if (canDelete) {
           actions.set("delete library", {
-            icon: <DeleteOutlinedIcon sx={{ color: red[500] }} />,
+            icon: (
+              <IconButton className="DeleteClass">
+                <DeleteOutlinedIcon />
+              </IconButton>
+            ),
             name: "Delete Library",
             onClick: () => handleActionClick(new Event("delete-library")),
           });
         }
         actions.set("version library", {
-          icon: <AccountTreeOutlinedIcon sx={{ color: blue[500] }} />,
+          icon: (
+            <IconButton>
+              <AccountTreeOutlinedIcon />
+            </IconButton>
+          ),
           name: "Version Library",
           onClick: () => handleActionClick(new Event("version-library")),
         });
       }
       if (!library?.draft) {
         actions.set("draft library", {
-          icon: <EditCalendarOutlinedIcon sx={{ color: blue[500] }} />,
+          icon: (
+            <IconButton>
+              <EditCalendarOutlinedIcon />
+            </IconButton>
+          ),
           name: "Draft Library",
           onClick: () => handleActionClick(new Event("draft-library")),
         });
       }
       if (owner && owner == username && featureFlags.ShareLibrary) {
         actions.set("share library", {
-          icon: <ShareIcon color="#2196f3" />,
+          icon: (
+            <IconButton>
+              <ShareIcon />
+            </IconButton>
+          ),
           name: "Share Library",
           onClick: (event: React.MouseEvent<HTMLElement>) => {
             setOpen(false);

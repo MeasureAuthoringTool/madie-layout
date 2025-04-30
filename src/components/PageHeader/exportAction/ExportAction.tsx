@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { IconButton } from "@mui/material";
 import { Popover } from "@madie/madie-design-system/dist/react";
 import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
-import { blue } from "@mui/material/colors";
 
 interface PropTypes {
   onClick: (exportType: string) => void;
@@ -24,7 +23,7 @@ export default function ExportAction(props: PropTypes) {
         onClick={(event) => setAnchorEl(event.currentTarget)}
         data-testid="export-action-btn"
       >
-        <FileUploadOutlinedIcon sx={{ color: blue[500] }} />
+        <FileUploadOutlinedIcon />
       </IconButton>
       <Popover
         optionsOpen={Boolean(anchorEl)}
