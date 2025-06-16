@@ -29,7 +29,7 @@ const bulkCreate = (count: number) => {
     measureName: "",
     model: "",
     cqlLibraryName: "",
-  } as Measure;
+  } as unknown as Measure;
 
   const measures = [];
   for (let i = 0; i < count; i++) {
