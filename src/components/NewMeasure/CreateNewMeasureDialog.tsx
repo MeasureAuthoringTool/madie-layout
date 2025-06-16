@@ -60,7 +60,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
         experimental: false,
       },
       // TO DO: validation, models for new entries
-    } as Measure,
+    } as unknown as Measure,
     validationSchema: MeasureSchemaValidator,
     onSubmit: async (values: Measure) => {
       await createMeasure(values);
@@ -69,6 +69,10 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
 
   let modelOptions = Object.keys(Model);
   const featureFlags = useFeatureFlags();
+  if (!featureFlags?.qiCore7) {
+    // remove QI-Core 7.0.0 from model options if the feature flag is not enabled
+    modelOptions = modelOptions.filter((model) => model !== "QICORE_7_0_0");
+  }
 
   async function createMeasure(measure: Measure) {
     const config: ServiceConfig = await getServiceConfig();
