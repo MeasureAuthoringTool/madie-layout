@@ -36,7 +36,6 @@ const MeasureActionCenter = (props: PropTypes) => {
   const [actions, setActions] = useState<Array<any>>([]);
   const [discardDialogOpen, setDiscardDialogOpen] = useState<boolean>(false);
   const [eventToTrigger, setEventToTrigger] = useState<Event | null>(null);
-  const featureFlags = useFeatureFlags();
 
   const { updateRouteHandlerState } = routeHandlerStore;
   const [routeHandlerState, setRouteHandlerState] = useState<RouteHandlerState>(
@@ -153,7 +152,7 @@ const MeasureActionCenter = (props: PropTypes) => {
       }
     }
 
-    if (featureFlags?.ShareMeasure && isOwnerOfSelectedMeasure([measure])) {
+    if (isOwnerOfSelectedMeasure([measure])) {
       actions.set("share/unshare measure", {
         icon: (
           <ShareAction
