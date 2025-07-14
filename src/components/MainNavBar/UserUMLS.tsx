@@ -8,7 +8,7 @@ import UMLSDialog from "./UMLSDialog";
 import {
   Toast,
   MadieConfirmDialog,
-} from "@madie/madie-design-system/dist/react";
+} from "@madie/madie-design-system";
 import { useOktaAuth } from "@okta/okta-react";
 import { useTerminologyServiceApi } from "@madie/madie-util";
 import "./MainNavBar.scss";

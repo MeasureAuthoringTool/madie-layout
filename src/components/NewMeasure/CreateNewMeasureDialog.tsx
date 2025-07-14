@@ -10,8 +10,7 @@ import {
   Select,
   TextField,
   Toast,
-  MadieAlert,
-} from "@madie/madie-design-system/dist/react";
+} from "@madie/madie-design-system";
 import { Box } from "@mui/system";
 import {
   wafIntercept,

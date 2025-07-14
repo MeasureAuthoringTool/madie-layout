@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { IconButton } from "@mui/material";
-import { Popover } from "@madie/madie-design-system/dist/react";
+import { Popover } from "@madie/madie-design-system"
 import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
 
 interface PropTypes {
@@ -25,7 +25,8 @@ export default function ExportAction(props: PropTypes) {
       >
         <FileUploadOutlinedIcon />
       </IconButton>
-      <Popover
+      {anchorEl && (
+        <Popover
         optionsOpen={Boolean(anchorEl)}
         anchorEl={anchorEl}
         handleClose={() => setAnchorEl(null)}
@@ -43,6 +44,7 @@ export default function ExportAction(props: PropTypes) {
           },
         ]}
       />
+      )}
     </>
   );
 }

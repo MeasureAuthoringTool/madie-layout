@@ -4,8 +4,8 @@ module.exports = {
   testEnvironment: "jsdom",
   transform: {
     "^.+\\.(j|t)sx?$": "babel-jest",
-    "^.+\\.svg$": "<rootDir>/svgTransform.js",
-    "^.+\\.png": "<rootDir>/svgTransform.js",
+    "^.+\\.svg$": "<rootDir>/svgTransform.cjs",
+    "^.+\\.png": "<rootDir>/svgTransform.cjs",
   },
   transformIgnorePatterns: ["node_modules/(?!formik)/"],
   moduleNameMapper: {
@@ -13,7 +13,7 @@ module.exports = {
     "single-spa-react/parcel": "single-spa-react/lib/cjs/parcel.cjs",
     "^.+\\.(css|less|scss)$": "babel-jest",
   },
-  setupFilesAfterEnv: ["@testing-library/jest-dom", "./jest.setup.js"],
+  setupFilesAfterEnv: ["@testing-library/jest-dom", "./jest.setup.mjs"],
   globals: {
     "ts-jest": {
       tsconfig: {

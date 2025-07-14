@@ -9,7 +9,7 @@ import {
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
 import EditCalendarOutlinedIcon from "@mui/icons-material/EditCalendarOutlined";
-import { MadieDiscardDialog } from "@madie/madie-design-system/dist/react";
+import { MadieDiscardDialog } from "@madie/madie-design-system";
 import { CqlLibrary } from "@madie/madie-models";
 import { blue, red } from "@mui/material/colors";
 import {
