@@ -5,7 +5,7 @@ import RouteChangeHandler from "./RouteChangeHandler";
 import Footer from "../components/Footer/Footer";
 
 import { ThemeProvider } from "@mui/material/styles";
-import { theme } from "@madie/madie-design-system/dist/react";
+import { theme } from "@madie/madie-design-system";
 
 const LayoutWrapper = ({ children }) => {
   return (

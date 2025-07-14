@@ -3,7 +3,7 @@ import { SpeedDial, SpeedDialAction, IconButton } from "@mui/material";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import EditCalendarOutlinedIcon from "@mui/icons-material/EditCalendarOutlined";
 import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
-import { MadieDiscardDialog } from "@madie/madie-design-system/dist/react";
+import { MadieDiscardDialog } from "@madie/madie-design-system";
 import { Measure } from "@madie/madie-models";
 import { blue, red } from "@mui/material/colors";
 import {

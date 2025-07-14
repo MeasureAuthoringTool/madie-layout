@@ -15,6 +15,7 @@ import NotFound from "../components/notfound/NotFound";
 import "../styles/LayoutStyles.scss";
 import TimeoutHandler from "../components/timeoutHandler/TimeoutHandler";
 import LayoutWrapper from "./LayoutWrapper";
+import "../madieDesignStyles.scss";
 
 function Router({ props }) {
   const { authState } = useOktaAuth();
@@ -46,6 +47,7 @@ function Router({ props }) {
         }
       >
         <Route path="/" element={<Navigate to="/measures" />} />
+        {/* @ts-ignore */}
         <Route path="login/callback" element={LoginCallback} />
         <Route path="measures/*" element={<MadieMeasure />} />
         <Route path="cql-libraries/*" element={<MadieCqlLibrary />} />

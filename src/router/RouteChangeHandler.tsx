@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useBlocker } from "react-router-dom";
-import { MadieDiscardDialog } from "@madie/madie-design-system/dist/react";
+import { MadieDiscardDialog } from "@madie/madie-design-system";
 import { routeHandlerStore } from "@madie/madie-util";
 // We have to listen at the top level for navigational changes to block them.
 // Navigation must be aware of dirty form state.

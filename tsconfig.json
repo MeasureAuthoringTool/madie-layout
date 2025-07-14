@@ -1,11 +1,18 @@
 {
   "extends": "ts-config-single-spa",
   "compilerOptions": {
-    "declaration": true,
-    "declarationDir": "dist",
-    "declarationMap": true,
-    "jsx": "react-jsx",
-    "sourceMap": true
+      "allowSyntheticDefaultImports": true,
+      "declaration": true,
+      "declarationDir": "dist",
+      "declarationMap": true,
+      "jsx": "react-jsx",
+      "target": "ES2022",
+      "module": "ESNext",
+      "esModuleInterop": true,
+      "isolatedModules": true,
+      "moduleResolution": "node",
+      "sourceMap": true,
+      "skipLibCheck": true
   },
   "files": ["src/madie-madie-layout.tsx"],
   "include": ["src/**/*"],

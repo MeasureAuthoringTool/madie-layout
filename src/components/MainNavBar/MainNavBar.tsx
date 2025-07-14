@@ -6,7 +6,7 @@ import { useOktaAuth } from "@okta/okta-react";
 import { NavLink, useLocation } from "react-router-dom";
 import UserProfile from "./UserProfile";
 import UserAvatar from "./UserAvatar";
-import { Tabs, Tab, Toast } from "@madie/madie-design-system/dist/react";
+import { Tabs, Tab } from "@madie/madie-design-system";
 import "./MainNavBar.scss";
 import UserUMLS from "./UserUMLS";
 

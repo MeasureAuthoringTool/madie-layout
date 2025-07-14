@@ -1,6 +1,6 @@
 import React from "react";
 import CloseIcon from "@mui/icons-material/Close";
-import { Button, TextField } from "@madie/madie-design-system/dist/react";
+import { Button, TextField } from "@madie/madie-design-system";
 import {
   Dialog,
   IconButton,

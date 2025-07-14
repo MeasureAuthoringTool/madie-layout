@@ -6,7 +6,7 @@ import { Fade, Breadcrumbs } from "@mui/material";
 import CreateNewMeasureDialog from "../NewMeasure/CreateNewMeasureDialog";
 import WafDialog from "../WafDialog/WafDialog";
 import MeasureActionCenter from "./MeasureActionCenter/MeasureActionCenter";
-import { Button } from "@madie/madie-design-system/dist/react";
+import { Button } from "@madie/madie-design-system"
 import { ApiContextProvider } from "../../../api/ServiceContext";
 import useGetServiceConfig from "../../../config/useGetServiceConfig";
 import {
