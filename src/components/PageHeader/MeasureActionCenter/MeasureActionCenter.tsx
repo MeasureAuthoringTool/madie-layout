@@ -15,6 +15,7 @@ import {
 import FeedOutlinedIcon from "@mui/icons-material/FeedOutlined";
 import ShareAction, { SharedOptions } from "../shareAction/ShareAction";
 import ExportAction from "../exportAction/ExportAction";
+import TransferAction from "../transferAction/TransferAction";
 
 interface PropTypes {
   canEdit: boolean;
@@ -31,11 +32,15 @@ const isOwnerOfSelectedMeasure = (measures) => {
   );
 };
 
+const TRANSFER_MEASURE = "Transfer";
+const CANNOT_TRANSFER = "You cannot transfer a measure you do not own.";
+
 const MeasureActionCenter = (props: PropTypes) => {
   const [open, setOpen] = useState(false);
   const [actions, setActions] = useState<Array<any>>([]);
   const [discardDialogOpen, setDiscardDialogOpen] = useState<boolean>(false);
   const [eventToTrigger, setEventToTrigger] = useState<Event | null>(null);
+  const featureFlags = useFeatureFlags();
 
   const { updateRouteHandlerState } = routeHandlerStore;
   const [routeHandlerState, setRouteHandlerState] = useState<RouteHandlerState>(
@@ -168,8 +173,25 @@ const MeasureActionCenter = (props: PropTypes) => {
         name: "Share/Unshare",
       });
     }
+
+    if (featureFlags?.TransferMeasure) {
+      actions.set("transfer measure", {
+        icon: (
+          <TransferAction
+            canTransfer={isOwnerOfSelectedMeasure([measure])}
+            onClick={() => {
+              handleActionClick(new Event("transfer-measure"));
+            }}
+          />
+        ),
+        name: isOwnerOfSelectedMeasure([measure])
+          ? TRANSFER_MEASURE
+          : CANNOT_TRANSFER,
+      });
+    }
     // required order to display
     const actionsListOrder = [
+      "transfer measure",
       "human readable",
       "draft measure",
       "version measure",
