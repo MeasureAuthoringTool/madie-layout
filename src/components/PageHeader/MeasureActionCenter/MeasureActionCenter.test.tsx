@@ -470,7 +470,7 @@ describe("MeasureActionCenter Component", () => {
     expect(screen.getByTestId("Share/Unshare")).toBeInTheDocument();
     expect(screen.getByTestId("DraftMeasure")).toBeInTheDocument();
     expect(screen.getByTestId("ExportMeasure")).toBeInTheDocument();
-    expect(screen.queryByTestId("Transfermeasure")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("Transfer")).not.toBeInTheDocument();
   });
 
   it("should display Transfer Measure measure has a different owner", () => {
