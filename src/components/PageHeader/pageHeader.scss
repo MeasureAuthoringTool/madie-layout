@@ -164,6 +164,12 @@
     }
   }
 
+  .MuiList-root {
+    > li {
+      text-transform: none !important;
+    }
+  }
+
   //  action button and header changes
   .page-header-action-button {
     padding: 14px 23px !important;
