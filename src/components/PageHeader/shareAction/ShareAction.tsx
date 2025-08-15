@@ -71,8 +71,7 @@ const ShareAction = (props: PropTypes) => {
           <Grow
             {...TransitionProps}
             style={{
-              transformOrigin:
-                placement === "bottom-start" ? "left top" : "left bottom",
+              transformOrigin: "left top",
             }}
           >
             <Paper>
