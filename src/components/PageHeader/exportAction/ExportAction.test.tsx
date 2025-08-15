@@ -64,7 +64,7 @@ describe("508, keyboard and clickaway behavior", () => {
     const menuList = await screen.findByRole("menu", { name: "" });
 
     fireEvent.keyDown(menuList, {
-      key: "Escape",
+      key: "Escape", // #nosec
       code: "Escape",
     });
 
