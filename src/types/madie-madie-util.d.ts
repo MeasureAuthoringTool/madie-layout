@@ -38,6 +38,7 @@ declare module "@madie/madie-util" {
     ShareMeasure: boolean;
     qiCore7: boolean;
     TransferMeasure: boolean;
+    TransferLibrary: boolean;
   }
 
   export const cqlLibraryStore: {
