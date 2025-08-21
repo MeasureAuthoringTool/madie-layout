@@ -1,5 +1,13 @@
-import React from "react";
-import { IconButton, Menu, MenuItem } from "@mui/material";
+import React, { useRef, useState } from "react";
+import {
+  ClickAwayListener,
+  Grow,
+  IconButton,
+  MenuItem,
+  MenuList,
+  Paper,
+  Popper,
+} from "@mui/material";
 import ShareIcon from "./ShareIcon";
 
 export enum SharedOptions {
@@ -14,46 +22,81 @@ interface PropTypes {
 }
 
 const ShareAction = (props: PropTypes) => {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
+  const [open, setOpen] = useState(false);
+  // move anchorElement to a stable reference that does not change across renders.
+  const anchorRef = useRef<HTMLButtonElement>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
+    setOpen(true);
   };
 
   const handleClose = () => {
-    setAnchorEl(null);
+    setOpen(false);
   };
 
   const handleMenuItemClick = (option: string) => {
     handleClose();
-
     props.onClick(option);
   };
-
+  function handleListKeyDown(event: React.KeyboardEvent) {
+    // it's inside of another key trap. If we allow the event to bubble up, the action center speed dial will take the command instead of the child element here.
+    event.stopPropagation();
+    if (event.key === "Tab") {
+      event.preventDefault();
+      setOpen(false);
+    } else if (event.key === "Escape") {
+      setOpen(false);
+    }
+  }
   return (
-    <span>
-      <IconButton onClick={handleClick} data-testid="share-action-btn">
-        <ShareIcon />
-      </IconButton>
-
-      <Menu
-        anchorEl={anchorEl}
+    <>
+      <span>
+        <IconButton
+          onClick={handleClick}
+          data-testid="share-action-btn"
+          ref={anchorRef}
+        >
+          <ShareIcon />
+        </IconButton>
+      </span>
+      <Popper
         open={open}
-        onClose={handleClose}
-        data-testid="share-menu"
+        anchorEl={anchorRef.current}
+        role={undefined}
+        placement="bottom-start"
+        transition
+        disablePortal
       >
-        {options.map((option) => (
-          <MenuItem
-            data-testid={`${option}-option`}
-            key={option}
-            onClick={() => handleMenuItemClick(option)}
+        {({ TransitionProps, placement }) => (
+          <Grow
+            {...TransitionProps}
+            style={{
+              transformOrigin: "left top",
+            }}
           >
-            {option}
-          </MenuItem>
-        ))}
-      </Menu>
-    </span>
+            <Paper>
+              <ClickAwayListener onClickAway={handleClose}>
+                <MenuList
+                  autoFocusItem={open}
+                  id="share-menu"
+                  onKeyDown={handleListKeyDown}
+                >
+                  {options.map((option, i) => (
+                    <MenuItem
+                      data-testid={`${option}-option`}
+                      key={option}
+                      onClick={() => handleMenuItemClick(option)}
+                    >
+                      {option}
+                    </MenuItem>
+                  ))}
+                </MenuList>
+              </ClickAwayListener>
+            </Paper>
+          </Grow>
+        )}
+      </Popper>
+    </>
   );
 };
 
