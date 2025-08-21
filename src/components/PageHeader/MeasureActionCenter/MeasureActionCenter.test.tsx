@@ -83,6 +83,7 @@ describe("MeasureActionCenter Component", () => {
     expect(screen.getByTestId("DraftMeasure")).toBeInTheDocument();
     expect(screen.getByTestId("ExportMeasure")).toBeInTheDocument();
     expect(screen.getByTestId("Viewhumanreadable")).toBeInTheDocument();
+    expect(screen.getByTestId("ViewHistory")).toBeInTheDocument();
   });
 
   it("should render 'Delete Measure' button only for draft measures and user has delete right when canEdit is true", () => {
@@ -268,6 +269,20 @@ describe("MeasureActionCenter Component", () => {
         type: "view-humanreadable",
       })
     );
+  });
+
+  it("should render View History button", () => {
+    render(
+      <MeasureActionCenter
+        canEdit={true}
+        measure={draftMeasure}
+        canDelete={false}
+      />
+    );
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+    const viewHistoryButton = screen.getByTestId("ViewHistory");
+    expect(viewHistoryButton).toBeInTheDocument();
   });
 
   it("should render Share button if the user is the owner of the measure", () => {
