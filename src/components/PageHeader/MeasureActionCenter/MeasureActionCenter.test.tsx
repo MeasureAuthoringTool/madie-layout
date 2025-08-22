@@ -70,6 +70,7 @@ describe("MeasureActionCenter Component", () => {
     (useFeatureFlags as jest.Mock).mockReturnValue({
       ShareMeasure: true,
       MeasureHistory: true,
+      TransferMeasure: true,
     });
     render(
       <MeasureActionCenter
@@ -83,10 +84,52 @@ describe("MeasureActionCenter Component", () => {
     expect(screen.queryByTestId("DeleteMeasure")).not.toBeInTheDocument();
     expect(screen.queryByTestId("VersionMeasure")).not.toBeInTheDocument();
     expect(screen.getByTestId("Share/Unshare")).toBeInTheDocument();
-    expect(screen.getByTestId("DraftMeasure")).toBeInTheDocument();
+    const draftMeasureBtn = screen.getByTestId("DraftMeasure");
+    expect(draftMeasureBtn).toBeInTheDocument();
     expect(screen.getByTestId("ExportMeasure")).toBeInTheDocument();
     expect(screen.getByTestId("Viewhumanreadable")).toBeInTheDocument();
     expect(screen.getByTestId("ViewHistory")).toBeInTheDocument();
+    expect(screen.getByTestId("Transfer")).toBeInTheDocument();
+
+    userEvent.click(draftMeasureBtn);
+    expect(dispatchEventSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "draft-measure",
+      })
+    );
+  });
+
+  it("should trigger transfer measure event", () => {
+    (useFeatureFlags as jest.Mock).mockReturnValueOnce({
+      TransferMeasure: true,
+    });
+    render(
+      <MeasureActionCenter
+        canEdit={true}
+        measure={versionedMeasure}
+        canDelete={true}
+      />
+    );
+
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+    expect(screen.queryByTestId("DeleteMeasure")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("VersionMeasure")).not.toBeInTheDocument();
+    expect(screen.getByTestId("Share/Unshare")).toBeInTheDocument();
+    expect(screen.getByTestId("DraftMeasure")).toBeInTheDocument();
+    expect(screen.getByTestId("ExportMeasure")).toBeInTheDocument();
+    expect(screen.getByTestId("Transfer")).toBeInTheDocument();
+    const transferMeasureBtn = screen.getByTestId("transfer-action-btn");
+    expect(transferMeasureBtn).toBeInTheDocument();
+    expect(transferMeasureBtn).toBeEnabled();
+
+    userEvent.click(transferMeasureBtn);
+
+    expect(dispatchEventSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "transfer-measure",
+      })
+    );
   });
 
   it("should render 'Delete Measure' button only for draft measures and user has delete right when canEdit is true", () => {
@@ -193,7 +236,7 @@ describe("MeasureActionCenter Component", () => {
     const exportIcon = screen.getByTestId("export-action-btn");
     userEvent.click(exportIcon);
 
-    const exportForPublishingButton = await screen.findByRole("button", {
+    const exportForPublishingButton = await screen.findByRole("menuitem", {
       name: "Export for Publishing",
     });
     userEvent.click(exportForPublishingButton);
@@ -218,7 +261,7 @@ describe("MeasureActionCenter Component", () => {
     const exportIcon = screen.getByTestId("export-action-btn");
     userEvent.click(exportIcon);
 
-    const exportButton = await screen.findByRole("button", {
+    const exportButton = await screen.findByRole("menuitem", {
       name: "Export",
     });
     userEvent.click(exportButton);
@@ -243,7 +286,7 @@ describe("MeasureActionCenter Component", () => {
     const exportIcon = screen.getByTestId("export-action-btn");
     userEvent.click(exportIcon);
 
-    const exportForPublishingButton = await screen.findByRole("button", {
+    const exportForPublishingButton = await screen.findByRole("menuitem", {
       name: "Export for Publishing",
     });
 
@@ -437,5 +480,46 @@ describe("MeasureActionCenter Component", () => {
     );
 
     setTimeoutSpy.mockRestore();
+  });
+
+  it("should not show Transfer Measure when feature flag is not on", () => {
+    (useFeatureFlags as jest.Mock).mockReturnValueOnce({
+      ShareMeasure: true,
+      TransferMeasure: false,
+    });
+    render(
+      <MeasureActionCenter
+        canEdit={true}
+        measure={versionedMeasure}
+        canDelete={true}
+      />
+    );
+
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+    expect(screen.queryByTestId("DeleteMeasure")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("VersionMeasure")).not.toBeInTheDocument();
+    expect(screen.getByTestId("Share/Unshare")).toBeInTheDocument();
+    expect(screen.getByTestId("DraftMeasure")).toBeInTheDocument();
+    expect(screen.getByTestId("ExportMeasure")).toBeInTheDocument();
+    expect(screen.queryByTestId("Transfer")).not.toBeInTheDocument();
+  });
+
+  it("should display Transfer Measure measure has a different owner", () => {
+    const measureSet = { ...mockMeasureSet, owner: "anotherUser" };
+    const measure = { ...draftMeasure, measureSet: measureSet };
+    (useFeatureFlags as jest.Mock).mockReturnValueOnce({
+      ShareMeasure: true,
+      TransferMeasure: true,
+    });
+    render(
+      <MeasureActionCenter canEdit={true} measure={measure} canDelete={true} />
+    );
+
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+    expect(screen.getByTestId("Share/Unshare")).toBeInTheDocument();
+    expect(screen.getByTestId("ExportMeasure")).toBeInTheDocument();
+    expect(screen.getByTestId("Transfer")).toBeInTheDocument();
   });
 });

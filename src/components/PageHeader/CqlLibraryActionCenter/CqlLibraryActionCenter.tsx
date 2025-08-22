@@ -40,7 +40,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
   );
   const [shareAnchorEl, setShareAnchorEl] = useState<null | HTMLElement>(null);
   const shareMenuOpen = Boolean(shareAnchorEl);
-  const featureFlags = useFeatureFlags();
+
   useEffect(() => {
     const subscription = routeHandlerStore.subscribe(setRouteHandlerState);
     return () => {
@@ -139,7 +139,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
           onClick: () => handleActionClick(new Event("draft-library")),
         });
       }
-      if (owner && owner == username && featureFlags.ShareLibrary) {
+      if (owner && owner == username) {
         actions.set("share library", {
           icon: (
             <IconButton>

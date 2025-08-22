@@ -3,12 +3,7 @@ import { SvgIcon } from "@mui/material";
 
 const ShareIcon = () => {
   return (
-    <SvgIcon
-      xmlns="http://www.w3.org/2000/svg"
-      width="20"
-      height="20"
-      viewBox="0 0 20 20"
-    >
+    <SvgIcon style={{ marginBottom: "-3px" }}>
       <path
         fill-rule="evenodd"
         clip-rule="evenodd"
