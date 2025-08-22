@@ -67,7 +67,10 @@ describe("MeasureActionCenter Component", () => {
   });
 
   it("should open action center on button click", () => {
-    (useFeatureFlags as jest.Mock).mockReturnValue({ ShareMeasure: true });
+    (useFeatureFlags as jest.Mock).mockReturnValue({
+      ShareMeasure: true,
+      MeasureHistory: true,
+    });
     render(
       <MeasureActionCenter
         canEdit={true}
@@ -272,6 +275,7 @@ describe("MeasureActionCenter Component", () => {
   });
 
   it("should render View History button", () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ MeasureHistory: true });
     render(
       <MeasureActionCenter
         canEdit={true}
@@ -283,6 +287,21 @@ describe("MeasureActionCenter Component", () => {
     userEvent.click(actionCenterButton);
     const viewHistoryButton = screen.getByTestId("ViewHistory");
     expect(viewHistoryButton).toBeInTheDocument();
+  });
+
+  it("should not render View History button when feature flag is disabled", () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ MeasureHistory: false });
+    render(
+      <MeasureActionCenter
+        canEdit={true}
+        measure={draftMeasure}
+        canDelete={false}
+      />
+    );
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+    const viewHistoryButton = screen.queryByTestId("ViewHistory");
+    expect(viewHistoryButton).toBeNull();
   });
 
   it("should render Share button if the user is the owner of the measure", () => {

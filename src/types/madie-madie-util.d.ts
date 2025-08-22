@@ -24,6 +24,7 @@ declare module "@madie/madie-util" {
       populationCriteriaTabs: boolean;
       importTestCases: boolean;
       qdm: boolean;
+      MeasureHistory: boolean;
     };
   }
 
@@ -36,6 +37,7 @@ declare module "@madie/madie-util" {
     ShareLibrary: boolean;
     importTestCases: boolean;
     ShareMeasure: boolean;
+    MeasureHistory: boolean;
   }
 
   export const cqlLibraryStore: {

@@ -102,15 +102,17 @@ const MeasureActionCenter = (props: PropTypes) => {
       onClick: () => handleActionClick(new Event("view-humanreadable")),
     });
 
-    actions.set("history", {
-      icon: (
-        <IconButton>
-          <HistoryIcon />
-        </IconButton>
-      ),
-      name: "View History",
-      onClick: () => {},
-    });
+    if (featureFlags?.MeasureHistory) {
+      actions.set("history", {
+        icon: (
+          <IconButton>
+            <HistoryIcon />
+          </IconButton>
+        ),
+        name: "View History",
+        onClick: () => {},
+      });
+    }
 
     actions.set("export measure", {
       icon: (
