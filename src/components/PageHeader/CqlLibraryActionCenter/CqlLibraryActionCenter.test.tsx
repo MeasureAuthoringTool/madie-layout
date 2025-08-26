@@ -1,10 +1,16 @@
 import * as React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import CqlLibraryActionCenter from "./CqlLibraryActionCenter";
-import { CqlLibrary, Model } from "@madie/madie-models";
+import { CqlLibrary, LibrarySet, Model } from "@madie/madie-models";
 import userEvent from "@testing-library/user-event";
 import { useFeatureFlags, routeHandlerStore } from "@madie/madie-util";
-import useCqlLibraryServiceApi from "../../../../api/useCqlLibraryServiceApi";
+
+const mockUser = "test user";
+
+const mockLibrarySet = {
+  librarySetId: "1-2-3-4",
+  owner: mockUser,
+} as unknown as LibrarySet;
 
 const cqlLibrary = {
   id: "622e1f46d1fd3729d861e6cb",
@@ -15,6 +21,7 @@ const cqlLibrary = {
   createdBy: null,
   lastModifiedAt: null,
   lastModifiedBy: null,
+  librarySet: mockLibrarySet,
 } as unknown as CqlLibrary;
 
 const versionedCqlLibrary = {
@@ -26,8 +33,8 @@ const versionedCqlLibrary = {
   createdBy: null,
   lastModifiedAt: null,
   lastModifiedBy: null,
+  librarySet: mockLibrarySet,
 } as unknown as CqlLibrary;
-const mockUser = "test user";
 jest.mock("../../../../api/useCqlLibraryServiceApi", () => ({
   __esModule: true,
   default: () => ({
@@ -69,6 +76,7 @@ describe("CqlLibraryActionCenter Component", () => {
   });
 
   it("should render delete and version library in action center when library is in draft status ", () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ TransferLibrary: true });
     render(
       <CqlLibraryActionCenter
         canEdit={true}
@@ -81,6 +89,7 @@ describe("CqlLibraryActionCenter Component", () => {
     expect(screen.queryByTestId("DeleteLibrary")).toBeInTheDocument();
     expect(screen.queryByTestId("VersionLibrary")).toBeInTheDocument();
     expect(screen.queryByTestId("DraftLibrary")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("transfer-action-btn")).toBeInTheDocument();
   });
 
   it("should render draft library in action center when library is in versioned status ", () => {
@@ -99,6 +108,7 @@ describe("CqlLibraryActionCenter Component", () => {
   });
 
   it("should open action center on button click", () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ TransferLibrary: true });
     render(
       <CqlLibraryActionCenter
         canEdit={true}
@@ -110,6 +120,7 @@ describe("CqlLibraryActionCenter Component", () => {
     userEvent.click(actionCenterButton);
     expect(screen.queryByTestId("DeleteLibrary")).not.toBeInTheDocument();
     expect(screen.queryByTestId("VersionLibrary")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("transfer-action-btn")).toBeInTheDocument();
   });
 
   it("should render 'Delete Library' button only for draft libraries when canEdit is true", () => {
@@ -247,5 +258,35 @@ describe("CqlLibraryActionCenter Component", () => {
     expect(dispatchEventSpy).toHaveBeenCalledWith(
       expect.objectContaining({ isTrusted: false }, { isTrusted: false })
     );
+  });
+
+  it("should not show Transfer Library when feature flag is not on", () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ TransferLibrary: false });
+    render(
+      <CqlLibraryActionCenter
+        canEdit={true}
+        library={versionedCqlLibrary}
+        canDelete={true}
+      />
+    );
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    userEvent.click(actionCenterButton);
+    expect(screen.queryByTestId("TransferLibrary")).not.toBeInTheDocument();
+  });
+
+  it("should display Transfer Library when library has different owner", () => {
+    const librarySet = { ...mockLibrarySet, owner: "anotherUser" };
+    const library = { ...cqlLibrary, librarySet: librarySet };
+    (useFeatureFlags as jest.Mock).mockReturnValue({ TransferLibrary: true });
+    render(
+      <CqlLibraryActionCenter
+        canEdit={true}
+        library={library}
+        canDelete={true}
+      />
+    );
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    userEvent.click(actionCenterButton);
+    expect(screen.queryByTestId("transfer-action-btn")).toBeInTheDocument();
   });
 });

@@ -20,12 +20,16 @@ import {
 } from "@madie/madie-util";
 import useCqlLibraryServiceApi from "../../../../api/useCqlLibraryServiceApi";
 import ShareIcon from "../shareAction/ShareIcon";
+import TransferAction from "../transferAction/TransferAction";
 
 interface PropTypes {
   canEdit: boolean;
   library: CqlLibrary;
   canDelete: boolean;
 }
+
+const TRANSFER_LIBRARY = "Transfer";
+const CANNOT_TRANSFER = "You cannot transfer a library you do not own.";
 
 const CqlLibraryActionCenter = (props: PropTypes) => {
   const [open, setOpen] = useState(false);
@@ -40,6 +44,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
   );
   const [shareAnchorEl, setShareAnchorEl] = useState<null | HTMLElement>(null);
   const shareMenuOpen = Boolean(shareAnchorEl);
+  const featureFlags = useFeatureFlags();
 
   useEffect(() => {
     const subscription = routeHandlerStore.subscribe(setRouteHandlerState);
@@ -154,8 +159,22 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
         });
       }
     }
+    if (featureFlags?.TransferLibrary) {
+      actions.set("transfer library", {
+        icon: (
+          <TransferAction
+            canTransfer={owner && owner == username}
+            onClick={() => {
+              handleActionClick(new Event("transfer-library"));
+            }}
+          />
+        ),
+        name: owner && owner == username ? TRANSFER_LIBRARY : CANNOT_TRANSFER,
+      });
+    }
     // required order to display
     const actionsListOrder = [
+      "transfer library",
       "draft library",
       "version library",
       "share library",
