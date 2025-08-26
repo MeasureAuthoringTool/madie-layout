@@ -69,6 +69,7 @@ describe("MeasureActionCenter Component", () => {
   it("should open action center on button click", () => {
     (useFeatureFlags as jest.Mock).mockReturnValue({
       ShareMeasure: true,
+      MeasureHistory: true,
       TransferMeasure: true,
     });
     render(
@@ -87,6 +88,7 @@ describe("MeasureActionCenter Component", () => {
     expect(draftMeasureBtn).toBeInTheDocument();
     expect(screen.getByTestId("ExportMeasure")).toBeInTheDocument();
     expect(screen.getByTestId("Viewhumanreadable")).toBeInTheDocument();
+    expect(screen.getByTestId("ViewHistory")).toBeInTheDocument();
     expect(screen.getByTestId("Transfer")).toBeInTheDocument();
 
     userEvent.click(draftMeasureBtn);
@@ -313,6 +315,36 @@ describe("MeasureActionCenter Component", () => {
         type: "view-humanreadable",
       })
     );
+  });
+
+  it("should render View History button", () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ MeasureHistory: true });
+    render(
+      <MeasureActionCenter
+        canEdit={true}
+        measure={draftMeasure}
+        canDelete={false}
+      />
+    );
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+    const viewHistoryButton = screen.getByTestId("ViewHistory");
+    expect(viewHistoryButton).toBeInTheDocument();
+  });
+
+  it("should not render View History button when feature flag is disabled", () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ MeasureHistory: false });
+    render(
+      <MeasureActionCenter
+        canEdit={true}
+        measure={draftMeasure}
+        canDelete={false}
+      />
+    );
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+    const viewHistoryButton = screen.queryByTestId("ViewHistory");
+    expect(viewHistoryButton).toBeNull();
   });
 
   it("should render Share button if the user is the owner of the measure", () => {

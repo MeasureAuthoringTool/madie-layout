@@ -3,9 +3,9 @@ import { SpeedDial, SpeedDialAction, IconButton } from "@mui/material";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import EditCalendarOutlinedIcon from "@mui/icons-material/EditCalendarOutlined";
 import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
+import HistoryIcon from "@mui/icons-material/History";
 import { MadieDiscardDialog } from "@madie/madie-design-system/dist/react";
 import { Measure } from "@madie/madie-models";
-import { blue, red } from "@mui/material/colors";
 import {
   RouteHandlerState,
   routeHandlerStore,
@@ -105,6 +105,19 @@ const MeasureActionCenter = (props: PropTypes) => {
         : `Save measure to view human readable`,
       onClick: () => handleActionClick(new Event("view-humanreadable")),
     });
+
+    if (featureFlags?.MeasureHistory) {
+      actions.set("history", {
+        icon: (
+          <IconButton>
+            <HistoryIcon />
+          </IconButton>
+        ),
+        name: "View History",
+        onClick: () => {},
+      });
+    }
+
     actions.set("export measure", {
       icon: (
         <ExportAction
@@ -193,6 +206,7 @@ const MeasureActionCenter = (props: PropTypes) => {
     const actionsListOrder = [
       "transfer measure",
       "human readable",
+      "history",
       "draft measure",
       "version measure",
       "share/unshare measure",

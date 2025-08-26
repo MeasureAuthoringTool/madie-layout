@@ -24,6 +24,7 @@ declare module "@madie/madie-util" {
       populationCriteriaTabs: boolean;
       importTestCases: boolean;
       qdm: boolean;
+      MeasureHistory: boolean;
     };
   }
 
@@ -39,6 +40,7 @@ declare module "@madie/madie-util" {
     qiCore7: boolean;
     TransferMeasure: boolean;
     TransferLibrary: boolean;
+    MeasureHistory: boolean;
   }
 
   export const cqlLibraryStore: {
