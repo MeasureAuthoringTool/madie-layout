@@ -9,6 +9,15 @@ jest.mock("@okta/okta-react", () => ({
   useOktaAuth: jest.fn(),
 }));
 
+jest.mock("@madie/madie-util", () => ({
+  useMeasureServiceApi: () => ({
+    getUserInfo: jest.fn().mockResolvedValue({}),
+  }),
+  useCqlLibraryServiceApi: () => ({
+    getUserInfo: jest.fn().mockResolvedValue({}),
+  }),
+}));
+
 const mockLogoutLogger = jest.fn((args) => {
   Promise.resolve("logged");
 });

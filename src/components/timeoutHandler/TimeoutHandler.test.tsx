@@ -12,7 +12,14 @@ import { describe, expect, test } from "@jest/globals";
 import { useOktaAuth } from "@okta/okta-react";
 
 jest.mock("@okta/okta-react");
-
+jest.mock("@madie/madie-util", () => ({
+  useMeasureServiceApi: () => ({
+    getUserInfo: jest.fn().mockResolvedValue({}),
+  }),
+  useCqlLibraryServiceApi: () => ({
+    getUserInfo: jest.fn().mockResolvedValue({}),
+  }),
+}));
 describe("Timeout Handler", () => {
   const mockRenewToken = jest.fn();
   const mockRefreshSession = jest.fn().mockResolvedValue(true);

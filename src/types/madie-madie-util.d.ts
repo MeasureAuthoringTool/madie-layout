@@ -109,7 +109,18 @@ declare module "@madie/madie-util" {
     logoutUMLS(): Promise<Boolean>;
   }
   export function useTerminologyServiceApi(): TerminologyServiceApi;
+  export class MeasureServiceApi {
+    constructor(baseUrl: string, getAccessToken: () => string);
+    fetchMeasure(id: string): Promise<Measure>;
+    unlockMeasures(): Promise<String>;
+  }
 
+  export class CqlLibraryServiceApi {
+    constructor(baseUrl: string, getAccessToken: () => string);
+    unlockLibraries(): Promise<String>;
+  }
+  export function useMeasureServiceApi(): Promise<MeasureServiceApi>;
+  export function useCqlLibraryServiceApi(): Promise<CqlLibraryServiceApi>;
   export function useDocumentTitle(
     title: string,
     prevailOnMount?: boolean
