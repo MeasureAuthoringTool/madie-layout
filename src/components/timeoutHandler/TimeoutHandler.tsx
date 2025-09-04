@@ -22,7 +22,7 @@ export interface timeoutPropTypes {
   timeLeft: number;
 }
 
-const TimeoutHandler = ({ timeLeft = 1000, warningTime = 500 }) => {
+const TimeoutHandler = ({ timeLeft = 10000, warningTime = 5000 }) => {
   // check if component is mounted before memory leak
   const mounted = useRef(false);
   useEffect(() => {
