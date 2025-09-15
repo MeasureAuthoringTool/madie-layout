@@ -1,44 +1,34 @@
 import * as React from "react";
 import { waitFor } from "@testing-library/react";
-import customLog, {
-  getServiceUrl,
-  loginLogger,
-  logoutLogger,
-} from "./customLog";
-import { ServiceConfig } from "./getServiceConfig";
-import axios from "../../api/axios-instance";
-
-jest.mock("../../api/axios-instance");
-
+import customLog, { loginLogger, logoutLogger } from "./customLog";
+import { ServiceConfig, axios } from "@madie/madie-util";
 const mockConfig: ServiceConfig = {
   loggingService: {
     baseUrl: "url",
   },
 };
 
-jest.mock("./getServiceConfig", () => {
-  return {
-    getServiceConfig: jest.fn(() => Promise.resolve(mockConfig)),
-  };
-});
+jest.mock("@madie/madie-util", () => ({
+  axios: {
+    get: jest.fn(),
+    post: jest.fn(),
+  },
+  getServiceConfig: jest.fn(() => Promise.resolve(mockConfig)),
+  useServiceConfig: jest.fn(() => mockConfig),
+}));
 
 describe("Custom Log", () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it("should retrieve the service url", async () => {
-    const actual = await getServiceUrl();
-    expect(actual).toBe("url");
-  });
-
   it("should do logging", async () => {
-    await customLog("test", "login");
+    await customLog("test", "login", mockConfig);
     expect(axios.post).toBeCalledTimes(1);
   });
 
   it("should not do logging", async () => {
-    await customLog("", "login");
+    await customLog("", "login", mockConfig);
     expect(axios.post).toBeCalledTimes(0);
   });
 
@@ -50,7 +40,7 @@ describe("Custom Log", () => {
         }),
       };
     });
-    await loginLogger("test");
+    await loginLogger("test", mockConfig);
     waitFor(() => expect(mockCustomLog).toHaveBeenCalled());
   });
 
@@ -62,7 +52,7 @@ describe("Custom Log", () => {
         }),
       };
     });
-    await logoutLogger("test");
+    await logoutLogger("test", mockConfig);
     waitFor(() => expect(mockCustomLog).toHaveBeenCalled());
   });
 });

@@ -14,13 +14,12 @@ import {
 } from "@madie/madie-design-system/dist/react";
 import { Box } from "@mui/system";
 import {
-  wafIntercept,
-  getServiceConfig,
+  axios,
+  useServiceConfig as getServiceConfig,
   ServiceConfig,
   useOktaTokens,
   useFeatureFlags,
 } from "@madie/madie-util";
-import axios from "../../../api/axios-instance";
 import {
   Checkbox,
   FormControlLabel,
@@ -75,7 +74,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
   }
 
   async function createMeasure(measure: Measure) {
-    const config: ServiceConfig = await getServiceConfig();
+    const config: ServiceConfig = getServiceConfig();
 
     measure.measureSetId = uuidv4();
     measure.versionId = uuidv4();

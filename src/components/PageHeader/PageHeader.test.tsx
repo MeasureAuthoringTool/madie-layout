@@ -1,4 +1,4 @@
-import "@testing-library/jest-dom";
+import "@testing-library/jest-dom/extend-expect";
 import * as React from "react";
 import {
   screen,
@@ -12,10 +12,10 @@ import { act, Simulate } from "react-dom/test-utils";
 import { describe, expect, test } from "@jest/globals";
 import userEvent from "@testing-library/user-event";
 import { mockLibraryName, mockMeasureName } from "../NewMeasure/bulkCreate";
-import axios from "../../../api/axios-instance";
+import { axios, useServiceConfig } from "@madie/madie-util";
 import PageHeader from "../PageHeader/PageHeader";
 import { Model } from "@madie/madie-models/dist/Model";
-import useGetServiceConfig from "../../../config/useGetServiceConfig";
+import useGetServiceConfig from "../../config/useGetServiceConfig";
 
 // First, define all mock data
 const mockLib = mockLibraryName();
@@ -57,6 +57,10 @@ const mockFormikInfo = {
 
 // Then, define all mocks
 jest.mock("@madie/madie-util", () => ({
+  axios: {
+    get: jest.fn(),
+    post: jest.fn(),
+  },
   getServiceConfig: () => ({
     measureService: {
       baseUrl: "example-service-url",
@@ -64,6 +68,19 @@ jest.mock("@madie/madie-util", () => ({
     cqlLibraryService: {
       baseUrl: "test-cql-library-service-url",
     },
+  }),
+  useServiceConfig: () => ({
+    measureService: {
+      baseUrl: "example-service-url",
+    },
+    cqlLibraryService: {
+      baseUrl: "test-cql-library-service-url",
+      fetchAllOwners: jest.fn().mockResolvedValue(["owner1", "owner2"]),
+    },
+  }),
+  useCqlLibraryServiceApi: () => ({
+    fetchAllLibraries: jest.fn().mockResolvedValue(["library1"]),
+    fetchAllOwners: jest.fn().mockResolvedValue(["owner1"]),
   }),
   routeHandlerStore: {
     updateRouteHandlerState: jest.fn(),
@@ -113,7 +130,7 @@ jest.mock("@madie/madie-util", () => ({
   checkUserCanDelete: jest.fn().mockImplementation(() => true),
 }));
 
-jest.mock("../../../config/useGetServiceConfig");
+jest.mock("../../config/useGetServiceConfig");
 const useGetServiceConfigMock = useGetServiceConfig as jest.Mock;
 useGetServiceConfigMock.mockImplementation(() => {
   return {
@@ -129,23 +146,39 @@ useGetServiceConfigMock.mockImplementation(() => {
   };
 });
 
-jest.mock("../../../api/useCqlLibraryServiceApi", () => ({
-  __esModule: true,
-  default: () => ({
-    fetchAllOwners: jest.fn().mockResolvedValue(["owner1"]),
-  }),
-}));
-
-jest.mock("../../../api/axios-instance");
-const mockedAxios = axios as jest.Mocked<typeof axios>;
 let postData: object = { status: 201 };
 let getData: object = { status: 200 };
-mockedAxios.post.mockResolvedValueOnce(postData);
+axios.post.mockResolvedValueOnce(postData);
 const { findByTestId, queryByText, queryByTestId, getByTestId } = screen;
 
 describe("Page Header and Dialogs", () => {
+  jest.mock("@madie/madie-util", () => ({
+    useCqlLibraryServiceApi: () => ({
+      fetchAllLibraries: jest.fn().mockResolvedValue(["library1"]),
+      fetchAllOwners: jest.fn().mockResolvedValue(["owner1"]),
+    }),
+    getServiceConfig: () => ({
+      measureService: {
+        baseUrl: "example-service-url",
+      },
+    }),
+
+    measureStore: {
+      state: mockFormikInfo,
+      initialState: mockFormikInfo,
+      subscribe: (set) => {
+        set(mockFormikInfo);
+        return { unsubscribe: () => null };
+      },
+      unsubscribe: () => null,
+    },
+    useOktaTokens: () => ({
+      getAccessToken: () => "test.jwt",
+      getUserName: () => mockUser,
+    }),
+  }));
   beforeEach(() => {
-    mockedAxios.get.mockResolvedValueOnce(getData);
+    axios.get.mockResolvedValueOnce(getData);
   });
   afterEach(() => {
     jest.clearAllMocks();
@@ -187,6 +220,7 @@ describe("Page Header and Dialogs", () => {
       expect(queryByText("QI-Core v4.1.1")).toBeInTheDocument();
     });
     await waitFor(() => {
+      screen.debug();
       expect(queryByText("Draft")).toBeInTheDocument();
     });
   });
@@ -331,7 +365,7 @@ describe("Page Header and Dialogs", () => {
     });
   });
 
-  test("our submission works as intended", async () => {
+  test.only("our submission works as intended", async () => {
     await act(async () => {
       render(
         <MemoryRouter
@@ -416,7 +450,7 @@ describe("Page Header and Dialogs", () => {
       });
       fireEvent.click(submitButton);
       await waitFor(() => {
-        expect(mockedAxios.post).toHaveBeenCalled(),
+        expect(axios.post).toHaveBeenCalled(),
           {
             timeout: 5000,
           };
@@ -429,7 +463,7 @@ describe("Page Header and Dialogs", () => {
 
   // same values aside from mockReject
   test("our submission fails as with generic error message", async () => {
-    mockedAxios.post.mockRejectedValueOnce({
+    axios.post.mockRejectedValueOnce({
       response: {
         data: {
           message: "a message",
@@ -513,7 +547,7 @@ describe("Page Header and Dialogs", () => {
     });
     fireEvent.click(submitButton);
     await waitFor(() => {
-      expect(mockedAxios.post).toHaveBeenCalled(),
+      expect(axios.post).toHaveBeenCalled(),
         {
           timeout: 5000,
         };
@@ -530,7 +564,7 @@ describe("Page Header and Dialogs", () => {
 
   // same values as above aside from error.
   test("our submission fails with an error class error message", async () => {
-    mockedAxios.post.mockRejectedValueOnce({
+    axios.post.mockRejectedValueOnce({
       response: {
         data: {
           message: "server error:",
@@ -614,7 +648,7 @@ describe("Page Header and Dialogs", () => {
       });
       fireEvent.click(submitButton);
       await waitFor(() => {
-        expect(mockedAxios.post).toHaveBeenCalled(),
+        expect(axios.post).toHaveBeenCalled(),
           {
             timeout: 5000,
           };
@@ -655,28 +689,6 @@ describe("Page Header and Dialogs", () => {
   });
 
   test("On measure edit page measureState is updated and links are rendered, ", async () => {
-    jest.mock("@madie/madie-util", () => ({
-      getServiceConfig: () => ({
-        measureService: {
-          baseUrl: "example-service-url",
-        },
-      }),
-
-      measureStore: {
-        state: mockFormikInfo,
-        initialState: mockFormikInfo,
-        subscribe: (set) => {
-          set(mockFormikInfo);
-          return { unsubscribe: () => null };
-        },
-        unsubscribe: () => null,
-      },
-      useOktaTokens: () => ({
-        getAccessToken: () => "test.jwt",
-        getUserName: () => mockUser,
-      }),
-    }));
-
     render(
       <MemoryRouter
         initialEntries={[

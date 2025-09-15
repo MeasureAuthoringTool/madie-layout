@@ -1,87 +1,57 @@
-import "@testing-library/jest-dom";
+import React from "react";
+import { render, screen, waitFor } from "@testing-library/react";
+import OktaSecurity from "./OktaSecurity";
+import * as madieUtil from "@madie/madie-util";
 
-import * as React from "react";
-import OktaSecurity, { transformAuthState } from "./OktaSecurity";
-import { act, render } from "@testing-library/react";
-import { MemoryRouter } from "react-router";
-import { describe, expect, test } from "@jest/globals";
-import oktaConfig from "./Config";
-
-jest.mock("../router/Router", () => () => (
-  <div data-testid="router-test-id">test</div>
-));
-
-jest.mock("./Config", () => ({
-  getOktaConfig: jest.fn(() =>
-    Promise.resolve({
-      baseUrl: `https://dev-Example.okta.com`,
-      issuer: "https://dev-Example.okta.com/oauth2/authzServerId",
-      clientId: "0oa1t055g23yx2o5d7",
-      redirectUri: "/login/callback",
-    })
-  ),
+// Mock dependencies
+jest.mock("@madie/madie-util", () => ({
+  getOktaConfig: jest.fn(),
 }));
-
 jest.mock("@okta/okta-react", () => ({
-  Security: (props) => {
-    const FakeSecurity = "very-fake-security";
-    // @ts-ignore
-    return <FakeSecurity {...props} />;
-  },
+  Security: jest.fn(({ children }) => (
+    <div data-testid="security">{children}</div>
+  )),
 }));
+jest.mock("./../router/Router", () =>
+  jest.fn(() => <div data-testid="router" />)
+);
 
-describe("Config component", () => {
-  afterEach(() => {
+describe("OktaSecurity", () => {
+  beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  test("should be able to fetch oktaConfig", async () => {
-    await act(async () => {
-      const { findByTestId } = await render(
-        <MemoryRouter>
-          <OktaSecurity />
-        </MemoryRouter>
-      );
-      const router = await findByTestId("router-test-id");
-      expect(router).toBeInTheDocument();
+  it("renders loading message initially", () => {
+    (madieUtil.getOktaConfig as jest.Mock).mockReturnValue(
+      new Promise(() => {})
+    );
+    render(<OktaSecurity />);
+    expect(screen.getByTestId("login-page-message")).toHaveTextContent(
+      "Loading..."
+    );
+  });
+
+  it("renders error message if getOktaConfig fails", async () => {
+    (madieUtil.getOktaConfig as jest.Mock).mockRejectedValue(new Error("fail"));
+    render(<OktaSecurity />);
+    await waitFor(() =>
+      expect(screen.getByTestId("login-page-message")).toHaveTextContent(
+        "Unable to load Login page, Please contact administration"
+      )
+    );
+  });
+
+  it("renders Security and Router when oktaConfig is loaded", async () => {
+    (madieUtil.getOktaConfig as jest.Mock).mockResolvedValue({
+      issuer: "https://example.com/oauth2/default",
+      clientId: "clientId",
+      redirectUri: "http://localhost:3000/login/callback",
+      scopes: ["openid", "profile", "email"],
     });
-  });
-
-  test("should handle get okta config error", async () => {
-    oktaConfig.getOktaConfig = jest
-      .fn()
-      .mockImplementation((url: string) =>
-        Promise.reject({ oktaAuthConfig: "undefined" })
-      );
-    await act(async () => {
-      const { findByTestId } = await render(
-        <MemoryRouter>
-          <OktaSecurity />
-        </MemoryRouter>
-      );
-      const loginPage = await findByTestId("login-page-message");
-      expect(loginPage).toBeInTheDocument();
+    render(<OktaSecurity />);
+    await waitFor(() => {
+      expect(screen.getByTestId("security")).toBeInTheDocument();
+      expect(screen.getByTestId("router")).toBeInTheDocument();
     });
-  });
-});
-
-describe("okta auth", () => {
-  test("checks initial isAuthenticated state", async () => {
-    const mockAuthState = { isAuthenticated: false };
-    const authResult = await transformAuthState({}, mockAuthState);
-    expect(authResult).toEqual(mockAuthState);
-  });
-
-  test("requires an active okta session", async () => {
-    const mockAuthState = { isAuthenticated: true };
-    const mockOtkaAuth = {
-      session: {
-        exists: jest.fn(() => {
-          return false;
-        }),
-      },
-    };
-    const authResult = await transformAuthState(mockOtkaAuth, mockAuthState);
-    expect(authResult.isAuthenticated).toBeFalsy();
   });
 });

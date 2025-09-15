@@ -7,8 +7,8 @@ import CreateNewMeasureDialog from "../NewMeasure/CreateNewMeasureDialog";
 import WafDialog from "../WafDialog/WafDialog";
 import MeasureActionCenter from "./MeasureActionCenter/MeasureActionCenter";
 import { Button } from "@madie/madie-design-system/dist/react";
-import { ApiContextProvider } from "../../../api/ServiceContext";
-import useGetServiceConfig from "../../../config/useGetServiceConfig";
+
+import useGetServiceConfig from "../../config/useGetServiceConfig";
 import {
   measureStore,
   cqlLibraryStore,
@@ -16,11 +16,11 @@ import {
   checkUserCanEdit,
   useFeatureFlags,
   checkUserCanDelete,
+  axios,
 } from "@madie/madie-util";
 import "twin.macro";
 import "styled-components/macro";
 import "./pageHeader.scss";
-import axios from "../../../api/axios-instance";
 import { useIsOverflow } from "./useIsOverflow";
 import CqlLibraryActionCenter from "./CqlLibraryActionCenter/CqlLibraryActionCenter";
 
@@ -254,13 +254,11 @@ const PageHeader = () => {
             {libraryCanEdit && (
               <div tw="pr-8" style={{ position: "relative" }}>
                 <div style={{ position: "absolute", top: 0, right: 0 }}>
-                  <ApiContextProvider value={config}>
-                    <CqlLibraryActionCenter
-                      canEdit={libraryCanEdit}
-                      library={libraryState}
-                      canDelete={libraryCanDelete}
-                    />
-                  </ApiContextProvider>
+                  <CqlLibraryActionCenter
+                    canEdit={libraryCanEdit}
+                    library={libraryState}
+                    canDelete={libraryCanDelete}
+                  />
                 </div>
               </div>
             )}

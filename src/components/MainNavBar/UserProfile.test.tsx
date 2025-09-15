@@ -12,9 +12,28 @@ jest.mock("@okta/okta-react", () => ({
 jest.mock("@madie/madie-util", () => ({
   useMeasureServiceApi: () => ({
     getUserInfo: jest.fn().mockResolvedValue({}),
+    unlockMeasures: jest.fn().mockResolvedValue({}),
   }),
   useCqlLibraryServiceApi: () => ({
     getUserInfo: jest.fn().mockResolvedValue({}),
+  }),
+
+  getServiceConfig: () => ({
+    measureService: {
+      baseUrl: "example-service-url",
+    },
+    cqlLibraryService: {
+      baseUrl: "test-cql-library-service-url",
+    },
+  }),
+  useServiceConfig: () => ({
+    measureService: {
+      baseUrl: "example-service-url",
+    },
+    cqlLibraryService: {
+      baseUrl: "test-cql-library-service-url",
+      fetchAllOwners: jest.fn().mockResolvedValue(["owner1", "owner2"]),
+    },
   }),
 }));
 

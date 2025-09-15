@@ -26,13 +26,6 @@ const TimeoutHandler = ({ timeLeft = 10000, warningTime = 5000 }) => {
   // check if component is mounted before memory leak
   const mounted = useRef(false);
   useEffect(() => {
-    const setRef = async () => {
-      //eslint-disable-next-line
-      measureServiceApiRef.current = await useMeasureServiceApi();
-      //eslint-disable-next-line
-      cqlLibraryServiceApiRef.current = await useCqlLibraryServiceApi();
-    };
-    setRef();
     mounted.current = true;
     return () => {
       mounted.current = false;
@@ -43,8 +36,8 @@ const TimeoutHandler = ({ timeLeft = 10000, warningTime = 5000 }) => {
   const logoutTimeoutRef = useRef<any>(null);
   const [timingOut, setTimingOut] = useState<boolean>(false);
   const { oktaAuth } = useOktaAuth();
-  const measureServiceApiRef = useRef(null);
-  const cqlLibraryServiceApiRef = useRef(null);
+  const measureServiceApiRef = useRef(useMeasureServiceApi());
+  const cqlLibraryServiceApiRef = useRef(useCqlLibraryServiceApi());
   const timeoutCallBack = () => {
     if (mounted.current) {
       if (localStorage.getItem("madieDebug") || (window as any).madieDebug) {

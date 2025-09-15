@@ -8,6 +8,8 @@ import { MenuItem } from "@mui/material";
 import {
   useMeasureServiceApi,
   useCqlLibraryServiceApi,
+  useServiceConfig,
+  ServiceConfig,
 } from "@madie/madie-util";
 const FormControl = styled.section(() => ({
   marginLeft: "10px",
@@ -17,17 +19,9 @@ function UserProfile() {
   const { oktaAuth } = useOktaAuth();
   const [userInfo, setUserInfo] = useState(null);
   const [userFirstName, setUserFirstName] = useState<string>("");
-  const measureServiceApiRef = useRef(null);
-  const cqlLibraryServiceApiRef = useRef(null);
+  const measureServiceApiRef = useRef(useMeasureServiceApi());
+  const cqlLibraryServiceApiRef = useRef(useCqlLibraryServiceApi());
   useEffect(() => {
-    const setRef = async () => {
-      //eslint-disable-next-line
-      measureServiceApiRef.current = await useMeasureServiceApi();
-      //eslint-disable-next-line
-      cqlLibraryServiceApiRef.current = await useCqlLibraryServiceApi();
-    };
-    setRef();
-
     window.localStorage.removeItem("givenName");
     oktaAuth.token
       .getUserInfo()
@@ -40,8 +34,11 @@ function UserProfile() {
       .catch((error) => {});
   }, [oktaAuth.token]);
 
+  const [config, setConfig] = useState<ServiceConfig>(useServiceConfig());
+
   const logout = async () => {
-    logoutLogger(userInfo);
+    //breaks because logoutLogger is using a hook
+    logoutLogger(userInfo, config);
     try {
       await measureServiceApiRef.current.unlockMeasures();
       await cqlLibraryServiceApiRef.current.unlockLibraries();
