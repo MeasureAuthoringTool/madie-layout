@@ -114,7 +114,9 @@ const MeasureActionCenter = (props: PropTypes) => {
           </IconButton>
         ),
         name: "View History",
-        onClick: () => {},
+        onClick: () => {
+          handleActionClick(new Event("view-measure-history"));
+        },
       });
     }
 
