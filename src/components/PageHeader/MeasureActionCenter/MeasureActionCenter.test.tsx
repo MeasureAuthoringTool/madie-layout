@@ -522,4 +522,49 @@ describe("MeasureActionCenter Component", () => {
     expect(screen.getByTestId("ExportMeasure")).toBeInTheDocument();
     expect(screen.getByTestId("Transfer")).toBeInTheDocument();
   });
+
+  it("should render 'View History' action when MeasureHistory feature flag is enabled", () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ MeasureHistory: true });
+    render(
+      <MeasureActionCenter
+        canEdit={true}
+        measure={draftMeasure}
+        canDelete={false}
+      />
+    );
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+    expect(screen.getByTestId("ViewHistory")).toBeInTheDocument();
+  });
+
+  it("should not render 'View History' action when MeasureHistory feature flag is disabled", () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ MeasureHistory: false });
+    render(
+      <MeasureActionCenter
+        canEdit={true}
+        measure={draftMeasure}
+        canDelete={false}
+      />
+    );
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+    expect(screen.queryByTestId("ViewHistory")).toBeNull();
+  });
+
+  it("should dispatch 'view-measure-history' event when 'View History' action is clicked", () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ MeasureHistory: true });
+    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+    render(
+      <MeasureActionCenter
+        canEdit={true}
+        measure={draftMeasure}
+        canDelete={false}
+      />
+    );
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+    const viewHistoryButton = screen.getByTestId("ViewHistory");
+    userEvent.click(viewHistoryButton);
+    expect(screen.getByTestId("ViewHistory")).toBeInTheDocument();
+  });
 });
