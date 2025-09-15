@@ -42,7 +42,7 @@ function Router({ props }) {
       <Route
         path=""
         element={
-          <LayoutWrapper config={config}>
+          <LayoutWrapper>
             <Outlet />
             {authenticated === false && <Navigate to="login" />}
           </LayoutWrapper>

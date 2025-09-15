@@ -14,6 +14,7 @@ const LayoutWrapper = ({ children }) => {
     <ThemeProvider theme={theme}>
       <div className="layout-wrapper">
         <MainNavBar />
+
         <PageHeader />
         <RouteChangeHandler />
         <div id="page-content">{children}</div>

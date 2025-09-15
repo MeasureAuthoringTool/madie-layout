@@ -10,15 +10,14 @@ import {
   Select,
   TextField,
   Toast,
-  MadieAlert,
 } from "@madie/madie-design-system/dist/react";
 import { Box } from "@mui/system";
 import {
   axios,
-  useServiceConfig as getServiceConfig,
   ServiceConfig,
   useOktaTokens,
   useFeatureFlags,
+  useServiceConfig as getServiceConfig,
 } from "@madie/madie-util";
 import {
   Checkbox,
@@ -40,6 +39,9 @@ interface Toast {
 
 const CreateNewMeasureDialog = ({ open, onClose }) => {
   const { getAccessToken } = useOktaTokens();
+  const [config, setConfig] = useState<ServiceConfig | null>(
+    getServiceConfig()
+  );
   const [toast, setToast] = useState<Toast>({
     toastOpen: false,
     toastType: "danger",
@@ -72,10 +74,15 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
     // remove QI-Core 7.0.0 from model options if the feature flag is not enabled
     modelOptions = modelOptions.filter((model) => model !== "QICORE_7_0_0");
   }
-
   async function createMeasure(measure: Measure) {
-    const config: ServiceConfig = getServiceConfig();
-
+    if (!config) {
+      setToast({
+        toastOpen: true,
+        toastType: "danger",
+        toastMessage: "Service configuration is not available.",
+      });
+      return;
+    }
     measure.measureSetId = uuidv4();
     measure.versionId = uuidv4();
     if (measure.model === Model.QDM_5_6) {
