@@ -36,12 +36,6 @@ const versionedCqlLibrary = {
   lastModifiedBy: null,
   librarySet: mockLibrarySet,
 } as unknown as CqlLibrary;
-jest.mock("../../../../api/useCqlLibraryServiceApi", () => ({
-  __esModule: true,
-  default: () => ({
-    fetchAllOwners: jest.fn().mockResolvedValue(["test user"]),
-  }),
-}));
 
 jest.mock("@madie/madie-util", () => ({
   useFeatureFlags: jest.fn().mockReturnValue({}),
@@ -53,6 +47,10 @@ jest.mock("@madie/madie-util", () => ({
     state: { canTravel: true, pendingPath: "" },
     initialState: { canTravel: false, pendingPath: "" },
   },
+  useCqlLibraryServiceApi: () => ({
+    fetchAllLibraries: jest.fn().mockResolvedValue(["library1"]),
+    fetchAllOwners: jest.fn().mockResolvedValue(["test user"]),
+  }),
   useOktaTokens: () => ({
     getAccessToken: () => "test.jwt",
     getUserName: () => mockUser,

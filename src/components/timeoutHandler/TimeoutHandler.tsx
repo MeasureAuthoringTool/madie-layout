@@ -13,6 +13,10 @@ import {
   DialogContentText,
 } from "@mui/material";
 import { useOktaAuth } from "@okta/okta-react";
+import {
+  useMeasureServiceApi,
+  useCqlLibraryServiceApi,
+} from "@madie/madie-util";
 
 export interface timeoutPropTypes {
   timeLeft: number;
@@ -32,6 +36,8 @@ const TimeoutHandler = ({ timeLeft = 10000, warningTime = 5000 }) => {
   const logoutTimeoutRef = useRef<any>(null);
   const [timingOut, setTimingOut] = useState<boolean>(false);
   const { oktaAuth } = useOktaAuth();
+  const measureServiceApiRef = useRef(useMeasureServiceApi());
+  const cqlLibraryServiceApiRef = useRef(useCqlLibraryServiceApi());
   const timeoutCallBack = () => {
     if (mounted.current) {
       if (localStorage.getItem("madieDebug") || (window as any).madieDebug) {
@@ -47,6 +53,12 @@ const TimeoutHandler = ({ timeLeft = 10000, warningTime = 5000 }) => {
           console.log(
             `[${new Date()}] - User has timed out due to inactivity. Initiating logout.`
           );
+        }
+        try {
+          await measureServiceApiRef.current.unlockMeasures();
+          await cqlLibraryServiceApiRef.current.unlockLibraries();
+        } catch (error) {
+          console.error("Error unlocking measures for user", error);
         }
         await oktaAuth.signOut();
       }, warningTime);

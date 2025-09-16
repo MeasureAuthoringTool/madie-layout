@@ -15,10 +15,13 @@ import NotFound from "../components/notfound/NotFound";
 import "../styles/LayoutStyles.scss";
 import TimeoutHandler from "../components/timeoutHandler/TimeoutHandler";
 import LayoutWrapper from "./LayoutWrapper";
+import useGetServiceConfig from "../config/useGetServiceConfig";
+import { ApiContextProvider } from "@madie/madie-util";
 
 function Router({ props }) {
   const { authState } = useOktaAuth();
   const authenticated = authState?.isAuthenticated;
+  const { config, error } = useGetServiceConfig();
   /*
     On initial page load we want to trigger a hard refresh because single spa loads the apps sequentially based on what contains what
     This init pattern pattern influences tab order so we need to refresh on first login.
@@ -61,10 +64,15 @@ function Router({ props }) {
 
   return (
     <div>
-      {authenticated && (
-        <TimeoutHandler timeLeft={25 * 60 * 1000} warningTime={5 * 60 * 1000} />
-      )}
-      <RouterProvider router={BrowserRouter} key={firstLogin ? 1 : 2} />
+      <ApiContextProvider value={config}>
+        {authenticated && (
+          <TimeoutHandler
+            timeLeft={25 * 60 * 1000}
+            warningTime={5 * 60 * 1000}
+          />
+        )}
+        <RouterProvider router={BrowserRouter} key={firstLogin ? 1 : 2} />
+      </ApiContextProvider>
     </div>
   );
 }

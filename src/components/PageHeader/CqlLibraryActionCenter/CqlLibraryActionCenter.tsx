@@ -17,8 +17,8 @@ import {
   routeHandlerStore,
   useOktaTokens,
   useFeatureFlags,
+  useCqlLibraryServiceApi,
 } from "@madie/madie-util";
-import useCqlLibraryServiceApi from "../../../../api/useCqlLibraryServiceApi";
 import ShareIcon from "../shareAction/ShareIcon";
 import SwapVertOutlinedIcon from "@mui/icons-material/SwapVertOutlined";
 

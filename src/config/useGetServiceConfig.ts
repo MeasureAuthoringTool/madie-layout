@@ -1,27 +1,5 @@
-import axios from "../api/axios-instance";
 import { useEffect, useState } from "react";
-
-export interface OktaConfig {
-  baseUrl: string;
-  issuer: string;
-  clientId: string;
-  redirectUri: string;
-}
-
-export interface ServiceConfig {
-  measureService: {
-    baseUrl: string;
-  };
-  elmTranslationService: {
-    baseUrl: string;
-  };
-  cqlLibraryService: {
-    baseUrl: string;
-  };
-  terminologyService: {
-    baseUrl: string;
-  };
-}
+import { ServiceConfig, axios } from "@madie/madie-util";
 
 const useGetServiceConfig = () => {
   const [config, setConfig] = useState<ServiceConfig | null>(null);

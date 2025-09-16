@@ -1,9 +1,9 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
 import { LoginWidget } from "@madie/madie-auth";
+import { useDocumentTitle } from "@madie/madie-util";
 import { useOktaAuth } from "@okta/okta-react";
 import { loginLogger } from "../../custom-hooks/customLog";
-import { useDocumentTitle } from "@madie/madie-util";
 
 function Login({ config }) {
   useDocumentTitle("MADiE Login");
@@ -18,7 +18,7 @@ function Login({ config }) {
           oktaAuth.token
             .getUserInfo()
             .then((info) => {
-              loginLogger(info);
+              loginLogger(info, config);
             })
             .catch((error) => {});
         }

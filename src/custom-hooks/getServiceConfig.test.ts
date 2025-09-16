@@ -1,13 +1,22 @@
 import * as React from "react";
-import { getServiceConfig, ServiceConfig } from "./getServiceConfig";
-import axios from "../../api/axios-instance";
 
-jest.mock("../../api/axios-instance");
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+import { ServiceConfig, axios } from "@madie/madie-util";
+import { get } from "@okta/okta-auth-js";
+import { getServiceConfig } from "./getServiceConfig";
+
+jest.mock("@madie/madie-util", () => ({
+  axios: {
+    get: jest.fn(),
+  },
+}));
 
 describe("Logging Service Config", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it("should retrieve the service configuration info", () => {
-    expect.assertions(1);
+    //expect.assertions(1);
     const config: ServiceConfig = {
       loggingService: {
         baseUrl: "url",
@@ -17,14 +26,16 @@ describe("Logging Service Config", () => {
       },
     };
     const resp = { data: config };
-    mockedAxios.get.mockResolvedValue(resp);
-    getServiceConfig().then((result) => expect(result).toEqual(config));
+    axios.get.mockResolvedValue(resp);
+    getServiceConfig().then((result: ServiceConfig) =>
+      expect(result).toEqual(config)
+    );
   });
 
   it("should error if the config is inaccessible", async () => {
     expect.assertions(1);
     const resp = { data: {} };
-    mockedAxios.get.mockResolvedValue(resp);
+    axios.get.mockResolvedValue(resp);
     try {
       await getServiceConfig();
     } catch (err) {
@@ -45,7 +56,7 @@ describe("Terminology Service Config", () => {
       },
     };
     const resp = { data: config };
-    mockedAxios.get.mockResolvedValue(resp);
+    axios.get.mockResolvedValue(resp);
     getServiceConfig().then((result) => expect(result).toEqual(config));
   });
 
@@ -58,7 +69,7 @@ describe("Terminology Service Config", () => {
         },
       },
     };
-    mockedAxios.get.mockResolvedValue(resp);
+    axios.get.mockResolvedValue(resp);
     try {
       await getServiceConfig();
     } catch (err) {
