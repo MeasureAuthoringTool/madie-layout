@@ -4,6 +4,7 @@ import CqlLibraryActionCenter from "./CqlLibraryActionCenter";
 import { CqlLibrary, LibrarySet, Model } from "@madie/madie-models";
 import userEvent from "@testing-library/user-event";
 import { useFeatureFlags, routeHandlerStore } from "@madie/madie-util";
+import { act } from "react-dom/test-utils";
 
 const mockUser = "test user";
 
@@ -75,7 +76,7 @@ describe("CqlLibraryActionCenter Component", () => {
     expect(screen.getByTestId("action-center")).toBeInTheDocument();
   });
 
-  it("should render delete and version library in action center when library is in draft status ", () => {
+  it("should render delete and version library in action center when library is in draft status ", async () => {
     (useFeatureFlags as jest.Mock).mockReturnValue({ TransferLibrary: true });
     render(
       <CqlLibraryActionCenter
@@ -85,11 +86,13 @@ describe("CqlLibraryActionCenter Component", () => {
       />
     );
     const actionCenterButton = screen.getByTestId("action-center");
-    userEvent.click(actionCenterButton);
+    await act(async () => {
+      userEvent.click(actionCenterButton);
+    });
     expect(screen.queryByTestId("DeleteLibrary")).toBeInTheDocument();
     expect(screen.queryByTestId("VersionLibrary")).toBeInTheDocument();
     expect(screen.queryByTestId("DraftLibrary")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("transfer-action-btn")).toBeInTheDocument();
+    expect(screen.queryByTestId("Transfer")).toBeInTheDocument();
   });
 
   it("should render draft library in action center when library is in versioned status ", () => {
@@ -107,7 +110,7 @@ describe("CqlLibraryActionCenter Component", () => {
     expect(screen.queryByTestId("VersionLibrary")).not.toBeInTheDocument();
   });
 
-  it("should open action center on button click", () => {
+  it("should open action center on button click", async () => {
     (useFeatureFlags as jest.Mock).mockReturnValue({ TransferLibrary: true });
     render(
       <CqlLibraryActionCenter
@@ -117,10 +120,12 @@ describe("CqlLibraryActionCenter Component", () => {
       />
     );
     const actionCenterButton = screen.getByLabelText("Library action center");
-    userEvent.click(actionCenterButton);
+    await act(async () => {
+      userEvent.click(actionCenterButton);
+    });
     expect(screen.queryByTestId("DeleteLibrary")).not.toBeInTheDocument();
     expect(screen.queryByTestId("VersionLibrary")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("transfer-action-btn")).toBeInTheDocument();
+    expect(screen.queryByTestId("Transfer")).toBeInTheDocument();
   });
 
   it("should render 'Delete Library' button only for draft libraries when canEdit is true", () => {
@@ -140,7 +145,9 @@ describe("CqlLibraryActionCenter Component", () => {
     (useFeatureFlags as jest.Mock).mockReturnValue({ ShareLibrary: true });
     render(<CqlLibraryActionCenter canEdit={true} library={cqlLibrary} />);
     const actionCenterButton = screen.getByLabelText("Library action center");
-    userEvent.click(actionCenterButton);
+    await act(async () => {
+      userEvent.click(actionCenterButton);
+    });
     const sharebutton = await screen.findByTestId("ShareLibrary");
     expect(sharebutton).toBeInTheDocument();
   });
@@ -274,7 +281,7 @@ describe("CqlLibraryActionCenter Component", () => {
     expect(screen.queryByTestId("TransferLibrary")).not.toBeInTheDocument();
   });
 
-  it("should display Transfer Library when library has different owner", () => {
+  it("should display Transfer Library when library has different owner", async () => {
     const librarySet = { ...mockLibrarySet, owner: "anotherUser" };
     const library = { ...cqlLibrary, librarySet: librarySet };
     (useFeatureFlags as jest.Mock).mockReturnValue({ TransferLibrary: true });
@@ -286,7 +293,11 @@ describe("CqlLibraryActionCenter Component", () => {
       />
     );
     const actionCenterButton = screen.getByLabelText("Library action center");
-    userEvent.click(actionCenterButton);
-    expect(screen.queryByTestId("transfer-action-btn")).toBeInTheDocument();
+    await act(async () => {
+      userEvent.click(actionCenterButton);
+    });
+    expect(
+      screen.queryByTestId("Youcannottransferalibraryyoudonotown.")
+    ).toBeInTheDocument();
   });
 });
