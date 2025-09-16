@@ -24,6 +24,23 @@ jest.mock("@madie/madie-util", () => ({
     updateMeasure: (measure) => measure,
   },
   useFeatureFlags: jest.fn().mockReturnValue({}),
+  useMeasureServiceApi: () => ({
+    getUserInfo: jest.fn().mockResolvedValue({}),
+    unlockMeasures: jest.fn().mockResolvedValue({}),
+  }),
+  useCqlLibraryServiceApi: () => ({
+    getUserInfo: jest.fn().mockResolvedValue({}),
+    unlockLibraries: jest.fn().mockResolvedValue({}),
+  }),
+  useServiceConfig: () => ({
+    measureService: {
+      baseUrl: "example-service-url",
+    },
+    cqlLibraryService: {
+      baseUrl: "test-cql-library-service-url",
+      fetchAllOwners: jest.fn().mockResolvedValue(["owner1", "owner2"]),
+    },
+  }),
 }));
 
 const formikInfo = {

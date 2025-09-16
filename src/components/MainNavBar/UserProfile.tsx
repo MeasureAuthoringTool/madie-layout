@@ -1,18 +1,26 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useOktaAuth } from "@okta/okta-react";
 import { logoutLogger } from "../../custom-hooks/customLog";
 import tw, { styled } from "twin.macro";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { MenuItem } from "@mui/material";
+import {
+  useMeasureServiceApi,
+  useCqlLibraryServiceApi,
+  useServiceConfig,
+  ServiceConfig,
+} from "@madie/madie-util";
 const FormControl = styled.section(() => ({
   marginLeft: "10px",
 }));
+
 function UserProfile() {
   const { oktaAuth } = useOktaAuth();
   const [userInfo, setUserInfo] = useState(null);
   const [userFirstName, setUserFirstName] = useState<string>("");
-
+  const measureServiceApiRef = useRef(useMeasureServiceApi());
+  const cqlLibraryServiceApiRef = useRef(useCqlLibraryServiceApi());
   useEffect(() => {
     window.localStorage.removeItem("givenName");
     oktaAuth.token
@@ -26,8 +34,17 @@ function UserProfile() {
       .catch((error) => {});
   }, [oktaAuth.token]);
 
+  const [config, setConfig] = useState<ServiceConfig>(useServiceConfig());
+
   const logout = async () => {
-    logoutLogger(userInfo);
+    //breaks because logoutLogger is using a hook
+    logoutLogger(userInfo, config);
+    try {
+      await measureServiceApiRef.current.unlockMeasures();
+      await cqlLibraryServiceApiRef.current.unlockLibraries();
+    } catch (error) {
+      console.error("Error unlocking measures for user", error);
+    }
     oktaAuth.signOut();
   };
 

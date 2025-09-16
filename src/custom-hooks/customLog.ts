@@ -1,33 +1,25 @@
 import { AxiosResponse } from "axios";
-import axios from "../../api/axios-instance";
-import { ServiceConfig, getServiceConfig } from "./getServiceConfig";
+import { ServiceConfig, axios } from "@madie/madie-util";
 
-export default async function customLog(
+export default function customLog(
   input: any,
-  action: string
+  action: string,
+  config: ServiceConfig
 ): Promise<AxiosResponse<any, any>> {
+  const serviceUrl = config?.loggingService?.baseUrl;
   if (
     input !== null &&
     input !== undefined &&
     Object.keys(input).length !== 0
   ) {
-    const serviceUrl = await getServiceUrl();
-
     return axios.post(`${serviceUrl}/log/${action}`, input);
   }
 }
 
-export const getServiceUrl = async () => {
-  const config: ServiceConfig = await getServiceConfig();
-  const serviceUrl: string = config?.loggingService?.baseUrl;
-
-  return serviceUrl;
+export const loginLogger = (content, config: ServiceConfig) => {
+  return customLog(content, "login", config);
 };
 
-export const loginLogger = (content) => {
-  return customLog(content, "login");
-};
-
-export const logoutLogger = (content) => {
-  return customLog(content, "logout");
+export const logoutLogger = (content, config: ServiceConfig) => {
+  return customLog(content, "logout", config);
 };
