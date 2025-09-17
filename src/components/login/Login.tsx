@@ -1,13 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import { Navigate } from "react-router-dom";
 import { LoginWidget } from "@madie/madie-auth";
-import { useDocumentTitle } from "@madie/madie-util";
+import {
+  useDocumentTitle,
+  OktaConfig,
+  ServiceConfig,
+  useServiceConfig,
+} from "@madie/madie-util";
 import { useOktaAuth } from "@okta/okta-react";
 import { loginLogger } from "../../custom-hooks/customLog";
 
-function Login({ config }) {
+function Login({ config }: { config: OktaConfig }) {
   useDocumentTitle("MADiE Login");
   const { oktaAuth, authState } = useOktaAuth();
+  const serviceConfig: ServiceConfig = useServiceConfig();
 
   const loginConfig = {
     props: {
@@ -18,9 +24,11 @@ function Login({ config }) {
           oktaAuth.token
             .getUserInfo()
             .then((info) => {
-              loginLogger(info, config);
+              loginLogger(info, serviceConfig);
             })
-            .catch((error) => {});
+            .catch((error) => {
+              console.error("Error writing Login info", error);
+            });
         }
       },
       onError: (err) => {
