@@ -63,6 +63,14 @@ jest.mock("@madie/madie-util", () => ({
 }));
 
 describe("CqlLibraryActionCenter Component", () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+    routeHandlerStore.state = { canTravel: true, pendingPath: "" };
+    jest.spyOn(require("@madie/madie-util"), "useOktaTokens").mockReturnValue({
+      getAccessToken: () => "test.jwt",
+      getUserName: () => mockUser,
+    });
+  });
   it("renders the action center", () => {
     render(
       <CqlLibraryActionCenter
@@ -280,13 +288,15 @@ describe("CqlLibraryActionCenter Component", () => {
   });
 
   it("should display Transfer Library when library has different owner", async () => {
-    const librarySet = { ...mockLibrarySet, owner: "anotherUser" };
-    const library = { ...cqlLibrary, librarySet: librarySet };
     (useFeatureFlags as jest.Mock).mockReturnValue({ TransferLibrary: true });
+    jest.spyOn(require("@madie/madie-util"), "useOktaTokens").mockReturnValue({
+      getAccessToken: () => "test.jwt",
+      getUserName: () => "bad user",
+    });
     render(
       <CqlLibraryActionCenter
         canEdit={true}
-        library={library}
+        library={cqlLibrary}
         canDelete={true}
       />
     );
@@ -294,8 +304,45 @@ describe("CqlLibraryActionCenter Component", () => {
     await act(async () => {
       userEvent.click(actionCenterButton);
     });
-    expect(
-      screen.queryByTestId("Youcannottransferalibraryyoudonotown.")
-    ).toBeInTheDocument();
+    screen.debug();
+    await waitFor(() => {
+      expect(
+        screen.queryByTestId("Youcannottransferalibraryyoudonotown.")
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("should trigger transfer library event", async () => {
+    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+    (useFeatureFlags as jest.Mock).mockReturnValue({
+      TransferLibrary: true,
+    });
+
+    render(
+      <CqlLibraryActionCenter
+        canEdit={true}
+        library={cqlLibrary}
+        canDelete={true}
+      />
+    );
+
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    await act(async () => {
+      userEvent.click(actionCenterButton);
+    });
+
+    const transferMeasureBtn = screen.getByTestId("Transfer");
+    expect(transferMeasureBtn).toBeInTheDocument();
+    expect(transferMeasureBtn).toBeEnabled();
+
+    await act(async () => {
+      userEvent.click(transferMeasureBtn);
+    });
+
+    expect(dispatchEventSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "transfer-library",
+      })
+    );
   });
 });
