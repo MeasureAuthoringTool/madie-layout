@@ -9,6 +9,8 @@ import { MemoryRouter } from "react-router";
 import { useOktaAuth } from "@okta/okta-react";
 import MainNavBar from "./MainNavBar";
 import {
+  useMeasureServiceApi,
+  useCqlLibraryServiceApi,
   useTerminologyServiceApi,
   TerminologyServiceApi,
 } from "@madie/madie-util";
@@ -34,6 +36,25 @@ const MockSignOut = jest.fn().mockImplementation(() => {
 
 jest.mock("@madie/madie-util", () => ({
   useTerminologyServiceApi: jest.fn(),
+  useMeasureServiceApi: jest.fn(),
+  useCqlLibraryServiceApi: jest.fn(),
+  getServiceConfig: () => ({
+    measureService: {
+      baseUrl: "example-service-url",
+    },
+    cqlLibraryService: {
+      baseUrl: "test-cql-library-service-url",
+    },
+  }),
+  useServiceConfig: () => ({
+    measureService: {
+      baseUrl: "example-service-url",
+    },
+    cqlLibraryService: {
+      baseUrl: "test-cql-library-service-url",
+      fetchAllOwners: jest.fn().mockResolvedValue(["owner1", "owner2"]),
+    },
+  }),
 }));
 
 beforeEach(() => {

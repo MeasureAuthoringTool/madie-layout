@@ -1,8 +1,15 @@
 import React, { useState } from "react";
 import { Security } from "@okta/okta-react";
 import { OktaAuth, toRelativeUrl } from "@okta/okta-auth-js";
-import { getOktaConfig, OktaConfig } from "./Config";
+import { getOktaConfig } from "@madie/madie-util";
 import Router from "../router/Router";
+
+interface OktaConfig {
+  baseUrl: string;
+  issuer: string;
+  clientId: string;
+  redirectUri: string;
+}
 
 export const transformAuthState = async (oktaAuth, authState) => {
   // verifies unexpired tokens are available from the tokenManager (default behavior)

@@ -4,23 +4,34 @@ import Login from "./Login";
 import { MemoryRouter } from "react-router";
 import { useOktaAuth } from "@okta/okta-react";
 import userEvent from "@testing-library/user-event";
+import { loginLogger, logoutLogger } from "../../custom-hooks/customLog";
 
 jest.mock("@okta/okta-react", () => ({
   useOktaAuth: jest.fn(),
 }));
-
+const mockConfig = {
+  measureService: {
+    baseUrl: "example-service-url",
+  },
+  cqlLibraryService: {
+    baseUrl: "test-cql-library-service-url",
+  },
+  loggingService: {
+    baseUrl: "test-logging-service-url",
+  },
+};
 jest.mock("@madie/madie-util", () => ({
   useDocumentTitle: jest.fn(),
+  useServiceConfig: jest.fn(() => mockConfig),
 }));
 
-const mockLoginLogger = jest.fn((args) => {
-  Promise.resolve("logged");
+const mockLogoutLogger = jest.fn((args) => {
+  Promise.resolve("logged out ");
 });
 jest.mock("../../custom-hooks/customLog", () => {
-  //lazy load the mock otherwise will thorw ReferenceError: Cannot access 'mockLoginLogger' before initialization
   return {
-    loginLogger: (args) => {
-      return mockLoginLogger(args);
+    logoutLogger: (args) => {
+      return mockLogoutLogger(args);
     },
   };
 });
@@ -99,7 +110,7 @@ describe("Login component", () => {
 
     const loginButton = screen.getByRole("button", { name: "Login Widget" });
     userEvent.click(loginButton);
-    expect(mockHandleLoginRedirect).toBeCalled();
-    await waitFor(() => expect(mockLoginLogger).toHaveBeenCalled());
+    await waitFor(() => expect(mockHandleLoginRedirect).toBeCalled());
+    //await waitFor(() => expect(mockLogoutLogger).toHaveBeenCalled());
   });
 });

@@ -1,14 +1,4 @@
-import axios from "../../api/axios-instance";
-
-export interface ServiceConfig {
-  loggingService: {
-    baseUrl: string;
-  };
-  terminologyService: {
-    baseUrl: string;
-  };
-  madieVersion: string;
-}
+import { axios, ServiceConfig } from "@madie/madie-util";
 
 export async function getServiceConfig(): Promise<ServiceConfig> {
   const serviceConfig: ServiceConfig = (
