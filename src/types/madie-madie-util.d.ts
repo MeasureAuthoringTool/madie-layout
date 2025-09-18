@@ -25,6 +25,7 @@ declare module "@madie/madie-util" {
       importTestCases: boolean;
       qdm: boolean;
       MeasureHistory: boolean;
+      LibraryHistory: boolean;
     };
   }
 
@@ -41,6 +42,7 @@ declare module "@madie/madie-util" {
     TransferMeasure: boolean;
     TransferLibrary: boolean;
     MeasureHistory: boolean;
+    LibraryHistory: boolean;
   }
 
   export const cqlLibraryStore: {
