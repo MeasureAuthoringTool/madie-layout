@@ -93,6 +93,7 @@ declare module "@madie/madie-util" {
   };
 
   export function useServiceConfig(): ServiceConfig;
+  export function getServiceConfig(): Promise<ServiceConfig>;
   export function getOktaConfig(): Promise<OktaConfig>;
 
   export function useKeyPress(targetKey: any): boolean;
