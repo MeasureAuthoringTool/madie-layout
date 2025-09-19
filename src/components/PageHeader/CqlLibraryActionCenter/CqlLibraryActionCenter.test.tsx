@@ -304,7 +304,6 @@ describe("CqlLibraryActionCenter Component", () => {
     await act(async () => {
       userEvent.click(actionCenterButton);
     });
-    screen.debug();
     await waitFor(() => {
       expect(
         screen.queryByTestId("Youcannottransferalibraryyoudonotown.")
