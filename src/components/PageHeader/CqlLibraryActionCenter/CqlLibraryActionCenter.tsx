@@ -20,7 +20,7 @@ import {
   useCqlLibraryServiceApi,
 } from "@madie/madie-util";
 import ShareIcon from "../shareAction/ShareIcon";
-import TransferAction from "../transferAction/TransferAction";
+import SwapVertOutlinedIcon from "@mui/icons-material/SwapVertOutlined";
 
 interface PropTypes {
   canEdit: boolean;
@@ -162,14 +162,14 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
     if (featureFlags?.TransferLibrary) {
       actions.set("transfer library", {
         icon: (
-          <TransferAction
-            canTransfer={owner && owner == username}
-            onClick={() => {
-              handleActionClick(new Event("transfer-library"));
-            }}
-          />
+          <IconButton>
+            <SwapVertOutlinedIcon style={{ transform: "rotate(90deg)" }} />
+          </IconButton>
         ),
         name: owner && owner == username ? TRANSFER_LIBRARY : CANNOT_TRANSFER,
+        onClick: () => {
+          handleActionClick(new Event("transfer-library"));
+        },
       });
     }
     // required order to display
