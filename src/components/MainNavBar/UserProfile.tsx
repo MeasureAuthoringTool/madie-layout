@@ -17,6 +17,7 @@ const FormControl = styled.section(() => ({
 
 function UserProfile() {
   const { oktaAuth } = useOktaAuth();
+  const config: ServiceConfig = useServiceConfig();
   const [userInfo, setUserInfo] = useState(null);
   const [userFirstName, setUserFirstName] = useState<string>("");
   const measureServiceApiRef = useRef(useMeasureServiceApi());
@@ -33,8 +34,6 @@ function UserProfile() {
       })
       .catch((error) => {});
   }, [oktaAuth.token]);
-
-  const [config, setConfig] = useState<ServiceConfig>(useServiceConfig());
 
   const logout = async () => {
     //breaks because logoutLogger is using a hook
