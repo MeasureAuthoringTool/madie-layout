@@ -9,6 +9,7 @@ import {
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
 import EditCalendarOutlinedIcon from "@mui/icons-material/EditCalendarOutlined";
+import HistoryIcon from "@mui/icons-material/History";
 import { MadieDiscardDialog } from "@madie/madie-design-system/dist/react";
 import { CqlLibrary } from "@madie/madie-models";
 import { blue, red } from "@mui/material/colors";
@@ -110,6 +111,18 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
   ): any[] => {
     const actions = new Map<string, any>();
 
+    if (featureFlags?.LibraryHistory) {
+      actions.set("history library", {
+        icon: (
+          <IconButton>
+            <HistoryIcon />
+          </IconButton>
+        ),
+        name: "History",
+        onClick: () => {},
+      });
+    }
+
     if (canEdit) {
       if (library?.draft) {
         if (canDelete) {
@@ -174,6 +187,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
     }
     // required order to display
     const actionsListOrder = [
+      "history library",
       "transfer library",
       "draft library",
       "version library",
