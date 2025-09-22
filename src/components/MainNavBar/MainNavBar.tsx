@@ -6,23 +6,21 @@ import { useOktaAuth } from "@okta/okta-react";
 import { NavLink, useLocation } from "react-router-dom";
 import UserProfile from "./UserProfile";
 import UserAvatar from "./UserAvatar";
-import { Tabs, Tab, Toast } from "@madie/madie-design-system/dist/react";
+import { Tabs, Tab } from "@madie/madie-design-system/dist/react";
 import "./MainNavBar.scss";
 import UserUMLS from "./UserUMLS";
 
 const MainNavBar = () => {
-  const [headerText, setHeaderText] = useState(true);
+  const [showFullLogo, setShowFullLogo] = useState(true);
 
   const { authState } = useOktaAuth();
 
-  let resizeWindow = () => {
-    const headerWidth = document.getElementById("madie-header").clientWidth;
-    if (headerWidth > 1256) {
-      setHeaderText(true);
-    } else {
-      setHeaderText(false);
-    }
+  const resizeWindow = () => {
+    const headerWidth =
+      document.getElementById("madie-header")?.clientWidth ?? 0;
+    setShowFullLogo(headerWidth > 1256);
   };
+
   useEffect(() => {
     resizeWindow();
     window.addEventListener("resize", resizeWindow);
@@ -30,15 +28,11 @@ const MainNavBar = () => {
   }, []);
 
   const { pathname } = useLocation();
-  // need either /measures/ we will never hit /help
-  const [selected, setSelected] = useState("");
-  useEffect(() => {
-    if (pathname.includes("/measures")) {
-      setSelected("/measures");
-    } else if (pathname.includes("/cql-libraries")) {
-      setSelected("/cql-libraries");
-    }
-  }, [pathname, setSelected]);
+  const selected = pathname.includes("/measures")
+    ? "/measures"
+    : pathname.includes("/cql-libraries")
+    ? "/cql-libraries"
+    : "";
 
   return (
     <nav>
@@ -60,23 +54,18 @@ const MainNavBar = () => {
       >
         <div id="logo_div">
           <NavLink to="/measures" className="logo">
-            {!headerText && (
-              <>
-                <img
-                  src={logo}
-                  alt="MADiE Measure Authoring Development Integrated Environment logo"
-                  id="logo"
-                />
-              </>
-            )}
-            {headerText && (
-              <>
-                <img
-                  src={logoFull}
-                  alt="MADiE Measure Authoring Development Integrated Environment logo"
-                  id="fulllogo"
-                />
-              </>
+            {!showFullLogo ? (
+              <img
+                src={logo}
+                alt="MADiE Measure Authoring Development Integrated Environment logo"
+                id="logo"
+              />
+            ) : (
+              <img
+                src={logoFull}
+                alt="MADiE Measure Authoring Development Integrated Environment logo"
+                id="fulllogo"
+              />
             )}
           </NavLink>
         </div>

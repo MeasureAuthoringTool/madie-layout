@@ -130,22 +130,6 @@ jest.mock("@madie/madie-util", () => ({
   checkUserCanDelete: jest.fn().mockImplementation(() => true),
 }));
 
-jest.mock("../../config/useGetServiceConfig");
-const useGetServiceConfigMock = useGetServiceConfig as jest.Mock;
-useGetServiceConfigMock.mockImplementation(() => {
-  return {
-    config: {
-      cqlLibraryService: {
-        baseUrl: "test-cql-library-service-url",
-        fetchAllOwners: jest.fn().mockResolvedValue(["owner1", "owner2"]),
-      },
-      measureService: {
-        baseUrl: "example-service-url",
-      },
-    },
-  };
-});
-
 let postData: object = { status: 201 };
 let getData: object = { status: 200 };
 axios.post.mockResolvedValueOnce(postData);

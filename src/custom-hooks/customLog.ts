@@ -4,9 +4,9 @@ import { ServiceConfig, axios } from "@madie/madie-util";
 export default function customLog(
   input: any,
   action: string,
-  config: ServiceConfig
+  serviceConfig: ServiceConfig
 ): Promise<AxiosResponse<any, any>> {
-  const serviceUrl = config?.loggingService?.baseUrl;
+  const serviceUrl = serviceConfig?.loggingService?.baseUrl;
   if (
     input !== null &&
     input !== undefined &&
@@ -16,10 +16,10 @@ export default function customLog(
   }
 }
 
-export const loginLogger = (content, config: ServiceConfig) => {
-  return customLog(content, "login", config);
+export const loginLogger = (content, serviceConfig: ServiceConfig) => {
+  return customLog(content, "login", serviceConfig);
 };
 
-export const logoutLogger = (content, config: ServiceConfig) => {
-  return customLog(content, "logout", config);
+export const logoutLogger = (content, serviceConfig: ServiceConfig) => {
+  return customLog(content, "logout", serviceConfig);
 };
