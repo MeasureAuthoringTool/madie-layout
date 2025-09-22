@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { SpeedDial, SpeedDialAction, IconButton } from "@mui/material";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import EditCalendarOutlinedIcon from "@mui/icons-material/EditCalendarOutlined";
@@ -11,6 +11,7 @@ import {
   routeHandlerStore,
   useFeatureFlags,
   checkUserCanEdit,
+  useMeasureServiceApi,
 } from "@madie/madie-util";
 import FeedOutlinedIcon from "@mui/icons-material/FeedOutlined";
 import ShareAction, { SharedOptions } from "../shareAction/ShareAction";
@@ -32,6 +33,11 @@ const isOwnerOfSelectedMeasure = (measures) => {
   );
 };
 
+export const DEL_MEASURE = "Delete measure";
+export const UNABLE_DELETE = "Unable to delete measure.";
+export const UNABLE_DELETE_LOCKED =
+  UNABLE_DELETE + " Locked while being edited by <harpID>";
+
 const TRANSFER_MEASURE = "Transfer";
 const CANNOT_TRANSFER = "You cannot transfer a measure you do not own.";
 
@@ -41,6 +47,9 @@ const MeasureActionCenter = (props: PropTypes) => {
   const [discardDialogOpen, setDiscardDialogOpen] = useState<boolean>(false);
   const [eventToTrigger, setEventToTrigger] = useState<Event | null>(null);
   const featureFlags = useFeatureFlags();
+  const measureServiceApi = useRef(useMeasureServiceApi());
+  const [isLocked, setIsLocked] = useState<boolean>(false);
+  const [lockMessage, setLockMessage] = useState<string>(DEL_MEASURE);
 
   const { updateRouteHandlerState } = routeHandlerStore;
   const [routeHandlerState, setRouteHandlerState] = useState<RouteHandlerState>(
@@ -57,6 +66,36 @@ const MeasureActionCenter = (props: PropTypes) => {
   useEffect(() => {
     setActions(getActionArray(props.measure, props.canEdit, props.canDelete));
   }, [props, routeHandlerState]);
+
+  const validateDeleteActionState = useCallback(async () => {
+    if (props.measure?.id) {
+      const lockMsg: string =
+        await measureServiceApi.current.checkMeasureLocked(props.measure?.id);
+
+      // no locks on measure and test cases when returned message is "OK to proceed"
+      if (lockMsg !== "OK to proceed") {
+        setIsLocked(true);
+        // measure lock message is the harpId
+        if (!lockMsg.includes("test cases")) {
+          setLockMessage(
+            UNABLE_DELETE_LOCKED.replace("<harpID>", `${lockMsg}`)
+          );
+        } else {
+          // test case lock message is "One or more test cases are locked by another user."
+          setLockMessage(UNABLE_DELETE + " " + lockMsg);
+        }
+      } else {
+        setIsLocked(false);
+        setLockMessage(DEL_MEASURE);
+      }
+    }
+  }, [props.measure, props.canEdit, props.canDelete, featureFlags?.Locking]);
+
+  useEffect(() => {
+    if (featureFlags?.Locking) {
+      validateDeleteActionState();
+    }
+  }, [props.measure, validateDeleteActionState]);
 
   const onContinue = async () => {
     // we need every formik instance to use useFormikResetOnEvent on init
@@ -161,12 +200,13 @@ const MeasureActionCenter = (props: PropTypes) => {
         if (canDelete) {
           actions.set("delete measure", {
             icon: (
-              <IconButton className="DeleteClass">
+              <IconButton className="DeleteClass" disabled={isLocked}>
                 <DeleteOutlinedIcon />
               </IconButton>
             ),
-            name: "Delete Measure",
+            name: `${lockMessage}`,
             onClick: () => handleActionClick(new Event("delete-measure")),
+            disabled: isLocked,
           });
         }
       }
@@ -269,12 +309,16 @@ const MeasureActionCenter = (props: PropTypes) => {
             icon={action.icon}
             tooltipTitle={action.name}
             data-testid={action.name.replace(/\s/g, "")}
-            onClick={() => {
-              setOpen(false);
-              if (action.onClick) {
-                action.onClick();
-              }
-            }}
+            onClick={
+              action.disabled //prevent opening when it's disabled
+                ? undefined
+                : () => {
+                    setOpen(false);
+                    if (action.onClick) {
+                      action.onClick();
+                    }
+                  }
+            }
             sx={{
               boxShadow: "none",
               transition: "opacity 0s, visibility 0s",

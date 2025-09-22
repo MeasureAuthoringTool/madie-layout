@@ -53,6 +53,7 @@ declare module "@madie/madie-util" {
     TransferLibrary: boolean;
     MeasureHistory: boolean;
     LibraryHistory: boolean;
+    Locking: boolean;
   }
 
   export const cqlLibraryStore: {
@@ -127,6 +128,7 @@ declare module "@madie/madie-util" {
     constructor(baseUrl: string, getAccessToken: () => string);
     fetchMeasure(id: string): Promise<Measure>;
     unlockMeasures(): Promise<String>;
+    checkMeasureLocked(id: string): Promise<string>;
   }
 
   export class CqlLibraryServiceApi {

@@ -1,13 +1,15 @@
 import * as React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
-import MeasureActionCenter from "./MeasureActionCenter";
+import MeasureActionCenter, { DEL_MEASURE } from "./MeasureActionCenter";
 import { Measure, MeasureSet } from "@madie/madie-models";
 import userEvent from "@testing-library/user-event";
 import {
   useFeatureFlags,
   routeHandlerStore,
   checkUserCanEdit,
+  useMeasureServiceApi,
 } from "@madie/madie-util";
+import { act } from "react-dom/test-utils";
 
 const mockMeasureSet = {
   cmsId: "124",
@@ -42,6 +44,7 @@ jest.mock("@madie/madie-util", () => ({
     initialState: { canTravel: false, pendingPath: "" },
   },
   checkUserCanEdit: jest.fn().mockImplementation(() => true),
+  useMeasureServiceApi: jest.fn(),
 }));
 
 describe("MeasureActionCenter Component", () => {
@@ -142,7 +145,7 @@ describe("MeasureActionCenter Component", () => {
     );
     const actionCenterButton = screen.getByLabelText("Measure action center");
     userEvent.click(actionCenterButton);
-    expect(screen.getByTestId("DeleteMeasure")).toBeInTheDocument();
+    expect(screen.getByTestId("Deletemeasure")).toBeInTheDocument();
   });
 
   it("should not render 'Delete Measure' button for versioned measures", () => {
@@ -155,7 +158,7 @@ describe("MeasureActionCenter Component", () => {
     );
     const actionCenterButton = screen.getByLabelText("Measure action center");
     userEvent.click(actionCenterButton);
-    expect(screen.queryByTestId("DeleteMeasure")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("Deletemeasure")).not.toBeInTheDocument();
   });
 
   it("should trigger delete-measure event when 'Delete Measure' action is clicked", () => {
@@ -168,7 +171,7 @@ describe("MeasureActionCenter Component", () => {
     );
     const actionCenterButton = screen.getByLabelText("Measure action center");
     userEvent.click(actionCenterButton);
-    const deleteMeasureButton = screen.getByTestId("DeleteMeasure");
+    const deleteMeasureButton = screen.getByTestId("Deletemeasure");
     userEvent.click(deleteMeasureButton);
     expect(dispatchEventSpy).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -566,5 +569,91 @@ describe("MeasureActionCenter Component", () => {
     const viewHistoryButton = screen.getByTestId("ViewHistory");
     userEvent.click(viewHistoryButton);
     expect(screen.getByTestId("ViewHistory")).toBeInTheDocument();
+  });
+
+  it("should render 'Delete Measure' button when feature flag is on and there is no locking", () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ Locking: true });
+    const mockMeasureServiceApi = {
+      checkMeasureLocked: jest.fn().mockResolvedValue("OK to proceed"),
+    } as any;
+    useMeasureServiceApi.mockImplementation(() => mockMeasureServiceApi);
+
+    render(
+      <MeasureActionCenter
+        canEdit={true}
+        measure={draftMeasure}
+        canDelete={true}
+      />
+    );
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    act(() => {
+      userEvent.click(actionCenterButton);
+    });
+    const deleteMeasureButton = screen.getByTestId("Deletemeasure");
+    expect(deleteMeasureButton).toBeInTheDocument();
+    expect(deleteMeasureButton).toBeEnabled();
+    expect(deleteMeasureButton).toHaveAttribute("aria-label", DEL_MEASURE);
+  });
+
+  it("Should not delete measure when measure is locked", async () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ Locking: true });
+    const mockMeasureServiceApi = {
+      checkMeasureLocked: jest.fn().mockResolvedValue("harpId"),
+    } as any;
+    useMeasureServiceApi.mockImplementation(() => mockMeasureServiceApi);
+
+    render(
+      <MeasureActionCenter
+        canEdit={true}
+        measure={draftMeasure}
+        canDelete={true}
+      />
+    );
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    act(() => {
+      userEvent.click(actionCenterButton);
+    });
+    const deleteMeasureButton = screen.getByTestId("Deletemeasure");
+    expect(deleteMeasureButton).toBeInTheDocument();
+    userEvent.click(deleteMeasureButton);
+    await waitFor(() => {
+      expect(dispatchEventSpy).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "delete-measure",
+        })
+      );
+    });
+  });
+
+  it("Should not delete measure when any test cases are locked", async () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ Locking: true });
+    const lockMsg = "One or more test cases are locked by another user.";
+    const mockMeasureServiceApi = {
+      checkMeasureLocked: jest.fn().mockResolvedValue(lockMsg),
+    } as any;
+    useMeasureServiceApi.mockImplementation(() => mockMeasureServiceApi);
+
+    render(
+      <MeasureActionCenter
+        canEdit={true}
+        measure={draftMeasure}
+        canDelete={true}
+      />
+    );
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    act(() => {
+      userEvent.click(actionCenterButton);
+    });
+
+    const deleteMeasureButton = screen.getByTestId("Deletemeasure");
+    expect(deleteMeasureButton).toBeInTheDocument();
+    userEvent.click(deleteMeasureButton);
+    await waitFor(() => {
+      expect(dispatchEventSpy).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "delete-measure",
+        })
+      );
+    });
   });
 });
