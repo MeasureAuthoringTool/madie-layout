@@ -52,6 +52,7 @@ declare module "@madie/madie-util" {
     TransferMeasure: boolean;
     TransferLibrary: boolean;
     MeasureHistory: boolean;
+    LibraryHistory: boolean;
   }
 
   export const cqlLibraryStore: {

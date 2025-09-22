@@ -9,6 +9,7 @@ import {
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
 import EditCalendarOutlinedIcon from "@mui/icons-material/EditCalendarOutlined";
+import HistoryIcon from "@mui/icons-material/History";
 import { MadieDiscardDialog } from "@madie/madie-design-system/dist/react";
 import { CqlLibrary } from "@madie/madie-models";
 import { blue, red } from "@mui/material/colors";
@@ -20,7 +21,7 @@ import {
   useCqlLibraryServiceApi,
 } from "@madie/madie-util";
 import ShareIcon from "../shareAction/ShareIcon";
-import TransferAction from "../transferAction/TransferAction";
+import SwapVertOutlinedIcon from "@mui/icons-material/SwapVertOutlined";
 
 interface PropTypes {
   canEdit: boolean;
@@ -110,6 +111,18 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
   ): any[] => {
     const actions = new Map<string, any>();
 
+    if (featureFlags?.LibraryHistory) {
+      actions.set("history library", {
+        icon: (
+          <IconButton>
+            <HistoryIcon />
+          </IconButton>
+        ),
+        name: "History",
+        onClick: () => {},
+      });
+    }
+
     if (canEdit) {
       if (library?.draft) {
         if (canDelete) {
@@ -162,18 +175,19 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
     if (featureFlags?.TransferLibrary) {
       actions.set("transfer library", {
         icon: (
-          <TransferAction
-            canTransfer={owner && owner == username}
-            onClick={() => {
-              handleActionClick(new Event("transfer-library"));
-            }}
-          />
+          <IconButton>
+            <SwapVertOutlinedIcon style={{ transform: "rotate(90deg)" }} />
+          </IconButton>
         ),
         name: owner && owner == username ? TRANSFER_LIBRARY : CANNOT_TRANSFER,
+        onClick: () => {
+          handleActionClick(new Event("transfer-library"));
+        },
       });
     }
     // required order to display
     const actionsListOrder = [
+      "history library",
       "transfer library",
       "draft library",
       "version library",
