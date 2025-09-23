@@ -171,21 +171,20 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
           },
         });
       }
-      if (featureFlags?.TransferLibrary) {
-        actions.set("transfer library", {
-          icon: (
-            <TransferAction
-              canTransfer={owner && owner == username}
-              onClick={() => {
-                handleActionClick(new Event("transfer-library"));
-              }}
-            />
-          ),
-          name: owner && owner == username ? TRANSFER_LIBRARY : CANNOT_TRANSFER,
-        });
-      }
     }
-
+    if (featureFlags?.TransferLibrary) {
+      actions.set("transfer library", {
+        icon: (
+          <TransferAction
+            canTransfer={owner && owner == username}
+            onClick={() => {
+              handleActionClick(new Event("transfer-library"));
+            }}
+          />
+        ),
+        name: owner && owner == username ? TRANSFER_LIBRARY : CANNOT_TRANSFER,
+      });
+    }
     // required order to display
     const actionsListOrder = [
       "history library",
