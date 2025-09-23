@@ -10,6 +10,7 @@ import {
   measureStore,
   cqlLibraryStore,
   featureFlagsStore,
+  useFeatureFlags,
   checkUserCanEdit,
   checkUserCanDelete,
   axios,
@@ -23,6 +24,7 @@ import CqlLibraryActionCenter from "./CqlLibraryActionCenter/CqlLibraryActionCen
 const PageHeader = () => {
   const { pathname } = useLocation();
   const [userFirstName, setUserFirstName] = useState<string>();
+  const featureFlags = useFeatureFlags();
 
   useEffect(() => {
     window.addEventListener("storage", () =>
