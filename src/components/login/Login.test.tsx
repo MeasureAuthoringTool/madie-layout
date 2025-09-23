@@ -43,7 +43,7 @@ describe("Login component", () => {
       authState: null,
     }));
 
-    expect(Login({ config: {} })).toBeNull();
+    expect(Login({ serviceConfig: {} })).toBeNull();
   });
 
   it("should mount login widget is loaded if not authenticated", async () => {
