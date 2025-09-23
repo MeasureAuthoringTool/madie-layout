@@ -24,8 +24,8 @@ function Login({ config }: { config: OktaConfig }) {
       cqlLibraryServiceApiRef.current.unlockLibraries();
       return true;
     } catch (error) {
-      console.error("Error unlocking measures for user", error);
-      return false;
+      console.error("Error unlocking measures/libraries for user", error);
+      return true;
     }
   };
   const loginConfig = {

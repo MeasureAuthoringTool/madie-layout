@@ -22,8 +22,16 @@ const mockConfig = {
 };
 // Keep existing mocks...
 
-const mockUnlockMeasures = jest.fn().mockResolvedValue({});
-const mockUnlockLibraries = jest.fn().mockResolvedValue({});
+const mockUnlockMeasures = jest
+  .fn()
+  .mockResolvedValueOnce({})
+  .mockResolvedValueOnce({})
+  .mockRejectedValueOnce({});
+const mockUnlockLibraries = jest
+  .fn()
+  .mockResolvedValueOnce({})
+  .mockResolvedValueOnce({})
+  .mockRejectedValueOnce({});
 
 jest.mock("@madie/madie-util", () => ({
   useDocumentTitle: jest.fn(),
@@ -115,6 +123,36 @@ describe("Login component", () => {
       config: {},
       onSuccess: (tokens) => oktaAuth.handleLoginRedirect(tokens),
     };
+    const mockHandleLoginRedirect = jest.fn();
+    const mockGetUserInfo = jest.fn().mockImplementation(() => {
+      return Promise.resolve();
+    });
+    const mockToken = { getUserInfo: mockGetUserInfo };
+    (useOktaAuth as jest.Mock).mockImplementation(() => ({
+      oktaAuth: {
+        token: mockToken,
+        handleLoginRedirect: mockHandleLoginRedirect,
+      },
+      authState: { isAuthenticated: false },
+    }));
+
+    render(
+      <MemoryRouter>
+        <Login {...loginProps} />
+      </MemoryRouter>
+    );
+
+    const loginButton = screen.getByRole("button", { name: "Login Widget" });
+    userEvent.click(loginButton);
+    await waitFor(() => expect(mockHandleLoginRedirect).toBeCalled());
+  });
+  it("Should login successfully with user info logged, even if unlock fails", async () => {
+    const oktaAuth = { handleLoginRedirect: jest.fn() };
+    const loginProps = {
+      config: {},
+      onSuccess: (tokens) => oktaAuth.handleLoginRedirect(tokens),
+    };
+
     const mockHandleLoginRedirect = jest.fn();
     const mockGetUserInfo = jest.fn().mockImplementation(() => {
       return Promise.resolve();
