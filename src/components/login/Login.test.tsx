@@ -22,16 +22,9 @@ const mockConfig = {
 };
 // Keep existing mocks...
 
-const mockUnlockMeasures = jest
-  .fn()
-  .mockResolvedValueOnce({})
-  .mockResolvedValueOnce({})
-  .mockRejectedValueOnce({});
-const mockUnlockLibraries = jest
-  .fn()
-  .mockResolvedValueOnce({})
-  .mockResolvedValueOnce({})
-  .mockRejectedValueOnce({});
+const mockUnlockMeasures = jest.fn();
+
+const mockUnlockLibraries = jest.fn();
 
 jest.mock("@madie/madie-util", () => ({
   useDocumentTitle: jest.fn(),
@@ -58,7 +51,13 @@ jest.mock("../../custom-hooks/customLog", () => {
 });
 
 describe("Login component", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
   it("should return null if authState is undefined", async () => {
+    mockUnlockMeasures.mockImplementationOnce(() => {
+      return {};
+    });
     (useOktaAuth as jest.Mock).mockImplementation(() => ({
       oktaAuth: {},
       authState: null,
@@ -114,6 +113,30 @@ describe("Login component", () => {
     await waitFor(() => {
       expect(mockUnlockMeasures).toHaveBeenCalled();
       expect(mockUnlockLibraries).toHaveBeenCalled();
+    });
+  });
+
+  it("should not mount login widget if authenticated, but unlock fails", async () => {
+    mockUnlockMeasures.mockImplementation(() => {
+      throw new Error("Network error");
+    });
+
+    const loginProps = { config: {} };
+    (useOktaAuth as jest.Mock).mockImplementation(() => ({
+      oktaAuth: {},
+      authState: { isAuthenticated: true },
+    }));
+
+    const { queryByTestId } = render(
+      <MemoryRouter>
+        <Login {...loginProps} />
+      </MemoryRouter>
+    );
+    expect(queryByTestId("login-testid")).toBeNull();
+    await waitFor(() => {
+      expect(() => mockUnlockMeasures()).toThrow("Network error");
+      expect(mockUnlockMeasures).toHaveBeenCalled();
+      expect(mockUnlockLibraries).toHaveBeenCalledTimes(0);
     });
   });
 
