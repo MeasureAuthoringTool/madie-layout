@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import tw from "twin.macro";
+import React, { useState } from "react";
 import "styled-components/macro";
 import { Measure } from "@madie/madie-models/dist/Measure";
 import { Model } from "@madie/madie-models/dist/Model";
@@ -14,10 +13,9 @@ import {
 import { Box } from "@mui/system";
 import {
   axios,
-  ServiceConfig,
+  useServiceConfig,
   useOktaTokens,
   useFeatureFlags,
-  useServiceConfig as getServiceConfig,
 } from "@madie/madie-util";
 import {
   Checkbox,
@@ -39,9 +37,8 @@ interface Toast {
 
 const CreateNewMeasureDialog = ({ open, onClose }) => {
   const { getAccessToken } = useOktaTokens();
-  const [config, setConfig] = useState<ServiceConfig | null>(
-    getServiceConfig()
-  );
+  const featureFlags = useFeatureFlags();
+  const config = useServiceConfig();
   const [toast, setToast] = useState<Toast>({
     toastOpen: false,
     toastType: "danger",
@@ -69,7 +66,6 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
   });
 
   let modelOptions = Object.keys(Model);
-  const featureFlags = useFeatureFlags();
   if (!featureFlags?.qiCore7) {
     // remove QI-Core 7.0.0 from model options if the feature flag is not enabled
     modelOptions = modelOptions.filter((model) => model !== "QICORE_7_0_0");

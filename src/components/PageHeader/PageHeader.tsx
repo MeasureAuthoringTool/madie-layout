@@ -1,20 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import { Fade, Breadcrumbs } from "@mui/material";
 import CreateNewMeasureDialog from "../NewMeasure/CreateNewMeasureDialog";
 import WafDialog from "../WafDialog/WafDialog";
 import MeasureActionCenter from "./MeasureActionCenter/MeasureActionCenter";
 import { Button } from "@madie/madie-design-system/dist/react";
-
-import useGetServiceConfig from "../../config/useGetServiceConfig";
 import {
   measureStore,
   cqlLibraryStore,
   featureFlagsStore,
-  checkUserCanEdit,
   useFeatureFlags,
+  checkUserCanEdit,
   checkUserCanDelete,
   axios,
 } from "@madie/madie-util";
@@ -27,6 +24,7 @@ import CqlLibraryActionCenter from "./CqlLibraryActionCenter/CqlLibraryActionCen
 const PageHeader = () => {
   const { pathname } = useLocation();
   const [userFirstName, setUserFirstName] = useState<string>();
+  const featureFlags = useFeatureFlags();
 
   useEffect(() => {
     window.addEventListener("storage", () =>
@@ -45,14 +43,12 @@ const PageHeader = () => {
   const [wafOpen, setWafOpen] = useState<boolean>(false);
   const [wafSupportId, setWafSupportId] = useState<string>("");
   const [libraryState, setLibraryState] = useState<any>(cqlLibraryStore.state);
-  const { config } = useGetServiceConfig();
   useEffect(() => {
     const subscription = cqlLibraryStore.subscribe(setLibraryState);
     return () => {
       subscription.unsubscribe();
     };
   }, []);
-
   const [measureState, setMeasureState] = useState<any>(measureStore.state);
 
   useEffect(() => {
@@ -132,7 +128,6 @@ const PageHeader = () => {
         console.error(reason);
       });
   }, []);
-  const featureFlags = useFeatureFlags();
 
   const overflowingText = useRef<HTMLHeadingElement>(null);
   const isOverflow = useIsOverflow(overflowingText, () => {});
@@ -251,7 +246,7 @@ const PageHeader = () => {
       {pathname.includes("edit") && pathname.includes("cql-libraries") && (
         <Fade in={libraryState?.cqlLibraryName !== undefined}>
           <div className="details">
-            {libraryCanEdit && (
+            {(libraryCanEdit || featureFlags?.LibraryHistory) && (
               <div tw="pr-8" style={{ position: "relative" }}>
                 <div style={{ position: "absolute", top: 0, right: 0 }}>
                   <CqlLibraryActionCenter

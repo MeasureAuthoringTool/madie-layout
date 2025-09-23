@@ -1,5 +1,4 @@
 import React, { useState, useRef } from "react";
-
 import { Navigate } from "react-router-dom";
 import { LoginWidget } from "@madie/madie-auth";
 import {

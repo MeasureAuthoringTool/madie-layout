@@ -15,13 +15,19 @@ import NotFound from "../components/notfound/NotFound";
 import "../styles/LayoutStyles.scss";
 import TimeoutHandler from "../components/timeoutHandler/TimeoutHandler";
 import LayoutWrapper from "./LayoutWrapper";
-import useGetServiceConfig from "../config/useGetServiceConfig";
-import { ApiContextProvider } from "@madie/madie-util";
+import { ApiContextProvider, getServiceConfig } from "@madie/madie-util";
 
 function Router({ props }) {
   const { authState } = useOktaAuth();
   const authenticated = authState?.isAuthenticated;
-  const { config, error } = useGetServiceConfig();
+  const [serviceConfig, setServiceConfig] = useState(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    getServiceConfig()
+      .then((config) => setServiceConfig(config))
+      .catch((err) => setError(err.message));
+  }, []);
   /*
     On initial page load we want to trigger a hard refresh because single spa loads the apps sequentially based on what contains what
     This init pattern pattern influences tab order so we need to refresh on first login.
@@ -37,6 +43,7 @@ function Router({ props }) {
       window.removeEventListener("measures-mount", mountListener, false);
     };
   }, []);
+
   const BrowserRouter = createBrowserRouter(
     createRoutesFromElements(
       <Route
@@ -62,9 +69,16 @@ function Router({ props }) {
     )
   );
 
+  if (error) {
+    return <div>Error loading service config: {error}</div>;
+  }
+  if (!serviceConfig) {
+    return <div>Loading service config...</div>;
+  }
+
   return (
     <div>
-      <ApiContextProvider value={config}>
+      <ApiContextProvider value={serviceConfig}>
         {authenticated && (
           <TimeoutHandler
             timeLeft={25 * 60 * 1000}

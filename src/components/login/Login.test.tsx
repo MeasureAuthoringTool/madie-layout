@@ -62,6 +62,7 @@ describe("Login component", () => {
       </MemoryRouter>
     );
     expect(container.firstChild).toBeNull();
+
   });
 
   it("should mount login widget is loaded if not authenticated", async () => {
