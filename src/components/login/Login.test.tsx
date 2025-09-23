@@ -20,9 +20,22 @@ const mockConfig = {
     baseUrl: "test-logging-service-url",
   },
 };
+// Keep existing mocks...
+
+const mockUnlockMeasures = jest.fn().mockResolvedValue({});
+const mockUnlockLibraries = jest.fn().mockResolvedValue({});
+
 jest.mock("@madie/madie-util", () => ({
   useDocumentTitle: jest.fn(),
   useServiceConfig: jest.fn(() => mockConfig),
+  useMeasureServiceApi: () => ({
+    getUserInfo: jest.fn().mockResolvedValue({}),
+    unlockMeasures: mockUnlockMeasures,
+  }),
+  useCqlLibraryServiceApi: () => ({
+    getUserInfo: jest.fn().mockResolvedValue({}),
+    unlockLibraries: mockUnlockLibraries,
+  }),
 }));
 
 const mockLogoutLogger = jest.fn((args) => {
@@ -43,7 +56,12 @@ describe("Login component", () => {
       authState: null,
     }));
 
-    expect(Login({ config: {} })).toBeNull();
+    const { container } = render(
+      <MemoryRouter>
+        <Login config={{}} />
+      </MemoryRouter>
+    );
+    expect(container.firstChild).toBeNull();
   });
 
   it("should mount login widget is loaded if not authenticated", async () => {
@@ -66,6 +84,10 @@ describe("Login component", () => {
     expect(getByTestId("login-testid")).toBeInTheDocument();
     fireEvent.click(screen.getByTestId("login-testid"));
     expect(oktaAuth.handleLoginRedirect).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(mockUnlockMeasures).not.toHaveBeenCalled();
+      expect(mockUnlockLibraries).not.toHaveBeenCalled();
+    });
   });
 
   it("should not mount login widget if authenticated", async () => {
@@ -81,6 +103,10 @@ describe("Login component", () => {
       </MemoryRouter>
     );
     expect(queryByTestId("login-testid")).toBeNull();
+    await waitFor(() => {
+      expect(mockUnlockMeasures).toHaveBeenCalled();
+      expect(mockUnlockLibraries).toHaveBeenCalled();
+    });
   });
 
   it("Should login successfully with user info logged", async () => {
@@ -111,6 +137,5 @@ describe("Login component", () => {
     const loginButton = screen.getByRole("button", { name: "Login Widget" });
     userEvent.click(loginButton);
     await waitFor(() => expect(mockHandleLoginRedirect).toBeCalled());
-    //await waitFor(() => expect(mockLogoutLogger).toHaveBeenCalled());
   });
 });

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
+
 import { Navigate } from "react-router-dom";
 import { LoginWidget } from "@madie/madie-auth";
 import {
@@ -6,6 +7,8 @@ import {
   OktaConfig,
   ServiceConfig,
   useServiceConfig,
+  useMeasureServiceApi,
+  useCqlLibraryServiceApi,
 } from "@madie/madie-util";
 import { useOktaAuth } from "@okta/okta-react";
 import { loginLogger } from "../../custom-hooks/customLog";
@@ -14,16 +17,27 @@ function Login({ config }: { config: OktaConfig }) {
   useDocumentTitle("MADiE Login");
   const { oktaAuth, authState } = useOktaAuth();
   const serviceConfig: ServiceConfig = useServiceConfig();
-
+  const measureServiceApiRef = useRef(useMeasureServiceApi());
+  const cqlLibraryServiceApiRef = useRef(useCqlLibraryServiceApi());
+  const loginUnlock = () => {
+    try {
+      measureServiceApiRef.current.unlockMeasures();
+      cqlLibraryServiceApiRef.current.unlockLibraries();
+      return true;
+    } catch (error) {
+      console.error("Error unlocking measures for user", error);
+      return false;
+    }
+  };
   const loginConfig = {
     props: {
       config: config,
-      onSuccess: (tokens) => {
+      onSuccess: async (tokens) => {
         oktaAuth.handleLoginRedirect(tokens);
         if (oktaAuth.token != null && oktaAuth.token.getUserInfo() != null) {
           oktaAuth.token
             .getUserInfo()
-            .then((info) => {
+            .then((info) => () => {
               loginLogger(info, serviceConfig);
             })
             .catch((error) => {
@@ -38,12 +52,14 @@ function Login({ config }: { config: OktaConfig }) {
   };
 
   if (!authState) return null;
-  return authState.isAuthenticated ? (
-    <Navigate to="/measures" />
-  ) : (
-    <>
-      <LoginWidget {...loginConfig} />
-    </>
-  );
+  else if (authState.isAuthenticated && loginUnlock()) {
+    return <Navigate to="/measures" />;
+  } else {
+    return (
+      <>
+        <LoginWidget {...loginConfig} />
+      </>
+    );
+  }
 }
 export default Login;
