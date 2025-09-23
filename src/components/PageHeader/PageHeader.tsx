@@ -251,16 +251,17 @@ const PageHeader = () => {
       {pathname.includes("edit") && pathname.includes("cql-libraries") && (
         <Fade in={libraryState?.cqlLibraryName !== undefined}>
           <div className="details">
-            <div tw="pr-8" style={{ position: "relative" }}>
-              <div style={{ position: "absolute", top: 0, right: 0 }}>
-                <CqlLibraryActionCenter
-                  canEdit={libraryCanEdit}
-                  library={libraryState}
-                  canDelete={libraryCanDelete}
-                />
+            {(libraryCanEdit || featureFlags?.LibraryHistory) && (
+              <div tw="pr-8" style={{ position: "relative" }}>
+                <div style={{ position: "absolute", top: 0, right: 0 }}>
+                  <CqlLibraryActionCenter
+                    canEdit={libraryCanEdit}
+                    library={libraryState}
+                    canDelete={libraryCanDelete}
+                  />
+                </div>
               </div>
-            </div>
-
+            )}
             <div>
               <Breadcrumbs aria-label="Libraries">
                 <Link
