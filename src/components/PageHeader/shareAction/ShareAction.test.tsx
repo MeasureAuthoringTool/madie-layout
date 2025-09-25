@@ -1,7 +1,7 @@
 import * as React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { Measure, MeasureSet, Model } from "@madie/madie-models";
-import ShareAction from "./ShareAction";
+import ShareAction, { SharedOptions } from "./ShareAction";
 import userEvent from "@testing-library/user-event";
 
 const mockUser = "test user";
@@ -30,10 +30,12 @@ const qiCoreMeasure = {
   measureMetaData: { draft: true },
 } as unknown as Measure;
 
+const options = [SharedOptions.SHARE_WITH, SharedOptions.UNSHARE];
+
 describe("ShareAction", () => {
   it("Should display menu items when the share action btn is clicked and call associated onClick method when menu item is clicked", () => {
     const onClick = jest.fn();
-    render(<ShareAction onClick={onClick} />);
+    render(<ShareAction onClick={onClick} options={options} />);
 
     const shareButton = screen.getByTestId("share-action-btn");
 
@@ -58,7 +60,7 @@ describe("ShareAction", () => {
 
 describe("508, keyboard and clickaway behavior", () => {
   it("closes on Tab and prevents default + stops propagation", async () => {
-    render(<ShareAction onClick={jest.fn()} />);
+    render(<ShareAction onClick={jest.fn()} options={options} />);
     userEvent.click(screen.getByTestId("share-action-btn"));
 
     const menuList = await screen.findByRole("menu", { name: "" });
@@ -72,7 +74,7 @@ describe("508, keyboard and clickaway behavior", () => {
   });
 
   it("closes on Escape and stops propagation", async () => {
-    render(<ShareAction onClick={jest.fn()} />);
+    render(<ShareAction onClick={jest.fn()} options={options} />);
     userEvent.click(screen.getByTestId("share-action-btn"));
 
     const menuList = await screen.findByRole("menu", { name: "" });
@@ -86,7 +88,7 @@ describe("508, keyboard and clickaway behavior", () => {
   });
 
   it("closes when clicking away", async () => {
-    render(<ShareAction onClick={jest.fn()} />);
+    render(<ShareAction onClick={jest.fn()} options={options} />);
     userEvent.click(screen.getByTestId("share-action-btn"));
 
     await screen.findByRole("menu");

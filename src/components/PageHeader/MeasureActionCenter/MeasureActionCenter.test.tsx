@@ -426,16 +426,51 @@ describe("MeasureActionCenter Component", () => {
     userEvent.click(shareButton);
 
     const shareWithMenuItem = screen.getByTestId("Share With-option");
-    const unsharehMenuItem = screen.getByTestId("Unshare-option");
+    const unshareMenuItem = screen.getByTestId("Unshare-option");
 
     expect(shareWithMenuItem).toBeInTheDocument();
-    expect(unsharehMenuItem).toBeInTheDocument();
+    expect(unshareMenuItem).toBeInTheDocument();
 
     userEvent.click(screen.getByRole("menuitem", { name: "Unshare" }));
 
     expect(dispatchEventSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         type: "unshare-measure",
+      })
+    );
+  });
+
+  it("should render 'Unshare' button when measure is shared with user but they are not owner", async () => {
+    // User is not the owner of measure but the measure shared with them
+    (checkUserCanEdit as jest.Mock)
+      .mockImplementationOnce(() => false) // ownerOfMeasure = false
+      .mockImplementationOnce(() => true); // sharedWithUser = true
+
+    render(
+      <MeasureActionCenter
+        canEdit={true}
+        measure={draftMeasure}
+        canDelete={false}
+      />
+    );
+
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+
+    const shareActionButton = screen.getByTestId("share-action-btn");
+    expect(shareActionButton).toBeInTheDocument();
+
+    userEvent.click(shareActionButton);
+
+    expect(screen.queryByTestId("Share With-option")).toBeNull();
+    const unshareMenuItem = await screen.findByTestId("Unshare-option");
+    expect(unshareMenuItem).toBeInTheDocument();
+
+    userEvent.click(unshareMenuItem);
+
+    expect(dispatchEventSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "unshare-measure-from-me",
       })
     );
   });
