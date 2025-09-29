@@ -189,13 +189,15 @@ const MeasureActionCenter = (props: PropTypes) => {
         icon: (
           <ShareAction
             options={[SharedOptions.SHARE_WITH, SharedOptions.UNSHARE]}
-            onClick={(option: string) => {
-              if (option === SharedOptions.SHARE_WITH) {
-                handleActionClick(new Event("share-measure"));
-              } else if (option === SharedOptions.UNSHARE) {
-                handleActionClick(new Event("unshare-measure"));
-              }
-            }}
+            onClick={(option: string) =>
+              handleActionClick(
+                new Event(
+                  option === SharedOptions.SHARE_WITH
+                    ? "share-measure"
+                    : "unshare-measure" // SharedOptions.UNSHARE
+                )
+              )
+            }
           />
         ),
         name: "Share/Unshare",
@@ -205,11 +207,9 @@ const MeasureActionCenter = (props: PropTypes) => {
         icon: (
           <ShareAction
             options={[SharedOptions.UNSHARE]}
-            onClick={(option: string) => {
-              if (option === SharedOptions.UNSHARE) {
-                handleActionClick(new Event("unshare-measure-from-me"));
-              }
-            }}
+            onClick={() =>
+              handleActionClick(new Event("unshare-measure-from-me"))
+            }
           />
         ),
         name: "Unshare",
