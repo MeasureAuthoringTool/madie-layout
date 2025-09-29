@@ -46,9 +46,6 @@ const MeasureActionCenter = (props: PropTypes) => {
     routeHandlerStore.state
   );
 
-  const ownerOfMeasure = isOwnerOfMeasure(props.measure);
-  const sharedWithUser = isSharedWithUser(props.measure);
-
   useEffect(() => {
     const subscription = routeHandlerStore.subscribe(setRouteHandlerState);
     return () => {
@@ -57,15 +54,7 @@ const MeasureActionCenter = (props: PropTypes) => {
   }, []);
 
   useEffect(() => {
-    setActions(
-      getActionArray(
-        props.measure,
-        props.canEdit,
-        props.canDelete,
-        ownerOfMeasure,
-        sharedWithUser
-      )
-    );
+    setActions(getActionArray(props.measure, props.canEdit, props.canDelete));
   }, [props, routeHandlerState]);
 
   const onContinue = async () => {
@@ -100,10 +89,11 @@ const MeasureActionCenter = (props: PropTypes) => {
   const getActionArray = (
     measure: Measure,
     canEdit: boolean,
-    canDelete: boolean,
-    ownerOfMeasure: boolean,
-    sharedWithUser: boolean
+    canDelete: boolean
   ): any[] => {
+    const ownerOfMeasure = isOwnerOfMeasure(measure);
+    const sharedWithUser = isSharedWithUser(measure);
+
     const actions = new Map<string, any>();
 
     actions.set("human readable", {
