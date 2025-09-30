@@ -23,13 +23,12 @@ interface PropTypes {
   canDelete: boolean;
 }
 
-const isOwnerOfSelectedMeasure = (measures) => {
-  return (
-    measures &&
-    measures.every((measure) => {
-      return checkUserCanEdit(measure?.measureSet?.owner, []);
-    })
-  );
+const isOwnerOfMeasure = (measure) => {
+  return measure && checkUserCanEdit(measure?.measureSet?.owner, []);
+};
+
+const isSharedWithUser = (measure) => {
+  return measure && checkUserCanEdit(null, measure?.measureSet?.acls);
 };
 
 const TRANSFER_MEASURE = "Transfer";
@@ -92,6 +91,9 @@ const MeasureActionCenter = (props: PropTypes) => {
     canEdit: boolean,
     canDelete: boolean
   ): any[] => {
+    const ownerOfMeasure = isOwnerOfMeasure(measure);
+    const sharedWithUser = isSharedWithUser(measure);
+
     const actions = new Map<string, any>();
 
     actions.set("human readable", {
@@ -172,20 +174,35 @@ const MeasureActionCenter = (props: PropTypes) => {
       }
     }
 
-    if (isOwnerOfSelectedMeasure([measure])) {
+    if (ownerOfMeasure) {
       actions.set("share/unshare measure", {
         icon: (
           <ShareAction
-            onClick={(option: string) => {
-              if (option === SharedOptions.SHARE_WITH) {
-                handleActionClick(new Event("share-measure"));
-              } else if (option === SharedOptions.UNSHARE) {
-                handleActionClick(new Event("unshare-measure"));
-              }
-            }}
+            options={[SharedOptions.SHARE_WITH, SharedOptions.UNSHARE]}
+            onClick={(option: string) =>
+              handleActionClick(
+                new Event(
+                  option === SharedOptions.SHARE_WITH
+                    ? "share-measure"
+                    : "unshare-measure" // SharedOptions.UNSHARE
+                )
+              )
+            }
           />
         ),
         name: "Share/Unshare",
+      });
+    } else if (sharedWithUser) {
+      actions.set("unshare measure from me", {
+        icon: (
+          <ShareAction
+            options={[SharedOptions.UNSHARE]}
+            onClick={() =>
+              handleActionClick(new Event("unshare-measure-from-me"))
+            }
+          />
+        ),
+        name: "Unshare",
       });
     }
 
@@ -193,15 +210,13 @@ const MeasureActionCenter = (props: PropTypes) => {
       actions.set("transfer measure", {
         icon: (
           <TransferAction
-            canTransfer={isOwnerOfSelectedMeasure([measure])}
+            canTransfer={ownerOfMeasure}
             onClick={() => {
               handleActionClick(new Event("transfer-measure"));
             }}
           />
         ),
-        name: isOwnerOfSelectedMeasure([measure])
-          ? TRANSFER_MEASURE
-          : CANNOT_TRANSFER,
+        name: ownerOfMeasure ? TRANSFER_MEASURE : CANNOT_TRANSFER,
       });
     }
     // required order to display
@@ -212,6 +227,7 @@ const MeasureActionCenter = (props: PropTypes) => {
       "draft measure",
       "version measure",
       "share/unshare measure",
+      "unshare measure from me",
       "export measure",
       "delete measure",
     ];

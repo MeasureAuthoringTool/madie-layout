@@ -426,10 +426,10 @@ describe("MeasureActionCenter Component", () => {
     userEvent.click(shareButton);
 
     const shareWithMenuItem = screen.getByTestId("Share With-option");
-    const unsharehMenuItem = screen.getByTestId("Unshare-option");
+    const unshareMenuItem = screen.getByTestId("Unshare-option");
 
     expect(shareWithMenuItem).toBeInTheDocument();
-    expect(unsharehMenuItem).toBeInTheDocument();
+    expect(unshareMenuItem).toBeInTheDocument();
 
     userEvent.click(screen.getByRole("menuitem", { name: "Unshare" }));
 
@@ -438,6 +438,61 @@ describe("MeasureActionCenter Component", () => {
         type: "unshare-measure",
       })
     );
+  });
+
+  it("should render Unshare from me button when measure is shared with user but they are not owner", async () => {
+    // User is not the owner of measure but the measure shared with them
+    (checkUserCanEdit as jest.Mock)
+      .mockImplementationOnce(() => false) // ownerOfMeasure = false
+      .mockImplementationOnce(() => true); // sharedWithUser = true
+
+    render(
+      <MeasureActionCenter
+        canEdit={true}
+        measure={draftMeasure}
+        canDelete={false}
+      />
+    );
+
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+
+    const shareActionButton = screen.getByTestId("share-action-btn");
+    expect(shareActionButton).toBeInTheDocument();
+
+    userEvent.click(shareActionButton);
+
+    expect(screen.queryByTestId("Share With-option")).toBeNull();
+    const unshareMenuItem = await screen.findByTestId("Unshare-option");
+    expect(unshareMenuItem).toBeInTheDocument();
+
+    userEvent.click(unshareMenuItem);
+
+    expect(dispatchEventSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "unshare-measure-from-me",
+      })
+    );
+  });
+
+  it("should not render Share/Unshare or Unshare from me button when user is not owner and measure is not shared with them", () => {
+    (checkUserCanEdit as jest.Mock)
+      .mockImplementationOnce(() => false) // ownerOfMeasure = false
+      .mockImplementationOnce(() => false); // sharedWithUser = false
+
+    render(
+      <MeasureActionCenter
+        canEdit={true}
+        measure={draftMeasure}
+        canDelete={false}
+      />
+    );
+
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+
+    const shareActionButton = screen.queryByTestId("share-action-btn");
+    expect(shareActionButton).toBeNull();
   });
 
   it("pops discard dialog, emits event for resetting forms on continue", async () => {

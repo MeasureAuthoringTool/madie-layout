@@ -14,14 +14,13 @@ export enum SharedOptions {
   SHARE_WITH = "Share With",
   UNSHARE = "Unshare",
 }
-
-const options = [SharedOptions.SHARE_WITH, SharedOptions.UNSHARE];
-
 interface PropTypes {
+  options: SharedOptions[];
   onClick: (option: string) => void;
 }
 
 const ShareAction = (props: PropTypes) => {
+  const { options, onClick } = props;
   const [open, setOpen] = useState(false);
   // move anchorElement to a stable reference that does not change across renders.
   const anchorRef = useRef<HTMLButtonElement>(null);
@@ -36,7 +35,7 @@ const ShareAction = (props: PropTypes) => {
 
   const handleMenuItemClick = (option: string) => {
     handleClose();
-    props.onClick(option);
+    onClick(option);
   };
   function handleListKeyDown(event: React.KeyboardEvent) {
     // it's inside of another key trap. If we allow the event to bubble up, the action center speed dial will take the command instead of the child element here.
