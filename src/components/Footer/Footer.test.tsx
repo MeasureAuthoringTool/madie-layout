@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import * as React from "react";
 import Footer from "./Footer";
 import { ServiceConfig } from "@madie/madie-util";
@@ -24,5 +24,6 @@ describe("Footer component", () => {
     const customHHSLogo = getByTestId("custom-hhs-logo");
     expect(customHHSLogo).toBeTruthy();
     expect(customMadieLogo).toBeTruthy();
+    expect(await screen.findByText("Version 1.2.3")).toBeInTheDocument();
   });
 });
