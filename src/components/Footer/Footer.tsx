@@ -2,10 +2,14 @@ import React, { useEffect, useState } from "react";
 import hhsLogoPath from "../../assets/images/hhs-logo-white.png";
 import madieLogoPath from "../../assets/images/madie-footer-logo.svg";
 import "./FooterStyles.scss";
-import { ServiceConfig } from "@madie/madie-util";
+import { getServiceConfig } from "@madie/madie-util";
 
 const Footer = () => {
   const [versionNumber, setVersionNumber] = useState<string>("N/A");
+
+  useEffect(() => {
+    getServiceConfig().then((res) => setVersionNumber(res.madieVersion));
+  }, []);
 
   const assets = {
     hhsLogo: (
