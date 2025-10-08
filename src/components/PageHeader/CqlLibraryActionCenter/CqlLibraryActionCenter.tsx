@@ -19,6 +19,7 @@ import {
   useOktaTokens,
   useFeatureFlags,
   useCqlLibraryServiceApi,
+  checkUserCanEdit,
 } from "@madie/madie-util";
 import ShareIcon from "../shareAction/ShareIcon";
 import SwapVertOutlinedIcon from "@mui/icons-material/SwapVertOutlined";
@@ -104,12 +105,21 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
   };
   const { getUserName } = useOktaTokens();
   const username = getUserName();
+  const isOwnerOfLibrary = (library: CqlLibrary) => {
+    return library && checkUserCanEdit(library?.librarySet?.owner, []);
+  };
+
+  const isSharedWithUser = (library: CqlLibrary) => {
+    return library && checkUserCanEdit(null, library?.librarySet?.acls);
+  };
   const getActionArray = (
     library: CqlLibrary,
     canEdit: boolean,
     canDelete: boolean
   ): any[] => {
     const actions = new Map<string, any>();
+    const ownerOfLibrary = isOwnerOfLibrary(library);
+    const sharedWithUser = isSharedWithUser(library);
 
     if (featureFlags?.LibraryHistory) {
       actions.set("history library", {
@@ -157,7 +167,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
           onClick: () => handleActionClick(new Event("draft-library")),
         });
       }
-      if (owner && owner == username) {
+      if (ownerOfLibrary) {
         actions.set("share library", {
           icon: (
             <IconButton>
@@ -165,6 +175,19 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
             </IconButton>
           ),
           name: "Share Library",
+          onClick: (event: React.MouseEvent<HTMLElement>) => {
+            setOpen(false);
+            setShareAnchorEl(event.currentTarget);
+          },
+        });
+      } else if (sharedWithUser) {
+        actions.set("unshare library from me", {
+          icon: (
+            <IconButton>
+              <ShareIcon />
+            </IconButton>
+          ),
+          name: "UnShare Library From Me",
           onClick: (event: React.MouseEvent<HTMLElement>) => {
             setOpen(false);
             setShareAnchorEl(event.currentTarget);
@@ -192,6 +215,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
       "draft library",
       "version library",
       "share library",
+      "unshare library from me",
       "delete library",
     ];
     return actionsListOrder.map((key) => actions.get(key)).filter(Boolean);
@@ -273,24 +297,38 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
         onClose={() => setShareAnchorEl(null)}
         data-testid="share-menu"
       >
-        <MenuItem
-          data-testid="Share With-option"
-          onClick={() => {
-            setShareAnchorEl(null);
-            handleActionClick(new Event("share-library"));
-          }}
-        >
-          Share With
-        </MenuItem>
-        <MenuItem
-          data-testid="Unshare-option"
-          onClick={() => {
-            setShareAnchorEl(null);
-            handleActionClick(new Event("unshare-library"));
-          }}
-        >
-          Unshare
-        </MenuItem>
+        {actions.some((action) => action.name === "UnShare Library From Me") ? (
+          <MenuItem
+            data-testid="Unshare-library-from-me-option"
+            onClick={() => {
+              setShareAnchorEl(null);
+              handleActionClick(new Event("unshare-library-from-me"));
+            }}
+          >
+            Unshare
+          </MenuItem>
+        ) : (
+          <>
+            <MenuItem
+              data-testid="Share With-option"
+              onClick={() => {
+                setShareAnchorEl(null);
+                handleActionClick(new Event("share-library"));
+              }}
+            >
+              Share With
+            </MenuItem>
+            <MenuItem
+              data-testid="Unshare-option"
+              onClick={() => {
+                setShareAnchorEl(null);
+                handleActionClick(new Event("unshare-library"));
+              }}
+            >
+              Unshare
+            </MenuItem>
+          </>
+        )}
       </Menu>
     </div>
   );
