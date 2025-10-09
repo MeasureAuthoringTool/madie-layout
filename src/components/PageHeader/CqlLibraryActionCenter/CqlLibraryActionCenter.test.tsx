@@ -3,7 +3,11 @@ import { render, screen, waitFor } from "@testing-library/react";
 import CqlLibraryActionCenter from "./CqlLibraryActionCenter";
 import { CqlLibrary, LibrarySet, Model } from "@madie/madie-models";
 import userEvent from "@testing-library/user-event";
-import { useFeatureFlags, routeHandlerStore } from "@madie/madie-util";
+import {
+  useFeatureFlags,
+  routeHandlerStore,
+  checkUserCanEdit,
+} from "@madie/madie-util";
 import { act } from "react-dom/test-utils";
 
 const mockUser = "test user";
@@ -60,6 +64,10 @@ jest.mock("@madie/madie-util", () => ({
       baseUrl: "test-cql-library-service-url",
     },
   }),
+  checkUserCanEdit: jest
+    .fn()
+    .mockImplementationOnce(() => false)
+    .mockImplementationOnce(() => true),
 }));
 
 describe("CqlLibraryActionCenter Component", () => {
@@ -147,14 +155,17 @@ describe("CqlLibraryActionCenter Component", () => {
     expect(screen.getByTestId("DeleteLibrary")).toBeInTheDocument();
   });
 
-  it("should render 'Share Library' button when canEdit is true and owner matches", async () => {
+  it("should render 'Version Library' button when canEdit is true and owner matches", async () => {
     (useFeatureFlags as jest.Mock).mockReturnValue({ ShareLibrary: true });
+    (checkUserCanEdit as jest.Mock)
+      .mockImplementationOnce(() => true) // ownerOfMeasure = false
+      .mockImplementationOnce(() => false); // sharedWithUser = false
     render(<CqlLibraryActionCenter canEdit={true} library={cqlLibrary} />);
     const actionCenterButton = screen.getByLabelText("Library action center");
     await act(async () => {
       userEvent.click(actionCenterButton);
     });
-    const sharebutton = await screen.findByTestId("ShareLibrary");
+    const sharebutton = await screen.findByTestId("VersionLibrary");
     expect(sharebutton).toBeInTheDocument();
   });
 
@@ -343,5 +354,35 @@ describe("CqlLibraryActionCenter Component", () => {
         type: "transfer-library",
       })
     );
+  });
+
+  it("should render 'Unshare' menu option when action is 'UnShare Library From Me'", async () => {
+    (checkUserCanEdit as jest.Mock)
+      .mockImplementationOnce(() => false) // ownerOfMeasure = false
+      .mockImplementationOnce(() => true); // sharedWithUser = false
+
+    const sharedLibrary = {
+      ...cqlLibrary,
+      librarySet: {
+        ...mockLibrarySet,
+        owner: "someone-else",
+        acls: ["test-acl"],
+      },
+    } as unknown as CqlLibrary;
+
+    render(
+      <CqlLibraryActionCenter
+        canEdit={true}
+        library={sharedLibrary}
+        canDelete={true}
+      />
+    );
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    userEvent.click(actionCenterButton);
+
+    const unshareBtn = await screen.findByTestId("UnShareLibraryFromMe");
+    userEvent.click(unshareBtn);
+
+    expect(screen.queryByTestId("Share With-option")).not.toBeInTheDocument();
   });
 });
