@@ -234,6 +234,27 @@ describe("CqlLibraryActionCenter Component", () => {
     );
   });
 
+  it("should trigger history-library event when 'History Library' action is clicked", () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ LibraryHistory: true });
+    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+    render(
+      <CqlLibraryActionCenter
+        canEdit={true}
+        library={cqlLibrary}
+        canDelete={false}
+      />
+    );
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    userEvent.click(actionCenterButton);
+    const historyLibrary = screen.getByTestId("History");
+    userEvent.click(historyLibrary);
+    expect(dispatchEventSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "history-library",
+      })
+    );
+  });
+
   it("should trigger draft-library event when 'Draft Library' action is clicked", () => {
     const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
     render(

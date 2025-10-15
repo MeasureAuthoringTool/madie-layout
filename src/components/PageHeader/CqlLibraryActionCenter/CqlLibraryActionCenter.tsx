@@ -129,7 +129,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
           </IconButton>
         ),
         name: "History",
-        onClick: () => {},
+        onClick: () => handleActionClick(new Event("history-library")),
       });
     }
 
