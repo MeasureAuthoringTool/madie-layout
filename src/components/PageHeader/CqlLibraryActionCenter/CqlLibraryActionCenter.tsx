@@ -195,7 +195,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
         });
       }
     }
-    if (featureFlags?.TransferLibrary) {
+    if (featureFlags?.TransferLibrary && isOwnerOfLibrary(library)) {
       actions.set("transfer library", {
         icon: (
           <IconButton>
