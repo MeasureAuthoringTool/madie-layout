@@ -210,8 +210,8 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
     }
     // required order to display
     const actionsListOrder = [
-      "history library",
       "transfer library",
+      "history library",
       "draft library",
       "version library",
       "share library",
