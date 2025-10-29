@@ -92,6 +92,7 @@ describe("CqlLibraryActionCenter Component", () => {
 
   it("should render delete and version library in action center when library is in draft status ", async () => {
     (useFeatureFlags as jest.Mock).mockReturnValue({ TransferLibrary: true });
+    (checkUserCanEdit as jest.Mock).mockReturnValue(true);
     render(
       <CqlLibraryActionCenter
         canEdit={true}
@@ -126,6 +127,7 @@ describe("CqlLibraryActionCenter Component", () => {
 
   it("should open action center on button click", async () => {
     (useFeatureFlags as jest.Mock).mockReturnValue({ TransferLibrary: true });
+    (checkUserCanEdit as jest.Mock).mockReturnValue(true);
     render(
       <CqlLibraryActionCenter
         canEdit={true}
@@ -319,8 +321,9 @@ describe("CqlLibraryActionCenter Component", () => {
     expect(screen.queryByTestId("TransferLibrary")).not.toBeInTheDocument();
   });
 
-  it("should display Transfer Library when library has different owner", async () => {
+  it("should not display Transfer Library when library has different owner", async () => {
     (useFeatureFlags as jest.Mock).mockReturnValue({ TransferLibrary: true });
+    (checkUserCanEdit as jest.Mock).mockReturnValue(false);
     jest.spyOn(require("@madie/madie-util"), "useOktaTokens").mockReturnValue({
       getAccessToken: () => "test.jwt",
       getUserName: () => "bad user",
@@ -337,9 +340,10 @@ describe("CqlLibraryActionCenter Component", () => {
       userEvent.click(actionCenterButton);
     });
     await waitFor(() => {
+      expect(screen.queryByTestId("Transfer")).not.toBeInTheDocument();
       expect(
         screen.queryByTestId("Youcannottransferalibraryyoudonotown.")
-      ).toBeInTheDocument();
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -348,6 +352,7 @@ describe("CqlLibraryActionCenter Component", () => {
     (useFeatureFlags as jest.Mock).mockReturnValue({
       TransferLibrary: true,
     });
+    (checkUserCanEdit as jest.Mock).mockReturnValue(true);
 
     render(
       <CqlLibraryActionCenter
