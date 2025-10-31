@@ -206,7 +206,7 @@ const MeasureActionCenter = (props: PropTypes) => {
       });
     }
 
-    if (featureFlags?.TransferMeasure && isOwnerOfMeasure(measure)) {
+    if (featureFlags?.TransferMeasure && ownerOfMeasure) {
       actions.set("transfer measure", {
         icon: (
           <TransferAction
