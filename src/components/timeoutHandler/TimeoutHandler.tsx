@@ -4,6 +4,7 @@ import React, {
   useRef,
   useEffect,
   useLayoutEffect,
+  useMemo,
 } from "react";
 import { throttle } from "lodash";
 import {
@@ -17,6 +18,7 @@ import {
   useMeasureServiceApi,
   useCqlLibraryServiceApi,
 } from "@madie/madie-util";
+import OktaAuth, { AccessToken, IDToken } from "@okta/okta-auth-js";
 
 export interface timeoutPropTypes {
   timeLeft: number;
@@ -72,61 +74,32 @@ const TimeoutHandler = ({ timeLeft = 10000, warningTime = 5000 }) => {
       );
     }
   };
+  async function refreshTokens(oktaAuth: OktaAuth) {
+    try {
+      const newIdToken = (await oktaAuth.tokenManager.renew(
+        "idToken"
+      )) as IDToken;
+      const newAccessToken = (await oktaAuth.tokenManager.renew(
+        "accessToken"
+      )) as AccessToken;
+      oktaAuth.tokenManager.setTokens({
+        idToken: newIdToken,
+        accessToken: newAccessToken,
+      });
+    } catch (error) {
+      console.error("Error refreshing tokens:", error);
+    }
+  }
 
-  const refreshTokens = useCallback(
-    throttle(
+  const refreshTokensMemo = useMemo(() => {
+    return throttle(
       () => {
-        oktaAuth.tokenManager
-          .renew("idToken")
-          .catch((error) => {
-            if (
-              localStorage.getItem("madieDebug") ||
-              (window as any).madieDebug
-            ) {
-              console.error(
-                "An error occurred while refreshing the idToken",
-                error
-              );
-              console.error("Stringified error: ", JSON.stringify(error));
-            }
-          })
-          .finally();
-        oktaAuth.tokenManager
-          .renew("accessToken")
-          .catch((error) => {
-            if (
-              localStorage.getItem("madieDebug") ||
-              (window as any).madieDebug
-            ) {
-              console.error(
-                "An error occurred while refreshing the accessToken",
-                error
-              );
-              console.error("Stringified error: ", JSON.stringify(error));
-            }
-          })
-          .finally();
-        oktaAuth.session
-          .refresh()
-          .catch((error) => {
-            if (
-              localStorage.getItem("madieDebug") ||
-              (window as any).madieDebug
-            ) {
-              console.error(
-                "An error occurred while refreshing the session",
-                error
-              );
-              console.error("Stringified error: ", JSON.stringify(error));
-            }
-          })
-          .finally();
+        refreshTokens(oktaAuth);
       },
       240000,
       { leading: true, trailing: true }
-    ),
-    []
-  );
+    );
+  }, [oktaAuth]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const resetTimeout = useCallback(
@@ -147,7 +120,7 @@ const TimeoutHandler = ({ timeLeft = 10000, warningTime = 5000 }) => {
 
   const handleUserActivity = useCallback(() => {
     resetTimeout();
-    refreshTokens();
+    refreshTokensMemo();
   }, []);
 
   // initialize
@@ -160,13 +133,13 @@ const TimeoutHandler = ({ timeLeft = 10000, warningTime = 5000 }) => {
     return () => {
       rootNode.removeEventListener("keypress", handleUserActivity);
       rootNode.removeEventListener("click", handleUserActivity);
-      rootNode.removeEventListener("mouseMove", handleUserActivity);
+      rootNode.removeEventListener("mousemove", handleUserActivity);
       clearTimeout(inactivityTimeoutRef.current);
       clearTimeout(logoutTimeoutRef.current);
       inactivityTimeoutRef.current = null;
       logoutTimeoutRef.current = null;
     };
-  }, [handleUserActivity, logoutTimeoutRef, inactivityTimeoutRef, timeLeft]);
+  }, [handleUserActivity, timeLeft]);
   return (
     <Dialog
       open={timingOut}
