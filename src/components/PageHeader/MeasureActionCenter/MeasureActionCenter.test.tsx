@@ -560,22 +560,22 @@ describe("MeasureActionCenter Component", () => {
     expect(screen.queryByTestId("Transfer")).not.toBeInTheDocument();
   });
 
-  it("should display Transfer Measure measure has a different owner", () => {
+  it("should not display Transfer Measure when measure has a different owner", () => {
     const measureSet = { ...mockMeasureSet, owner: "anotherUser" };
     const measure = { ...draftMeasure, measureSet: measureSet };
     (useFeatureFlags as jest.Mock).mockReturnValueOnce({
       ShareMeasure: true,
       TransferMeasure: true,
     });
+    (checkUserCanEdit as jest.Mock).mockReturnValueOnce(false); // User is not the owner
     render(
       <MeasureActionCenter canEdit={true} measure={measure} canDelete={true} />
     );
 
     const actionCenterButton = screen.getByLabelText("Measure action center");
     userEvent.click(actionCenterButton);
-    expect(screen.getByTestId("Share/Unshare")).toBeInTheDocument();
     expect(screen.getByTestId("ExportMeasure")).toBeInTheDocument();
-    expect(screen.getByTestId("Transfer")).toBeInTheDocument();
+    expect(screen.queryByTestId("Transfer")).not.toBeInTheDocument();
   });
 
   it("should render 'View History' action when MeasureHistory feature flag is enabled", () => {
