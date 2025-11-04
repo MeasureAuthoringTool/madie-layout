@@ -12,10 +12,9 @@ import { act, Simulate } from "react-dom/test-utils";
 import { describe, expect, test } from "@jest/globals";
 import userEvent from "@testing-library/user-event";
 import { mockLibraryName, mockMeasureName } from "../NewMeasure/bulkCreate";
-import { axios, useServiceConfig } from "@madie/madie-util";
+import { axios, useFeatureFlags, checkUserCanEdit } from "@madie/madie-util";
 import PageHeader from "../PageHeader/PageHeader";
 import { Model } from "@madie/madie-models/dist/Model";
-import useGetServiceConfig from "../../config/useGetServiceConfig";
 
 // First, define all mock data
 const mockLib = mockLibraryName();
@@ -126,7 +125,7 @@ jest.mock("@madie/madie-util", () => ({
     getUserName: () => mockUser,
   }),
   checkUserCanEdit: jest.fn().mockImplementation(() => true),
-  useFeatureFlags: jest.fn().mockReturnValue({ qdm: false }),
+  useFeatureFlags: jest.fn().mockReturnValue({ qdm: false, Locking: false }),
   checkUserCanDelete: jest.fn().mockImplementation(() => true),
 }));
 
@@ -204,7 +203,6 @@ describe("Page Header and Dialogs", () => {
       expect(queryByText("QI-Core v4.1.1")).toBeInTheDocument();
     });
     await waitFor(() => {
-      screen.debug();
       expect(queryByText("Draft")).toBeInTheDocument();
     });
   });
@@ -349,7 +347,7 @@ describe("Page Header and Dialogs", () => {
     });
   });
 
-  test.only("our submission works as intended", async () => {
+  test("our submission works as intended", async () => {
     await act(async () => {
       render(
         <MemoryRouter
@@ -695,5 +693,117 @@ describe("Page Header and Dialogs", () => {
     await waitFor(() =>
       expect(queryByTestId("info-1/5/2022 - 3/7/2022-1")).toBeInTheDocument()
     );
+  });
+
+  test("shows In Use chip when library is locked and Locking feature is enabled", async () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ Locking: true });
+    (checkUserCanEdit as jest.Mock).mockReturnValue(true);
+    const lockedLibrary = {
+      ...mockLibraryInfo,
+      cqlLibraryLock: {
+        lockedBy: "test user",
+      },
+      librarySet: { owner: "test user", acls: [] },
+    };
+    require("@madie/madie-util").cqlLibraryStore.state = lockedLibrary;
+    require("@madie/madie-util").cqlLibraryStore.subscribe = (set) => {
+      set(lockedLibrary);
+      return { unsubscribe: () => null };
+    };
+
+    render(
+      <MemoryRouter
+        initialEntries={["/cql-libraries/randomstring/edit/details"]}
+      >
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+    expect(
+      await screen.findByTestId(
+        `library-${lockedLibrary.cqlLibraryName}-inuse-chip`
+      )
+    ).toBeInTheDocument();
+
+    const tooltipIcon = screen.getByTestId("locked-icon");
+    expect(tooltipIcon).toBeInTheDocument();
+    userEvent.hover(tooltipIcon);
+    await waitFor(() => {
+      expect(
+        screen.getByText("Locked while being edited by test user")
+      ).toBeInTheDocument();
+    });
+  });
+
+  test("Should not show In Use chip when user cannot edit", async () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ Locking: true });
+    (checkUserCanEdit as jest.Mock).mockReturnValue(false);
+    const lockedLibrary = {
+      ...mockLibraryInfo,
+      cqlLibraryLock: {
+        lockedBy: "test user",
+      },
+      librarySet: { owner: "test user", acls: [] },
+    };
+    require("@madie/madie-util").cqlLibraryStore.state = lockedLibrary;
+    require("@madie/madie-util").cqlLibraryStore.subscribe = (set) => {
+      set(lockedLibrary);
+      return { unsubscribe: () => null };
+    };
+
+    render(
+      <MemoryRouter
+        initialEntries={["/cql-libraries/randomstring/edit/details"]}
+      >
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+    expect(
+      await screen.queryByTestId(
+        `library-${lockedLibrary.cqlLibraryName}-inuse-chip`
+      )
+    ).not.toBeInTheDocument();
+  });
+
+  test("Should not show In Use chip when library is not locked by other user", async () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ Locking: true });
+    (checkUserCanEdit as jest.Mock).mockReturnValue(true);
+    require("@madie/madie-util").cqlLibraryStore.state = mockLibraryInfo;
+    require("@madie/madie-util").cqlLibraryStore.subscribe = (set) => {
+      set(mockLibraryInfo);
+      return { unsubscribe: () => null };
+    };
+
+    render(
+      <MemoryRouter
+        initialEntries={["/cql-libraries/randomstring/edit/details"]}
+      >
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+    expect(
+      await screen.queryByTestId(
+        `library-${mockLibraryInfo.cqlLibraryName}-inuse-chip`
+      )
+    ).not.toBeInTheDocument();
+  });
+
+  test("handles wafReject event and opens WafDialog", async () => {
+    render(
+      <MemoryRouter initialEntries={["/measures"]}>
+        <PageHeader />
+      </MemoryRouter>
+    );
+    act(() => {
+      const event = new CustomEvent("wafReject", {
+        detail: { supportId: "12345" },
+      });
+      document.dispatchEvent(event);
+    });
+    expect(
+      await screen.findByText("WAF Issue Encountered")
+    ).toBeInTheDocument();
   });
 });
