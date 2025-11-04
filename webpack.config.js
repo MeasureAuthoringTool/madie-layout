@@ -115,6 +115,11 @@ module.exports = (webpackConfigEnv, argv) => {
         ),
       }),
     ],
+    // temp fix for github build issue (WARNING in entrypoint size limit: The following entrypoint(s) combined asset size exceeds the recommended limit (244 KiB). This can impact web performance.)
+    performance: {
+      maxEntrypointSize: 512000,
+      maxAssetSize: 512000,
+    },
   };
   // we need to pull out the styles and images, import them with scss.
   const copyConfig = {
