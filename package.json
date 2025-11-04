@@ -68,7 +68,7 @@
     "webpack-config-single-spa-react": "^4.0.1",
     "webpack-config-single-spa-react-ts": "^4.0.1",
     "webpack-config-single-spa-ts": "^4.1.0",
-    "webpack-dev-server": "^4.0.0-rc.0",
+    "webpack-dev-server": "^5.2.2",
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
