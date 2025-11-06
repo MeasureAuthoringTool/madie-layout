@@ -20,6 +20,9 @@ import "styled-components/macro";
 import "./pageHeader.scss";
 import { useIsOverflow } from "./useIsOverflow";
 import CqlLibraryActionCenter from "./CqlLibraryActionCenter/CqlLibraryActionCenter";
+import Chip from "@mui/material/Chip";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import Tooltip from "@mui/material/Tooltip";
 
 const PageHeader = () => {
   const { pathname } = useLocation();
@@ -298,6 +301,35 @@ const PageHeader = () => {
                     );
                 }
               )}
+              {featureFlags?.Locking &&
+                libraryCanEdit &&
+                libraryState?.cqlLibraryLock && (
+                  <div
+                    className="lock-indicator"
+                    data-testid={`lock-indicator-${libraryState?.id}`}
+                  >
+                    <Chip
+                      data-testid={`library-${libraryState?.cqlLibraryName}-inuse-chip`}
+                      label="In-Use"
+                      icon={
+                        <Tooltip
+                          title={`Locked while being edited by ${libraryState?.cqlLibraryLock?.lockedBy}`}
+                          aria-describedby="locked-tooltip"
+                        >
+                          <LockOutlinedIcon
+                            fontSize="small"
+                            data-testid="locked-icon"
+                          />
+                        </Tooltip>
+                      }
+                      sx={{
+                        backgroundColor: "#f5b027",
+                        height: "24px",
+                        ml: 1,
+                      }}
+                    />
+                  </div>
+                )}
             </div>
           </div>
         </Fade>
