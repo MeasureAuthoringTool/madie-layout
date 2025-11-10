@@ -206,6 +206,36 @@ const PageHeader = () => {
                   Draft
                 </div>
               )}
+              {featureFlags?.Locking &&
+                measureCanEdit &&
+                measureState?.measureLock && (
+                  <div
+                    className="lock-indicator"
+                    data-testid={`lock-indicator-${measureState?.id}`}
+                    style={{ display: "flex", alignItems: "center" }}
+                  >
+                    <Tooltip
+                      title={`Locked while being edited by ${measureState?.measureLock?.lockedBy}`}
+                      aria-describedby="locked-tooltip"
+                    >
+                      <Chip
+                        data-testid={`measure-${measureState?.measureName}-inuse-chip`}
+                        label="In-Use"
+                        icon={
+                          <LockOutlinedIcon
+                            fontSize="small"
+                            data-testid="locked-icon"
+                          />
+                        }
+                        sx={{
+                          backgroundColor: "#f5b027",
+                          height: "24px",
+                          ml: 1,
+                        }}
+                      />
+                    </Tooltip>
+                  </div>
+                )}
             </div>
           </div>
         </Fade>

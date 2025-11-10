@@ -806,4 +806,140 @@ describe("Page Header and Dialogs", () => {
       await screen.findByText("WAF Issue Encountered")
     ).toBeInTheDocument();
   });
+
+  test("shows In Use chip when measure is locked and Locking feature is enabled", async () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ Locking: true });
+    (checkUserCanEdit as jest.Mock).mockReturnValue(true);
+    const lockedMeasure = {
+      ...mockFormikInfo,
+      id: "test-measure-id",
+      measureLock: {
+        id: "lock-id",
+        measureId: "test-measure-id",
+        lockedBy: "another user",
+        lockedAt: "2025-11-07T10:00:00Z",
+      },
+      measureSet: { owner: "test user", acls: [] },
+    };
+    require("@madie/madie-util").measureStore.state = lockedMeasure;
+    require("@madie/madie-util").measureStore.subscribe = (set) => {
+      set(lockedMeasure);
+      return { unsubscribe: () => null };
+    };
+
+    render(
+      <MemoryRouter initialEntries={["/measures/test-measure-id/edit/details"]}>
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+    expect(
+      await screen.findByTestId(
+        `measure-${lockedMeasure.measureName}-inuse-chip`
+      )
+    ).toBeInTheDocument();
+
+    const chip = screen.getByTestId(
+      `measure-${lockedMeasure.measureName}-inuse-chip`
+    );
+    userEvent.hover(chip);
+    await waitFor(() => {
+      expect(
+        screen.getByText("Locked while being edited by another user")
+      ).toBeInTheDocument();
+    });
+  });
+
+  test("Should not show In Use chip when measure user cannot edit", async () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ Locking: true });
+    (checkUserCanEdit as jest.Mock).mockReturnValue(false);
+    const lockedMeasure = {
+      ...mockFormikInfo,
+      id: "test-measure-id",
+      measureLock: {
+        id: "lock-id",
+        measureId: "test-measure-id",
+        lockedBy: "another user",
+        lockedAt: "2025-11-07T10:00:00Z",
+      },
+      measureSet: { owner: "test user", acls: [] },
+    };
+    require("@madie/madie-util").measureStore.state = lockedMeasure;
+    require("@madie/madie-util").measureStore.subscribe = (set) => {
+      set(lockedMeasure);
+      return { unsubscribe: () => null };
+    };
+
+    render(
+      <MemoryRouter initialEntries={["/measures/test-measure-id/edit/details"]}>
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+    expect(
+      await screen.queryByTestId(
+        `measure-${lockedMeasure.measureName}-inuse-chip`
+      )
+    ).not.toBeInTheDocument();
+  });
+
+  test("Should not show In Use chip when measure is not locked", async () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ Locking: true });
+    (checkUserCanEdit as jest.Mock).mockReturnValue(true);
+    const unlockedMeasure = {
+      ...mockFormikInfo,
+      id: "test-measure-id",
+      measureSet: { owner: "test user", acls: [] },
+    };
+    require("@madie/madie-util").measureStore.state = unlockedMeasure;
+    require("@madie/madie-util").measureStore.subscribe = (set) => {
+      set(unlockedMeasure);
+      return { unsubscribe: () => null };
+    };
+
+    render(
+      <MemoryRouter initialEntries={["/measures/test-measure-id/edit/details"]}>
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+    expect(
+      await screen.queryByTestId(
+        `measure-${unlockedMeasure.measureName}-inuse-chip`
+      )
+    ).not.toBeInTheDocument();
+  });
+
+  test("Should not show In Use chip when Locking feature flag is disabled", async () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ Locking: false });
+    (checkUserCanEdit as jest.Mock).mockReturnValue(true);
+    const lockedMeasure = {
+      ...mockFormikInfo,
+      id: "test-measure-id",
+      measureLock: {
+        id: "lock-id",
+        measureId: "test-measure-id",
+        lockedBy: "another user",
+        lockedAt: "2025-11-07T10:00:00Z",
+      },
+      measureSet: { owner: "test user", acls: [] },
+    };
+    require("@madie/madie-util").measureStore.state = lockedMeasure;
+    require("@madie/madie-util").measureStore.subscribe = (set) => {
+      set(lockedMeasure);
+      return { unsubscribe: () => null };
+    };
+
+    render(
+      <MemoryRouter initialEntries={["/measures/test-measure-id/edit/details"]}>
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+    expect(
+      await screen.queryByTestId(
+        `measure-${lockedMeasure.measureName}-inuse-chip`
+      )
+    ).not.toBeInTheDocument();
+  });
 });
