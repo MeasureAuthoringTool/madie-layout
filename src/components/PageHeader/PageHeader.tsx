@@ -90,6 +90,11 @@ const PageHeader = () => {
     measureState?.measureMetadata?.draft
   );
 
+  const measureLockedBy =
+    featureFlags?.Locking && measureState?.measureLock
+      ? "Locked while being edited by " + measureState?.measureLock?.lockedBy
+      : undefined;
+
   const libraryCanEdit: boolean = checkUserCanEdit(
     libraryState?.librarySet?.owner,
     libraryState?.librarySet?.acls,
@@ -147,6 +152,7 @@ const PageHeader = () => {
                   canEdit={measureCanEdit}
                   measure={measureState}
                   canDelete={measureCanDelete}
+                  measureLockedBy={measureLockedBy}
                 />
               </div>
             </div>
