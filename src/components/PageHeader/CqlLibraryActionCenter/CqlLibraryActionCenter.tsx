@@ -28,6 +28,7 @@ interface PropTypes {
   canEdit: boolean;
   library: CqlLibrary;
   canDelete: boolean;
+  libraryLockedBy?: string | undefined;
 }
 
 const TRANSFER_LIBRARY = "Transfer";
@@ -136,25 +137,51 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
     if (canEdit) {
       if (library?.draft) {
         if (canDelete) {
-          actions.set("delete library", {
+          if (props.libraryLockedBy) {
+            actions.set("delete library", {
+              icon: (
+                <IconButton
+                  className="DeleteClass"
+                  disabled
+                  data-testid="deleteDisabled"
+                >
+                  <DeleteOutlinedIcon />
+                </IconButton>
+              ),
+              name: props.libraryLockedBy,
+            });
+          } else {
+            actions.set("delete library", {
+              icon: (
+                <IconButton className="DeleteClass">
+                  <DeleteOutlinedIcon />
+                </IconButton>
+              ),
+              name: "Delete Library",
+              onClick: () => handleActionClick(new Event("delete-library")),
+            });
+          }
+        }
+        if (props.libraryLockedBy) {
+          actions.set("version library", {
             icon: (
-              <IconButton className="DeleteClass">
-                <DeleteOutlinedIcon />
+              <IconButton disabled data-testid="versionDisabled">
+                <AccountTreeOutlinedIcon />
               </IconButton>
             ),
-            name: "Delete Library",
-            onClick: () => handleActionClick(new Event("delete-library")),
+            name: props.libraryLockedBy,
+          });
+        } else {
+          actions.set("version library", {
+            icon: (
+              <IconButton>
+                <AccountTreeOutlinedIcon />
+              </IconButton>
+            ),
+            name: "Version Library",
+            onClick: () => handleActionClick(new Event("version-library")),
           });
         }
-        actions.set("version library", {
-          icon: (
-            <IconButton>
-              <AccountTreeOutlinedIcon />
-            </IconButton>
-          ),
-          name: "Version Library",
-          onClick: () => handleActionClick(new Event("version-library")),
-        });
       }
       if (!library?.draft) {
         actions.set("draft library", {

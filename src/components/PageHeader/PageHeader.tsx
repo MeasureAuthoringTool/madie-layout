@@ -95,6 +95,10 @@ const PageHeader = () => {
     libraryState?.librarySet?.acls,
     true
   );
+  const libraryLockedBy =
+    featureFlags?.Locking && libraryState?.cqlLibraryLock
+      ? "Locked while being edited by " + libraryState?.cqlLibraryLock.lockedBy
+      : undefined;
 
   const libraryCanDelete: boolean = checkUserCanDelete(
     libraryState?.librarySet?.owner,
@@ -286,6 +290,7 @@ const PageHeader = () => {
                     canEdit={libraryCanEdit}
                     library={libraryState}
                     canDelete={libraryCanDelete}
+                    libraryLockedBy={libraryLockedBy}
                   />
                 </div>
               </div>

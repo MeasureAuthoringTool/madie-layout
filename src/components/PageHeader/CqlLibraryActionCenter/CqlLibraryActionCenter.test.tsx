@@ -411,4 +411,93 @@ describe("CqlLibraryActionCenter Component", () => {
 
     expect(screen.queryByTestId("Share With-option")).not.toBeInTheDocument();
   });
+
+  it("renders disabled Delete and Version button when locked", () => {
+    render(
+      <CqlLibraryActionCenter
+        canEdit={true}
+        canDelete={true}
+        library={cqlLibrary}
+        libraryLockedBy="user1"
+      />
+    );
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    userEvent.click(actionCenterButton);
+
+    const disabledDeleteBtn = screen.getByTestId("deleteDisabled");
+    expect(disabledDeleteBtn).toBeDefined(); // Ensure a disabled button is found
+    expect(disabledDeleteBtn).toBeDisabled();
+
+    const disabledVersionBtn = screen.getByTestId("versionDisabled");
+    expect(disabledVersionBtn).toBeDefined(); // Ensure a disabled button is found
+    expect(disabledVersionBtn).toBeDisabled();
+  });
+
+  it("dispatches 'share-library' event when 'Share With' menu item is clicked", async () => {
+    (checkUserCanEdit as jest.Mock).mockReturnValue(true);
+    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+    render(
+      <CqlLibraryActionCenter
+        canEdit={true}
+        library={cqlLibrary}
+        canDelete={true}
+      />
+    );
+
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    await act(async () => {
+      userEvent.click(actionCenterButton);
+    });
+
+    const shareAction = await screen.findByTestId("ShareLibrary");
+    await act(async () => {
+      userEvent.click(shareAction);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("share-menu")).toBeInTheDocument();
+    });
+
+    await act(async () => {
+      userEvent.click(screen.getByTestId("Share With-option"));
+    });
+
+    expect(dispatchEventSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "share-library" })
+    );
+  });
+
+  it("dispatches 'unshare-library' event when 'Unshare' menu item is clicked", async () => {
+    (checkUserCanEdit as jest.Mock).mockReturnValue(true);
+    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+    render(
+      <CqlLibraryActionCenter
+        canEdit={true}
+        library={cqlLibrary}
+        canDelete={true}
+      />
+    );
+
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    await act(async () => {
+      userEvent.click(actionCenterButton);
+    });
+
+    const shareAction = await screen.findByTestId("ShareLibrary");
+    await act(async () => {
+      userEvent.click(shareAction);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("share-menu")).toBeInTheDocument();
+    });
+
+    await act(async () => {
+      userEvent.click(screen.getByTestId("Unshare-option"));
+    });
+
+    expect(dispatchEventSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "unshare-library" })
+    );
+  });
 });
