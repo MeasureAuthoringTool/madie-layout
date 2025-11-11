@@ -622,4 +622,24 @@ describe("MeasureActionCenter Component", () => {
     userEvent.click(viewHistoryButton);
     expect(screen.getByTestId("ViewHistory")).toBeInTheDocument();
   });
+
+  it("renders disabled Delete button when locked", () => {
+    render(
+      <MeasureActionCenter
+        canEdit={true}
+        canDelete={true}
+        measure={draftMeasure}
+        measureLockedBy="user1"
+      />
+    );
+    userEvent.click(screen.getByLabelText("Measure action center"));
+
+    const disabledDeleteBtn = screen.getByTestId("deleteDisabled");
+    expect(disabledDeleteBtn).toBeDefined(); // Ensure a disabled button is found
+    expect(disabledDeleteBtn).toBeDisabled();
+
+    const disabledVersionBtn = screen.getByTestId("versionDisabled");
+    expect(disabledVersionBtn).toBeDefined(); // Ensure a disabled button is found
+    expect(disabledVersionBtn).toBeDisabled();
+  });
 });
