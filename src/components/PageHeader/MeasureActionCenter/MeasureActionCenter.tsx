@@ -21,6 +21,7 @@ interface PropTypes {
   canEdit: boolean;
   measure: Measure;
   canDelete: boolean;
+  measureLockedBy?: string;
 }
 
 const isOwnerOfMeasure = (measure) => {
@@ -54,7 +55,14 @@ const MeasureActionCenter = (props: PropTypes) => {
   }, []);
 
   useEffect(() => {
-    setActions(getActionArray(props.measure, props.canEdit, props.canDelete));
+    setActions(
+      getActionArray(
+        props.measure,
+        props.canEdit,
+        props.canDelete,
+        props.measureLockedBy
+      )
+    );
   }, [props, routeHandlerState]);
 
   const onContinue = async () => {
@@ -89,7 +97,8 @@ const MeasureActionCenter = (props: PropTypes) => {
   const getActionArray = (
     measure: Measure,
     canEdit: boolean,
-    canDelete: boolean
+    canDelete: boolean,
+    measureLockedBy: string | undefined
   ): any[] => {
     const ownerOfMeasure = isOwnerOfMeasure(measure);
     const sharedWithUser = isSharedWithUser(measure);
@@ -150,26 +159,52 @@ const MeasureActionCenter = (props: PropTypes) => {
         });
       }
       if (measure?.measureMetaData?.draft) {
-        actions.set("version measure", {
-          icon: (
-            <IconButton>
-              <AccountTreeOutlinedIcon />
-            </IconButton>
-          ),
-          name: "Version Measure",
-          onClick: () => handleActionClick(new Event("version-measure")),
-        });
-
-        if (canDelete) {
-          actions.set("delete measure", {
+        if (measureLockedBy) {
+          actions.set("version measure", {
             icon: (
-              <IconButton className="DeleteClass">
-                <DeleteOutlinedIcon />
+              <IconButton disabled data-testid="versionDisabled">
+                <AccountTreeOutlinedIcon />
               </IconButton>
             ),
-            name: "Delete Measure",
-            onClick: () => handleActionClick(new Event("delete-measure")),
+            name: measureLockedBy,
           });
+        } else {
+          actions.set("version measure", {
+            icon: (
+              <IconButton>
+                <AccountTreeOutlinedIcon />
+              </IconButton>
+            ),
+            name: "Version Measure",
+            onClick: () => handleActionClick(new Event("version-measure")),
+          });
+        }
+
+        if (canDelete) {
+          if (measureLockedBy) {
+            actions.set("delete measure", {
+              icon: (
+                <IconButton
+                  className="DeleteClass"
+                  disabled
+                  data-testid="deleteDisabled"
+                >
+                  <DeleteOutlinedIcon />
+                </IconButton>
+              ),
+              name: measureLockedBy,
+            });
+          } else {
+            actions.set("delete measure", {
+              icon: (
+                <IconButton className="DeleteClass">
+                  <DeleteOutlinedIcon />
+                </IconButton>
+              ),
+              name: "Delete Measure",
+              onClick: () => handleActionClick(new Event("delete-measure")),
+            });
+          }
         }
       }
     }
