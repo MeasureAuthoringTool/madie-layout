@@ -12,6 +12,7 @@ import {
 import { act, Simulate } from "react-dom/test-utils";
 import userEvent from "@testing-library/user-event";
 import CreateNewMeasureDialog from "./CreateNewMeasureDialog";
+// @ts-ignore
 import { useFeatureFlags } from "@madie/madie-util";
 
 jest.mock("@madie/madie-util", () => ({
@@ -60,7 +61,7 @@ describe("Measures Create Dialog", () => {
 
   test("Checking for all the items in the measure creation form", async () => {
     await act(async () => {
-      const { findByTestId } = await render(
+      const { findByTestId } = render(
         <CreateNewMeasureDialog open={true} onClose={undefined} />
       );
       expect(await findByTestId("measure-name-text-field")).toBeInTheDocument();
@@ -84,7 +85,7 @@ describe("Measures Create Dialog", () => {
       );
       const measurementPeriodEndInput = within(
         measurementPeriodEndNode
-      ).getByRole("textbox");
+      ).getByRole("textbox") as HTMLInputElement;
       userEvent.type(
         measurementPeriodEndInput,
         formikInfo.measurementPeriodEnd
@@ -97,28 +98,32 @@ describe("Measures Create Dialog", () => {
 
   test("to check if all given inputs are as expected", async () => {
     await act(async () => {
-      const { queryByTestId, getByTestId } = await render(
+      const { queryByTestId, getByTestId } = render(
         <CreateNewMeasureDialog open={true} onClose={undefined} />
       );
 
-      const nameNode = await getByTestId("measure-name-input");
+      const nameNode = (await screen.findByTestId(
+        "measure-name-input"
+      )) as HTMLInputElement;
       userEvent.type(nameNode, formikInfo.measureName);
       expect(nameNode.value).toBe(formikInfo.measureName);
       Simulate.change(nameNode);
 
-      const libraryNode = await getByTestId("cql-library-name-input");
+      const libraryNode = getByTestId(
+        "cql-library-name-input"
+      ) as HTMLInputElement;
       userEvent.type(libraryNode, formikInfo.cqlLibraryName);
       expect(libraryNode.value).toBe(formikInfo.cqlLibraryName);
       Simulate.change(libraryNode);
 
-      const ecqmNode = await getByTestId("ecqm-input");
+      const ecqmNode = getByTestId("ecqm-input") as HTMLInputElement;
       userEvent.type(ecqmNode, formikInfo.ecqmTitle);
       expect(ecqmNode.value).toBe(formikInfo.ecqmTitle);
       Simulate.change(ecqmNode);
 
-      const modelSelect = await getByTestId("measure-model-select");
+      const modelSelect = getByTestId("measure-model-select");
       fireEvent.click(modelSelect);
-      const modelNode = await getByTestId("measure-model-input");
+      const modelNode = getByTestId("measure-model-input") as HTMLInputElement;
       fireEvent.select(modelNode, { target: { value: formikInfo.model } });
       expect(modelNode.value).toBe(formikInfo.model);
       Simulate.change(modelNode);
@@ -128,7 +133,7 @@ describe("Measures Create Dialog", () => {
       );
       const measurementPeriodStartInput = within(
         measurementPeriodStartNode
-      ).getByRole("textbox");
+      ).getByRole("textbox") as HTMLInputElement;
       userEvent.type(
         measurementPeriodStartInput,
         formikInfo.measurementPeriodStart
@@ -140,7 +145,7 @@ describe("Measures Create Dialog", () => {
       const measurementPeriodEndNode = getByTestId("measurement-period-end");
       const measurementPeriodEndInput = within(
         measurementPeriodEndNode
-      ).getByRole("textbox");
+      ).getByRole("textbox") as HTMLInputElement;
       userEvent.type(
         measurementPeriodEndInput,
         formikInfo.measurementPeriodEnd
@@ -149,7 +154,7 @@ describe("Measures Create Dialog", () => {
         formikInfo.measurementPeriodEnd
       );
 
-      const submitButton = await getByTestId("continue-button");
+      const submitButton = getByTestId("continue-button");
       expect(submitButton).not.toBeDisabled();
       fireEvent.click(submitButton);
       await waitFor(() => {
@@ -160,28 +165,26 @@ describe("Measures Create Dialog", () => {
 
   test("the dialog allows create for a QDM measure with underscore in library name", async () => {
     (useFeatureFlags as jest.Mock).mockReturnValue({ qdm: true });
-    const { queryByTestId, getByTestId } = await render(
+    const { queryByTestId, getByTestId } = render(
       <CreateNewMeasureDialog open={true} onClose={undefined} />
     );
 
-    const nameNode = (await getByTestId(
-      "measure-name-input"
-    )) as HTMLInputElement;
+    const nameNode = getByTestId("measure-name-input") as HTMLInputElement;
     userEvent.type(nameNode, "QdmMeasure");
     expect(nameNode.value).toBe("QdmMeasure");
 
-    const libraryNode = (await getByTestId(
+    const libraryNode = getByTestId(
       "cql-library-name-input"
-    )) as HTMLInputElement;
+    ) as HTMLInputElement;
     userEvent.type(libraryNode, "Qdm_MeasureLib");
     expect(libraryNode.value).toBe("Qdm_MeasureLib");
 
-    const ecqmNode = (await getByTestId("ecqm-input")) as HTMLInputElement;
+    const ecqmNode = getByTestId("ecqm-input") as HTMLInputElement;
     userEvent.type(ecqmNode, "ecqmTitleQdm");
     expect(ecqmNode.value).toBe("ecqmTitleQdm");
 
-    const modelSelect = await getByTestId("measure-model-select");
-    const modelSelectBtn = await within(modelSelect).getByRole("combobox");
+    const modelSelect = getByTestId("measure-model-select");
+    const modelSelectBtn = within(modelSelect).getByRole("combobox");
     userEvent.click(modelSelectBtn);
     const options = await screen.findAllByRole("option");
     expect(options.length).toEqual(3);
@@ -208,7 +211,7 @@ describe("Measures Create Dialog", () => {
       formikInfo.measurementPeriodEnd
     );
 
-    const submitButton = await getByTestId("continue-button");
+    const submitButton = getByTestId("continue-button");
     await waitFor(() => expect(submitButton).not.toBeDisabled());
     fireEvent.click(submitButton);
     await waitFor(() => {
@@ -218,9 +221,9 @@ describe("Measures Create Dialog", () => {
 
   test("checking if error text is displayed for invalid dates", async () => {
     await act(async () => {
-      await render(<CreateNewMeasureDialog open={true} onClose={undefined} />);
+      render(<CreateNewMeasureDialog open={true} onClose={undefined} />);
 
-      const measurementPeriodStartNode = screen.getByTestId(
+      const measurementPeriodStartNode = await screen.findByTestId(
         "measurement-period-start"
       );
       const measurementPeriodStartInput = within(
@@ -228,12 +231,12 @@ describe("Measures Create Dialog", () => {
       ).getByRole("textbox");
       userEvent.type(measurementPeriodStartInput, "12/33");
 
-      const measurementPeriodEndNode = screen.getByTestId(
+      const measurementPeriodEndNode = await screen.findByTestId(
         "measurement-period-end"
       );
       const measurementPeriodEndInput = within(
         measurementPeriodEndNode
-      ).getByRole("textbox");
+      ).getByRole("textbox") as HTMLInputElement;
       userEvent.type(
         measurementPeriodEndInput,
         formikInfo.measurementPeriodEnd
@@ -259,9 +262,9 @@ describe("Measures Create Dialog", () => {
 
   test("checking if error text is displayed when measurement periods are not provided", async () => {
     await act(async () => {
-      await render(<CreateNewMeasureDialog open={true} onClose={undefined} />);
+      render(<CreateNewMeasureDialog open={true} onClose={undefined} />);
 
-      const measurementPeriodStartNode = screen.getByTestId(
+      const measurementPeriodStartNode = await screen.findByTestId(
         "measurement-period-start"
       );
       const measurementPeriodStartInput = within(
@@ -269,12 +272,12 @@ describe("Measures Create Dialog", () => {
       ).getByRole("textbox");
       userEvent.type(measurementPeriodStartInput, "");
 
-      const measurementPeriodEndNode = screen.getByTestId(
+      const measurementPeriodEndNode = await screen.findByTestId(
         "measurement-period-end"
       );
       const measurementPeriodEndInput = within(
         measurementPeriodEndNode
-      ).getByRole("textbox");
+      ).getByRole("textbox") as HTMLInputElement;
       userEvent.type(
         measurementPeriodEndInput,
         formikInfo.measurementPeriodEnd
@@ -300,9 +303,9 @@ describe("Measures Create Dialog", () => {
 
   test("checking if error text is displayed when measurement periods are not between the years 1900 and 2100", async () => {
     await act(async () => {
-      await render(<CreateNewMeasureDialog open={true} onClose={undefined} />);
+      render(<CreateNewMeasureDialog open={true} onClose={undefined} />);
 
-      const measurementPeriodStartNode = screen.getByTestId(
+      const measurementPeriodStartNode = await screen.findByTestId(
         "measurement-period-start"
       );
       const measurementPeriodStartInput = within(
@@ -310,12 +313,12 @@ describe("Measures Create Dialog", () => {
       ).getByRole("textbox");
       userEvent.type(measurementPeriodStartInput, "12/22/2100");
 
-      const measurementPeriodEndNode = screen.getByTestId(
+      const measurementPeriodEndNode = await screen.findByTestId(
         "measurement-period-end"
       );
       const measurementPeriodEndInput = within(
         measurementPeriodEndNode
-      ).getByRole("textbox");
+      ).getByRole("textbox") as HTMLInputElement;
       userEvent.type(
         measurementPeriodEndInput,
         formikInfo.measurementPeriodEnd
@@ -388,28 +391,26 @@ describe("Measures Create Dialog", () => {
 
   test("the dialog does not allow create for a QI-Core measure with underscore in library name", async () => {
     (useFeatureFlags as jest.Mock).mockReturnValue({ qdm: true });
-    const { queryByTestId, getByTestId } = await render(
+    const { getByTestId } = render(
       <CreateNewMeasureDialog open={true} onClose={undefined} />
     );
 
-    const nameNode = (await getByTestId(
-      "measure-name-input"
-    )) as HTMLInputElement;
+    const nameNode = getByTestId("measure-name-input") as HTMLInputElement;
     userEvent.type(nameNode, "QiCoreMeasure");
     expect(nameNode.value).toBe("QiCoreMeasure");
 
-    const libraryNode = (await getByTestId(
+    const libraryNode = getByTestId(
       "cql-library-name-input"
-    )) as HTMLInputElement;
+    ) as HTMLInputElement;
     userEvent.type(libraryNode, "QiCore_MeasureLib");
     expect(libraryNode.value).toBe("QiCore_MeasureLib");
 
-    const ecqmNode = (await getByTestId("ecqm-input")) as HTMLInputElement;
+    const ecqmNode = getByTestId("ecqm-input") as HTMLInputElement;
     userEvent.type(ecqmNode, "ecqmTitleQdm");
     expect(ecqmNode.value).toBe("ecqmTitleQdm");
 
-    const modelSelect = await getByTestId("measure-model-select");
-    const modelSelectBtn = await within(modelSelect).getByRole("combobox");
+    const modelSelect = getByTestId("measure-model-select");
+    const modelSelectBtn = within(modelSelect).getByRole("combobox");
     userEvent.click(modelSelectBtn);
     const options = await screen.findAllByRole("option");
     expect(options.length).toEqual(3);
@@ -436,12 +437,12 @@ describe("Measures Create Dialog", () => {
       formikInfo.measurementPeriodEnd
     );
 
-    const submitButton = await getByTestId("continue-button");
+    const submitButton = getByTestId("continue-button");
     await waitFor(() => expect(submitButton).toBeDisabled());
   }, 10000);
 
   test("Model dropdown shows QI-Core v6.0.0", async () => {
-    const { getByTestId } = await render(
+    const { getByTestId } = render(
       <CreateNewMeasureDialog open={true} onClose={undefined} />
     );
     const modelSelectDropDown = getByTestId("measure-model-select");
@@ -457,7 +458,7 @@ describe("Measures Create Dialog", () => {
   });
 
   test("Model dropdown does not shows QI-Core v7.0.0", async () => {
-    const { getByTestId, queryByTestId } = await render(
+    const { getByTestId, queryByTestId } = render(
       <CreateNewMeasureDialog open={true} onClose={undefined} />
     );
     const modelSelectDropDown = getByTestId("measure-model-select");
@@ -477,7 +478,7 @@ describe("Measures Create Dialog", () => {
 
   test("Model dropdown shows QI-Core v7.0.0 when feature flag is on", async () => {
     (useFeatureFlags as jest.Mock).mockReturnValue({ qiCore7: true });
-    const { getByTestId } = await render(
+    const { getByTestId } = render(
       <CreateNewMeasureDialog open={true} onClose={undefined} />
     );
     const modelSelectDropDown = getByTestId("measure-model-select");
@@ -493,5 +494,56 @@ describe("Measures Create Dialog", () => {
     expect(
       getByTestId("measure-model-option-QI-Core v7.0.0")
     ).toBeInTheDocument();
+  });
+
+  test("Composite check box should be visible if feature flag is ON and model is QI-Core", async () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({
+      QICoreCompositeMeasure: true,
+    });
+    const { getByTestId, queryByTestId } = render(
+      <CreateNewMeasureDialog open={true} onClose={undefined} />
+    );
+    const modelSelectDropDown = getByTestId("measure-model-select");
+    const modelSelectBtn = within(modelSelectDropDown).getByRole("combobox");
+    userEvent.click(modelSelectBtn);
+
+    const option = getByTestId("measure-model-option-QI-Core v4.1.1");
+    userEvent.click(option);
+
+    expect(queryByTestId("composite")).toBeInTheDocument();
+  });
+
+  test("Composite check box should NOT be visible if feature flag is OFF and model is QI-Core", async () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({
+      QICoreCompositeMeasure: false,
+    });
+    const { getByTestId, queryByTestId } = render(
+      <CreateNewMeasureDialog open={true} onClose={undefined} />
+    );
+    const modelSelectDropDown = getByTestId("measure-model-select");
+    const modelSelectBtn = within(modelSelectDropDown).getByRole("combobox");
+    userEvent.click(modelSelectBtn);
+
+    const option = getByTestId("measure-model-option-QI-Core v4.1.1");
+    userEvent.click(option);
+
+    expect(queryByTestId("composite")).not.toBeInTheDocument();
+  });
+
+  test("Composite check box should NOT be visible if feature flag is ON and model is QDM", async () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({
+      QICoreCompositeMeasure: true,
+    });
+    const { getByTestId, queryByTestId } = render(
+      <CreateNewMeasureDialog open={true} onClose={undefined} />
+    );
+    const modelSelectDropDown = getByTestId("measure-model-select");
+    const modelSelectBtn = within(modelSelectDropDown).getByRole("combobox");
+    userEvent.click(modelSelectBtn);
+
+    const option = getByTestId("measure-model-option-QDM v5.6");
+    userEvent.click(option);
+
+    expect(queryByTestId("composite")).not.toBeInTheDocument();
   });
 });

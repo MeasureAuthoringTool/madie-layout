@@ -44,7 +44,7 @@ declare module "@madie/madie-util" {
     pendingRoute: string;
   }
 
-  interface FeatureFlags {
+  export interface FeatureFlags {
     ShareLibrary: boolean;
     importTestCases: boolean;
     ShareMeasure: boolean;
@@ -54,6 +54,7 @@ declare module "@madie/madie-util" {
     MeasureHistory: boolean;
     LibraryHistory: boolean;
     Locking: boolean;
+    QICoreCompositeMeasure: boolean;
   }
 
   export const cqlLibraryStore: {

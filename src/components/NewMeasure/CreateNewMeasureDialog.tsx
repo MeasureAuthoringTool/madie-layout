@@ -16,6 +16,7 @@ import {
   useServiceConfig,
   useOktaTokens,
   useFeatureFlags,
+  FeatureFlags,
 } from "@madie/madie-util";
 import {
   Checkbox,
@@ -37,7 +38,7 @@ interface Toast {
 
 const CreateNewMeasureDialog = ({ open, onClose }) => {
   const { getAccessToken } = useOktaTokens();
-  const featureFlags = useFeatureFlags();
+  const featureFlags: FeatureFlags = useFeatureFlags();
   const config = useServiceConfig();
   const [toast, setToast] = useState<Toast>({
     toastOpen: false,
@@ -56,6 +57,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
       measurementPeriodEnd: null,
       measureMetaData: {
         experimental: false,
+        composite: false,
       },
       // TO DO: validation, models for new entries
     } as unknown as Measure,
@@ -83,6 +85,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
     measure.versionId = uuidv4();
     if (measure.model === Model.QDM_5_6) {
       measure.measureMetaData.experimental = null;
+      measure.measureMetaData.composite = null;
     }
     await axios
       .post<Measure>(config?.measureService?.baseUrl + "/measure", measure, {
@@ -344,8 +347,33 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
         />
       </Box>
 
+      {featureFlags?.QICoreCompositeMeasure &&
+        formik.values.model &&
+        formik.values.model !== Model.QDM_5_6 && (
+          <Box sx={formRow}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  onChange={formik.handleChange}
+                  sx={{
+                    color: "#333333",
+                  }}
+                  name="measureMetaData.composite"
+                  id="composite"
+                  data-testid="composite"
+                />
+              }
+              label="Enable Composite Functionality"
+              sx={{
+                color: "#333333",
+                textTransform: "none",
+              }}
+            />
+          </Box>
+        )}
+
       {formik.values.model && formik.values.model !== Model.QDM_5_6 && (
-        <Box sx={formRowGapped}>
+        <Box sx={formRow}>
           <FormControlLabel
             control={
               <Checkbox
