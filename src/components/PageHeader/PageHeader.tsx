@@ -216,6 +216,14 @@ const PageHeader = () => {
                   Draft
                 </div>
               )}
+              {measureState?.measureMetaData?.composite && (
+                <div
+                  className="composite-bubble"
+                  data-testid="composite-bubble"
+                >
+                  Composite
+                </div>
+              )}
               {featureFlags?.Locking &&
                 measureCanEdit &&
                 measureState?.measureLock && (
