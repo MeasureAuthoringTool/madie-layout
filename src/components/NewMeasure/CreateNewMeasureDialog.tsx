@@ -422,7 +422,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
           {...formik.getFieldProps("measurementPeriodStart")}
           InputProps={{
             "data-testid": "measurement-period-start-input",
-            "aria-describedby": "create-measure-period-start-helper-text",
+            "aria-describedby": "measurement-period-start-helper-text",
             "aria-required": true,
           }}
           onBlur={() =>
@@ -443,7 +443,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
           }
           InputProps={{
             "data-testid": "measurement-period-end-input",
-            "aria-describedby": "create-measure-period-end-helper-text",
+            "aria-describedby": "measurement-period-end-helper-text",
             required: true,
             "aria-required": true,
           }}
