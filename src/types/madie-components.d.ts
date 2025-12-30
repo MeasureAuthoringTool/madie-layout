@@ -13,7 +13,7 @@ declare module "@madie/madie-components" {
     readonly lg: "lg";
     readonly xl: "xl";
   };
-  export type ButtonSize = typeof ButtonSizeDefs[keyof typeof ButtonSizeDefs];
+  export type ButtonSize = (typeof ButtonSizeDefs)[keyof typeof ButtonSizeDefs];
 
   export const ButtonVariantDefs: {
     readonly primary: "primary";
@@ -21,7 +21,7 @@ declare module "@madie/madie-components" {
     readonly white: "white";
   };
   export type ButtonVariant =
-    typeof ButtonVariantDefs[keyof typeof ButtonVariantDefs];
+    (typeof ButtonVariantDefs)[keyof typeof ButtonVariantDefs];
 
   export const ButtonShapeDefs: {
     readonly normal: "normal";
@@ -29,7 +29,7 @@ declare module "@madie/madie-components" {
     readonly circular: "circular";
   };
   export type ButtonShape =
-    typeof ButtonShapeDefs[keyof typeof ButtonShapeDefs];
+    (typeof ButtonShapeDefs)[keyof typeof ButtonShapeDefs];
 
   export type IconType = (props: React.ComponentProps<"svg">) => JSX.Element;
 
