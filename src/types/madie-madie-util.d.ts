@@ -49,10 +49,6 @@ declare module "@madie/madie-util" {
     importTestCases: boolean;
     ShareMeasure: boolean;
     qiCore7: boolean;
-    TransferMeasure: boolean;
-    TransferLibrary: boolean;
-    MeasureHistory: boolean;
-    LibraryHistory: boolean;
     Locking: boolean;
     QICoreCompositeMeasure: boolean;
   }

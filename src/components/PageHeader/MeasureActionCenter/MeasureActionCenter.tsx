@@ -117,19 +117,17 @@ const MeasureActionCenter = (props: PropTypes) => {
       onClick: () => handleActionClick(new Event("view-humanreadable")),
     });
 
-    if (featureFlags?.MeasureHistory) {
-      actions.set("history", {
-        icon: (
-          <IconButton>
-            <HistoryIcon />
-          </IconButton>
-        ),
-        name: "View History",
-        onClick: () => {
-          handleActionClick(new Event("view-measure-history"));
-        },
-      });
-    }
+    actions.set("history", {
+      icon: (
+        <IconButton>
+          <HistoryIcon />
+        </IconButton>
+      ),
+      name: "View History",
+      onClick: () => {
+        handleActionClick(new Event("view-measure-history"));
+      },
+    });
 
     actions.set("export measure", {
       icon: (
@@ -241,7 +239,7 @@ const MeasureActionCenter = (props: PropTypes) => {
       });
     }
 
-    if (featureFlags?.TransferMeasure && ownerOfMeasure) {
+    if (ownerOfMeasure) {
       actions.set("transfer measure", {
         icon: (
           <TransferAction
