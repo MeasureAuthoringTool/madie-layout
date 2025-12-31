@@ -212,13 +212,13 @@ const PageHeader = () => {
                   );
               })}
               {measureState?.measureMetaData?.draft && (
-                <div className="draft-bubble" data-testid="draft-bubble">
+                <div className="bubble draft-bubble" data-testid="draft-bubble">
                   Draft
                 </div>
               )}
               {measureState?.measureMetaData?.composite && (
                 <div
-                  className="composite-bubble"
+                  className="bubble composite-bubble"
                   data-testid="composite-bubble"
                 >
                   Composite
@@ -329,7 +329,7 @@ const PageHeader = () => {
             <div tw="py-4">
               <h2 tw="text-2xl text-white mb-0">{`${libraryState?.cqlLibraryName}`}</h2>
               {libraryState?.draft && (
-                <div className="draft-bubble" data-testid="draft-bubble">
+                <div className="bubble draft-bubble" data-testid="draft-bubble">
                   Draft
                 </div>
               )}
