@@ -51,6 +51,7 @@ const mockFormikInfo = {
   active: true,
   measureMetaData: {
     draft: true,
+    composite: true,
   },
 };
 
@@ -287,6 +288,30 @@ describe("Page Header and Dialogs", () => {
       });
       expect(dispatchEventSpy).toHaveBeenCalledWith(expect.any(Event));
       expect(dispatchEventSpy.mock.calls[0][0].type).toBe("delete-measure");
+    });
+  });
+
+  test("Composite bubble is displayed when composite is true", async () => {
+    await act(async () => {
+      render(
+        <MemoryRouter
+          initialEntries={[
+            {
+              pathname: "/measures/randomstroning/edit/details",
+              search: "",
+              hash: "",
+              state: undefined,
+              key: "1fewtg",
+            },
+          ]}
+        >
+          <PageHeader />
+        </MemoryRouter>
+      );
+
+      await waitFor(() => {
+        expect(queryByText("Composite")).toBeInTheDocument();
+      });
     });
   });
 
