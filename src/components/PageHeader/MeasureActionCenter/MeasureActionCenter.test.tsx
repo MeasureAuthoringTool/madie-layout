@@ -69,8 +69,6 @@ describe("MeasureActionCenter Component", () => {
   it("should open action center on button click", () => {
     (useFeatureFlags as jest.Mock).mockReturnValue({
       ShareMeasure: true,
-      MeasureHistory: true,
-      TransferMeasure: true,
     });
     render(
       <MeasureActionCenter
@@ -100,9 +98,6 @@ describe("MeasureActionCenter Component", () => {
   });
 
   it("should trigger transfer measure event", () => {
-    (useFeatureFlags as jest.Mock).mockReturnValueOnce({
-      TransferMeasure: true,
-    });
     render(
       <MeasureActionCenter
         canEdit={true}
@@ -318,7 +313,6 @@ describe("MeasureActionCenter Component", () => {
   });
 
   it("should render View History button", () => {
-    (useFeatureFlags as jest.Mock).mockReturnValue({ MeasureHistory: true });
     render(
       <MeasureActionCenter
         canEdit={true}
@@ -330,21 +324,6 @@ describe("MeasureActionCenter Component", () => {
     userEvent.click(actionCenterButton);
     const viewHistoryButton = screen.getByTestId("ViewHistory");
     expect(viewHistoryButton).toBeInTheDocument();
-  });
-
-  it("should not render View History button when feature flag is disabled", () => {
-    (useFeatureFlags as jest.Mock).mockReturnValue({ MeasureHistory: false });
-    render(
-      <MeasureActionCenter
-        canEdit={true}
-        measure={draftMeasure}
-        canDelete={false}
-      />
-    );
-    const actionCenterButton = screen.getByLabelText("Measure action center");
-    userEvent.click(actionCenterButton);
-    const viewHistoryButton = screen.queryByTestId("ViewHistory");
-    expect(viewHistoryButton).toBeNull();
   });
 
   it("should render Share button if the user is the owner of the measure", () => {
@@ -537,35 +516,11 @@ describe("MeasureActionCenter Component", () => {
     setTimeoutSpy.mockRestore();
   });
 
-  it("should not show Transfer Measure when feature flag is not on", () => {
-    (useFeatureFlags as jest.Mock).mockReturnValueOnce({
-      ShareMeasure: true,
-      TransferMeasure: false,
-    });
-    render(
-      <MeasureActionCenter
-        canEdit={true}
-        measure={versionedMeasure}
-        canDelete={true}
-      />
-    );
-
-    const actionCenterButton = screen.getByLabelText("Measure action center");
-    userEvent.click(actionCenterButton);
-    expect(screen.queryByTestId("DeleteMeasure")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("VersionMeasure")).not.toBeInTheDocument();
-    expect(screen.getByTestId("Share/Unshare")).toBeInTheDocument();
-    expect(screen.getByTestId("DraftMeasure")).toBeInTheDocument();
-    expect(screen.getByTestId("ExportMeasure")).toBeInTheDocument();
-    expect(screen.queryByTestId("Transfer")).not.toBeInTheDocument();
-  });
-
   it("should not display Transfer Measure when measure has a different owner", () => {
     const measureSet = { ...mockMeasureSet, owner: "anotherUser" };
     const measure = { ...draftMeasure, measureSet: measureSet };
     (useFeatureFlags as jest.Mock).mockReturnValueOnce({
       ShareMeasure: true,
-      TransferMeasure: true,
     });
     (checkUserCanEdit as jest.Mock).mockReturnValueOnce(false); // User is not the owner
     render(
@@ -578,8 +533,7 @@ describe("MeasureActionCenter Component", () => {
     expect(screen.queryByTestId("Transfer")).not.toBeInTheDocument();
   });
 
-  it("should render 'View History' action when MeasureHistory feature flag is enabled", () => {
-    (useFeatureFlags as jest.Mock).mockReturnValue({ MeasureHistory: true });
+  it("should render 'View History' action", () => {
     render(
       <MeasureActionCenter
         canEdit={true}
@@ -592,22 +546,7 @@ describe("MeasureActionCenter Component", () => {
     expect(screen.getByTestId("ViewHistory")).toBeInTheDocument();
   });
 
-  it("should not render 'View History' action when MeasureHistory feature flag is disabled", () => {
-    (useFeatureFlags as jest.Mock).mockReturnValue({ MeasureHistory: false });
-    render(
-      <MeasureActionCenter
-        canEdit={true}
-        measure={draftMeasure}
-        canDelete={false}
-      />
-    );
-    const actionCenterButton = screen.getByLabelText("Measure action center");
-    userEvent.click(actionCenterButton);
-    expect(screen.queryByTestId("ViewHistory")).toBeNull();
-  });
-
   it("should dispatch 'view-measure-history' event when 'View History' action is clicked", () => {
-    (useFeatureFlags as jest.Mock).mockReturnValue({ MeasureHistory: true });
     const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
     render(
       <MeasureActionCenter
