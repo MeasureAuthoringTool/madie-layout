@@ -91,7 +91,6 @@ describe("CqlLibraryActionCenter Component", () => {
   });
 
   it("should render delete and version library in action center when library is in draft status ", async () => {
-    (useFeatureFlags as jest.Mock).mockReturnValue({ TransferLibrary: true });
     (checkUserCanEdit as jest.Mock).mockReturnValue(true);
     render(
       <CqlLibraryActionCenter
@@ -126,7 +125,6 @@ describe("CqlLibraryActionCenter Component", () => {
   });
 
   it("should open action center on button click", async () => {
-    (useFeatureFlags as jest.Mock).mockReturnValue({ TransferLibrary: true });
     (checkUserCanEdit as jest.Mock).mockReturnValue(true);
     render(
       <CqlLibraryActionCenter
@@ -237,7 +235,6 @@ describe("CqlLibraryActionCenter Component", () => {
   });
 
   it("should trigger history-library event when 'History Library' action is clicked", () => {
-    (useFeatureFlags as jest.Mock).mockReturnValue({ LibraryHistory: true });
     const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
     render(
       <CqlLibraryActionCenter
@@ -307,22 +304,7 @@ describe("CqlLibraryActionCenter Component", () => {
     );
   });
 
-  it("should not show Transfer Library when feature flag is not on", () => {
-    (useFeatureFlags as jest.Mock).mockReturnValue({ TransferLibrary: false });
-    render(
-      <CqlLibraryActionCenter
-        canEdit={true}
-        library={versionedCqlLibrary}
-        canDelete={true}
-      />
-    );
-    const actionCenterButton = screen.getByLabelText("Library action center");
-    userEvent.click(actionCenterButton);
-    expect(screen.queryByTestId("TransferLibrary")).not.toBeInTheDocument();
-  });
-
   it("should not display Transfer Library when library has different owner", async () => {
-    (useFeatureFlags as jest.Mock).mockReturnValue({ TransferLibrary: true });
     (checkUserCanEdit as jest.Mock).mockReturnValue(false);
     jest.spyOn(require("@madie/madie-util"), "useOktaTokens").mockReturnValue({
       getAccessToken: () => "test.jwt",
@@ -349,9 +331,6 @@ describe("CqlLibraryActionCenter Component", () => {
 
   it("should trigger transfer library event", async () => {
     const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
-    (useFeatureFlags as jest.Mock).mockReturnValue({
-      TransferLibrary: true,
-    });
     (checkUserCanEdit as jest.Mock).mockReturnValue(true);
 
     render(
@@ -367,12 +346,12 @@ describe("CqlLibraryActionCenter Component", () => {
       userEvent.click(actionCenterButton);
     });
 
-    const transferMeasureBtn = screen.getByTestId("Transfer");
-    expect(transferMeasureBtn).toBeInTheDocument();
-    expect(transferMeasureBtn).toBeEnabled();
+    const transferLibraryBtn = screen.getByTestId("Transfer");
+    expect(transferLibraryBtn).toBeInTheDocument();
+    expect(transferLibraryBtn).toBeEnabled();
 
     await act(async () => {
-      userEvent.click(transferMeasureBtn);
+      userEvent.click(transferLibraryBtn);
     });
 
     expect(dispatchEventSpy).toHaveBeenCalledWith(

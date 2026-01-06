@@ -122,17 +122,15 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
     const ownerOfLibrary = isOwnerOfLibrary(library);
     const sharedWithUser = isSharedWithUser(library);
 
-    if (featureFlags?.LibraryHistory) {
-      actions.set("history library", {
-        icon: (
-          <IconButton>
-            <HistoryIcon />
-          </IconButton>
-        ),
-        name: "History",
-        onClick: () => handleActionClick(new Event("history-library")),
-      });
-    }
+    actions.set("history library", {
+      icon: (
+        <IconButton>
+          <HistoryIcon />
+        </IconButton>
+      ),
+      name: "History",
+      onClick: () => handleActionClick(new Event("history-library")),
+    });
 
     if (canEdit) {
       if (library?.draft) {
@@ -222,7 +220,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
         });
       }
     }
-    if (featureFlags?.TransferLibrary && isOwnerOfLibrary(library)) {
+    if (isOwnerOfLibrary(library)) {
       actions.set("transfer library", {
         icon: (
           <IconButton>
