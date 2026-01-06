@@ -63,18 +63,10 @@ module.exports = (webpackConfigEnv, argv) => {
           ],
           exclude: /node_modules/,
         },
-        // teach webpack how to read the binaries
+        // teach webpack how to read the binaries. file-loader doesn't work in webpack 5
         {
-          test: /\.(woff(2)?|ttf|otf|eot)(\?v=\d+\.\d+\.\d+)?$/,
-          use: [
-            {
-              loader: "file-loader",
-              options: {
-                name: "[name].[ext]",
-                outputPath: "fonts/",
-              },
-            },
-          ],
+          test: /\.(woff2?|ttf|otf|eot)$/,
+          type: "asset/resource",
         },
       ],
     },

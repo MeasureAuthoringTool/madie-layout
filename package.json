@@ -48,7 +48,6 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-config-ts-react-important-stuff": "^3.0.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "file-loader": "^6.2.0",
     "html-webpack-plugin": "^5.3.2",
     "husky": "^7.0.2",
     "identity-obj-proxy": "^3.0.0",
