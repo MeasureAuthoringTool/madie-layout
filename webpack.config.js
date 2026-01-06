@@ -64,17 +64,13 @@ module.exports = (webpackConfigEnv, argv) => {
           exclude: /node_modules/,
         },
         // teach webpack how to read the binaries
+
         {
-          test: /\.(woff(2)?|ttf|otf|eot)(\?v=\d+\.\d+\.\d+)?$/,
-          use: [
-            {
-              loader: "file-loader",
-              options: {
-                name: "[name].[ext]",
-                outputPath: "fonts/",
-              },
-            },
-          ],
+          test: /\.(woff2?|ttf|otf|eot)$/,
+          type: "asset/resource",
+          generator: {
+            filename: "fonts/[name][ext]", // puts assets under dist/fonts/ in build
+          },
         },
       ],
     },
