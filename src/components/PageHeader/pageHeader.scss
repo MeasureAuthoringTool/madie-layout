@@ -123,19 +123,27 @@
         color: #fff;
       }
 
-      > .draft-bubble {
+      > .bubble {
         color: #242424;
         font-weight: 400;
         font-size: 14.4px;
         line-height: 20px;
-        background-color: #e1f3f8;
         padding: 2px 12px;
-        border: 1px solid #e1f3f8;
         border-radius: 24px;
         display: flex;
         align-items: center;
         height: 24px;
         margin-left: 16px;
+      }
+
+      > .draft-bubble {
+        background-color: #e1f3f8;
+        border: 1px solid #e1f3f8;
+      }
+
+      > .composite-bubble {
+        background-color: #f8e1f8;
+        border: 1px solid #f8e1f8;
       }
 
       > p {
