@@ -1,16 +1,17 @@
+import * as React from "react";
 import "@testing-library/jest-dom";
-
-import React from "react";
-import { render, fireEvent, waitFor, cleanup } from "@testing-library/react";
-import { describe, expect, test } from "@jest/globals";
+import {
+  render,
+  fireEvent,
+  waitFor,
+  cleanup,
+  screen,
+} from "@testing-library/react";
 import { act } from "react-dom/test-utils";
 import { MemoryRouter } from "react-router";
-
 import { useOktaAuth } from "@okta/okta-react";
 import MainNavBar from "./MainNavBar";
 import {
-  useMeasureServiceApi,
-  useCqlLibraryServiceApi,
   useTerminologyServiceApi,
   TerminologyServiceApi,
 } from "@madie/madie-util";
@@ -57,6 +58,12 @@ jest.mock("@madie/madie-util", () => ({
   }),
 }));
 
+jest.mock("@uswds/elements", () => ({
+  UsaBanner: {
+    define: jest.fn(),
+  },
+}));
+
 beforeEach(() => {
   const mockGetUserInfo = jest.fn().mockImplementation(() => {
     return Promise.resolve({ name: "test name", given_name: "test" });
@@ -89,27 +96,25 @@ beforeEach(() => {
 afterEach(cleanup);
 describe("MainNavBar Component", () => {
   test("Selecting different navigation routes, provides elements with classes as expected.", async () => {
-    await act(async () => {
-      const { findByTestId } = await render(
-        <MemoryRouter>
-          <MainNavBar />
-        </MemoryRouter>
-      );
+    const { findByTestId } = render(
+      <MemoryRouter>
+        <MainNavBar />
+      </MemoryRouter>
+    );
 
-      const measuresLink = await findByTestId("main-nav-bar-measures");
-      act(() => {
-        fireEvent.click(measuresLink);
-      });
-      await waitFor(() => {
-        expect(measuresLink).toHaveAttribute("aria-selected", "true");
-      });
-      const librariesLink = await findByTestId("main-nav-bar-cql-library");
-      act(() => {
-        fireEvent.click(librariesLink);
-      });
-      await waitFor(() => {
-        expect(librariesLink).toHaveAttribute("aria-selected", "true");
-      });
+    const measuresLink = await findByTestId("main-nav-bar-measures");
+    act(() => {
+      fireEvent.click(measuresLink);
+    });
+    await waitFor(() => {
+      expect(measuresLink).toHaveAttribute("aria-selected", "true");
+    });
+    const librariesLink = await findByTestId("main-nav-bar-cql-library");
+    act(() => {
+      fireEvent.click(librariesLink);
+    });
+    await waitFor(() => {
+      expect(librariesLink).toHaveAttribute("aria-selected", "true");
     });
   });
 
@@ -121,23 +126,35 @@ describe("MainNavBar Component", () => {
       authState: { isAuthenticated: false },
     }));
     await act(async () => {
-      const { queryByText } = await render(
+      const { queryByText } = render(
         <MemoryRouter>
           <MainNavBar />
         </MemoryRouter>
       );
 
-      const measuresLink = await queryByText("main-nav-bar-measures");
+      const measuresLink = queryByText("main-nav-bar-measures");
       expect(measuresLink).not.toBeInTheDocument();
 
-      const librariesLink = await queryByText("main-nav-bar-cql-library");
+      const librariesLink = queryByText("main-nav-bar-cql-library");
       expect(librariesLink).not.toBeInTheDocument();
 
-      const help = await queryByText("main-nav-bar-help");
+      const help = queryByText("main-nav-bar-help");
       expect(help).not.toBeInTheDocument();
 
       expect(queryByText("UMLS Active")).not.toBeInTheDocument();
       expect(queryByText("Connect to UMLS")).not.toBeInTheDocument();
     });
+  });
+
+  test("renders usa-banner component", async () => {
+    const { container } = render(
+      <MemoryRouter>
+        <MainNavBar />
+      </MemoryRouter>
+    );
+    await screen.findByTestId("main-nav-bar-measures");
+
+    const banner = container.querySelector("usa-banner") as HTMLElement;
+    expect(banner).toBeInTheDocument();
   });
 });

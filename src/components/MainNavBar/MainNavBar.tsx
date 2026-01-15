@@ -9,6 +9,24 @@ import UserAvatar from "./UserAvatar";
 import { Tabs, Tab } from "@madie/madie-design-system/dist/react";
 import "./MainNavBar.scss";
 import UserUMLS from "./UserUMLS";
+// @ts-ignore
+import { UsaBanner } from "@uswds/elements";
+
+// Register the web component once (safe in module scope)
+if (!window.customElements.get("usa-banner")) {
+  UsaBanner.define();
+}
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      "usa-banner": React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLElement>,
+        HTMLElement
+      >;
+    }
+  }
+}
 
 const MainNavBar = () => {
   const [showFullLogo, setShowFullLogo] = useState(true);
@@ -46,6 +64,7 @@ const MainNavBar = () => {
       >
         Skip to main content
       </a>
+      <usa-banner></usa-banner>
       <header
         role="banner"
         aria-label="Site header"
