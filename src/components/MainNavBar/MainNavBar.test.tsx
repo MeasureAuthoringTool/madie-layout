@@ -94,6 +94,7 @@ beforeEach(() => {
   });
 });
 afterEach(cleanup);
+
 describe("MainNavBar Component", () => {
   test("Selecting different navigation routes, provides elements with classes as expected.", async () => {
     const { findByTestId } = render(
@@ -146,15 +147,31 @@ describe("MainNavBar Component", () => {
     });
   });
 
-  test("renders usa-banner component", async () => {
+  test("renders usa-banner component when user is not authenticated", async () => {
+    (useOktaAuth as jest.Mock).mockImplementation(() => ({
+      oktaAuth: {
+        signOut: MockSignOut,
+      },
+      authState: { isAuthenticated: false },
+    }));
     const { container } = render(
       <MemoryRouter>
         <MainNavBar />
       </MemoryRouter>
     );
-    await screen.findByTestId("main-nav-bar-measures");
 
     const banner = container.querySelector("usa-banner") as HTMLElement;
     expect(banner).toBeInTheDocument();
+  });
+
+  test("usa-banner component is not displayed when user is authenticated", async () => {
+    const { container } = render(
+      <MemoryRouter>
+        <MainNavBar />
+      </MemoryRouter>
+    );
+
+    const banner = container.querySelector("usa-banner") as HTMLElement;
+    expect(banner).not.toBeInTheDocument();
   });
 });

@@ -64,7 +64,7 @@ const MainNavBar = () => {
       >
         Skip to main content
       </a>
-      <usa-banner></usa-banner>
+      {!authState?.isAuthenticated && <usa-banner></usa-banner>}
       <header
         role="banner"
         aria-label="Site header"
