@@ -1,7 +1,7 @@
 declare module "@madie/madie-util" {
   import { LifeCycleFn } from "single-spa";
   import { AxiosInstance } from "axios";
-  import { CqlLibrary, Measure, Acl } from "@madie/madie-models";
+  import { CqlLibrary, Measure, Acl, UserLogin } from "@madie/madie-models";
 
   export interface OktaConfig {
     baseUrl: string;
@@ -29,6 +29,9 @@ declare module "@madie/madie-util" {
       baseUrl: string;
     };
     loggingService?: {
+      baseUrl: string;
+    };
+    userService?: {
       baseUrl: string;
     };
     okta?: OktaConfig;
@@ -132,8 +135,15 @@ declare module "@madie/madie-util" {
     fetchAllOwners(librarySetIds: string[]): Promise<string[]>;
     unlockLibraries(): Promise<String>;
   }
+
+  export class UserServiceApi {
+    constructor(baseUrl: string, getAccessToken: () => string);
+    loginUser(accessTokenObj: any): Promise<UserLogin>;
+  }
+
   export function useMeasureServiceApi(): MeasureServiceApi;
   export function useCqlLibraryServiceApi(): CqlLibraryServiceApi;
+  export function useUserServiceApi(): UserServiceApi;
   export function useDocumentTitle(
     title: string,
     prevailOnMount?: boolean

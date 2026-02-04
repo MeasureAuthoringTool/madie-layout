@@ -1,7 +1,10 @@
 import React from "react";
 
 export function LoginWidget({ props }) {
-  const oktaTokens = { name: "test me" };
+  const oktaTokens = {
+    name: "test me",
+    accessToken: "mock-access-token",
+  };
   return (
     <div
       role="button"

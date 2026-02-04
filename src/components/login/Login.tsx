@@ -8,6 +8,7 @@ import {
   useServiceConfig,
   useMeasureServiceApi,
   useCqlLibraryServiceApi,
+  useUserServiceApi,
 } from "@madie/madie-util";
 import { useOktaAuth } from "@okta/okta-react";
 import { loginLogger } from "../../custom-hooks/customLog";
@@ -18,6 +19,7 @@ function Login({ config }: { config: OktaConfig }) {
   const serviceConfig: ServiceConfig = useServiceConfig();
   const measureServiceApiRef = useRef(useMeasureServiceApi());
   const cqlLibraryServiceApiRef = useRef(useCqlLibraryServiceApi());
+  const userServiceApiRef = useRef(useUserServiceApi());
   const loginUnlock = () => {
     try {
       measureServiceApiRef.current.unlockMeasures();
@@ -32,6 +34,15 @@ function Login({ config }: { config: OktaConfig }) {
     props: {
       config: config,
       onSuccess: async (tokens) => {
+        // this must sit before handleLoginRedirect or else the call may not complete before the redirect finishes triggering
+        try {
+          const userlogin = await userServiceApiRef.current.loginUser(
+            tokens.accessToken
+          );
+          // TODO: store user roles from login
+        } catch (error) {
+          // ignore errors
+        }
         oktaAuth.handleLoginRedirect(tokens);
         if (oktaAuth.token != null && oktaAuth.token.getUserInfo() != null) {
           oktaAuth.token
