@@ -52,7 +52,6 @@ declare module "@madie/madie-util" {
     importTestCases: boolean;
     ShareMeasure: boolean;
     qiCore7: boolean;
-    Locking: boolean;
     QICoreCompositeMeasure: boolean;
     AdminTransferMeasures: boolean;
   }

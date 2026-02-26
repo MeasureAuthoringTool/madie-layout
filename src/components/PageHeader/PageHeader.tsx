@@ -90,20 +90,18 @@ const PageHeader = () => {
     measureState?.measureMetadata?.draft
   );
 
-  const measureLockedBy =
-    featureFlags?.Locking && measureState?.measureLock
-      ? "Locked while being edited by " + measureState?.measureLock?.lockedBy
-      : undefined;
+  const measureLockedBy = measureState?.measureLock
+    ? "Locked while being edited by " + measureState?.measureLock?.lockedBy
+    : undefined;
 
   const libraryCanEdit: boolean = checkUserCanEdit(
     libraryState?.librarySet?.owner,
     libraryState?.librarySet?.acls,
     true
   );
-  const libraryLockedBy =
-    featureFlags?.Locking && libraryState?.cqlLibraryLock
-      ? "Locked while being edited by " + libraryState?.cqlLibraryLock.lockedBy
-      : undefined;
+  const libraryLockedBy = libraryState?.cqlLibraryLock
+    ? "Locked while being edited by " + libraryState?.cqlLibraryLock.lockedBy
+    : undefined;
 
   const libraryCanDelete: boolean = checkUserCanDelete(
     libraryState?.librarySet?.owner,
@@ -224,36 +222,34 @@ const PageHeader = () => {
                   Composite
                 </div>
               )}
-              {featureFlags?.Locking &&
-                measureCanEdit &&
-                measureState?.measureLock && (
-                  <div
-                    className="lock-indicator"
-                    data-testid={`lock-indicator-${measureState?.id}`}
-                    style={{ display: "flex", alignItems: "center" }}
+              {measureCanEdit && measureState?.measureLock && (
+                <div
+                  className="lock-indicator"
+                  data-testid={`lock-indicator-${measureState?.id}`}
+                  style={{ display: "flex", alignItems: "center" }}
+                >
+                  <Tooltip
+                    title={`Locked while being edited by ${measureState?.measureLock?.lockedBy}`}
+                    aria-describedby="locked-tooltip"
                   >
-                    <Tooltip
-                      title={`Locked while being edited by ${measureState?.measureLock?.lockedBy}`}
-                      aria-describedby="locked-tooltip"
-                    >
-                      <Chip
-                        data-testid={`measure-${measureState?.measureName}-inuse-chip`}
-                        label="In-Use"
-                        icon={
-                          <LockOutlinedIcon
-                            fontSize="small"
-                            data-testid="locked-icon"
-                          />
-                        }
-                        sx={{
-                          backgroundColor: "#f5b027",
-                          height: "24px",
-                          ml: 1,
-                        }}
-                      />
-                    </Tooltip>
-                  </div>
-                )}
+                    <Chip
+                      data-testid={`measure-${measureState?.measureName}-inuse-chip`}
+                      label="In-Use"
+                      icon={
+                        <LockOutlinedIcon
+                          fontSize="small"
+                          data-testid="locked-icon"
+                        />
+                      }
+                      sx={{
+                        backgroundColor: "#f5b027",
+                        height: "24px",
+                        ml: 1,
+                      }}
+                    />
+                  </Tooltip>
+                </div>
+              )}
             </div>
           </div>
         </Fade>
@@ -348,35 +344,33 @@ const PageHeader = () => {
                     );
                 }
               )}
-              {featureFlags?.Locking &&
-                libraryCanEdit &&
-                libraryState?.cqlLibraryLock && (
-                  <div
-                    className="lock-indicator"
-                    data-testid={`lock-indicator-${libraryState?.id}`}
-                  >
-                    <Chip
-                      data-testid={`library-${libraryState?.cqlLibraryName}-inuse-chip`}
-                      label="In-Use"
-                      icon={
-                        <Tooltip
-                          title={`Locked while being edited by ${libraryState?.cqlLibraryLock?.lockedBy}`}
-                          aria-describedby="locked-tooltip"
-                        >
-                          <LockOutlinedIcon
-                            fontSize="small"
-                            data-testid="locked-icon"
-                          />
-                        </Tooltip>
-                      }
-                      sx={{
-                        backgroundColor: "#f5b027",
-                        height: "24px",
-                        ml: 1,
-                      }}
-                    />
-                  </div>
-                )}
+              {libraryCanEdit && libraryState?.cqlLibraryLock && (
+                <div
+                  className="lock-indicator"
+                  data-testid={`lock-indicator-${libraryState?.id}`}
+                >
+                  <Chip
+                    data-testid={`library-${libraryState?.cqlLibraryName}-inuse-chip`}
+                    label="In-Use"
+                    icon={
+                      <Tooltip
+                        title={`Locked while being edited by ${libraryState?.cqlLibraryLock?.lockedBy}`}
+                        aria-describedby="locked-tooltip"
+                      >
+                        <LockOutlinedIcon
+                          fontSize="small"
+                          data-testid="locked-icon"
+                        />
+                      </Tooltip>
+                    }
+                    sx={{
+                      backgroundColor: "#f5b027",
+                      height: "24px",
+                      ml: 1,
+                    }}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </Fade>
