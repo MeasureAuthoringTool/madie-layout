@@ -53,6 +53,12 @@ declare module "@madie/madie-util" {
     ShareMeasure: boolean;
     qiCore7: boolean;
     QICoreCompositeMeasure: boolean;
+    AdminTransferMeasures: boolean;
+  }
+
+  export interface UserRoles {
+    roles: string[];
+    isAdmin: boolean;
   }
 
   export const cqlLibraryStore: {
@@ -83,6 +89,19 @@ declare module "@madie/madie-util" {
   };
 
   export function useFeatureFlags(): FeatureFlags;
+
+  export function useUserRoles(): UserRoles;
+
+  export function useIsAdminTransferEnabled(): boolean;
+
+  export const userRolesStore: {
+    subscribe: (
+      setUserRoles: React.Dispatch<React.SetStateAction<UserRoles>>
+    ) => import("rxjs").Subscription;
+    updateUserRoles: (roles: string[] | null) => void;
+    initialState: UserRoles;
+    state: UserRoles;
+  };
 
   export const featureFlagsStore: {
     subscribe: (
