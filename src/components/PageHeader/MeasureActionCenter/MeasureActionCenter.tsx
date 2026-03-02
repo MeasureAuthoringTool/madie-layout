@@ -9,8 +9,8 @@ import { Measure } from "@madie/madie-models";
 import {
   RouteHandlerState,
   routeHandlerStore,
-  useFeatureFlags,
   checkUserCanEdit,
+  useIsAdminTransferEnabled,
 } from "@madie/madie-util";
 import FeedOutlinedIcon from "@mui/icons-material/FeedOutlined";
 import ShareAction, { SharedOptions } from "../shareAction/ShareAction";
@@ -40,7 +40,7 @@ const MeasureActionCenter = (props: PropTypes) => {
   const [actions, setActions] = useState<Array<any>>([]);
   const [discardDialogOpen, setDiscardDialogOpen] = useState<boolean>(false);
   const [eventToTrigger, setEventToTrigger] = useState<Event | null>(null);
-  const featureFlags = useFeatureFlags();
+  const isAdminTransferEnabled = useIsAdminTransferEnabled?.() ?? false;
 
   const { updateRouteHandlerState } = routeHandlerStore;
   const [routeHandlerState, setRouteHandlerState] = useState<RouteHandlerState>(
@@ -63,7 +63,7 @@ const MeasureActionCenter = (props: PropTypes) => {
         props.measureLockedBy
       )
     );
-  }, [props, routeHandlerState]);
+  }, [props, routeHandlerState, isAdminTransferEnabled]);
 
   const onContinue = async () => {
     // we need every formik instance to use useFormikResetOnEvent on init
@@ -250,6 +250,19 @@ const MeasureActionCenter = (props: PropTypes) => {
           />
         ),
         name: ownerOfMeasure ? TRANSFER_MEASURE : CANNOT_TRANSFER,
+      });
+    } else if (isAdminTransferEnabled) {
+      // Admin users with feature flag can transfer any measure
+      actions.set("transfer measure", {
+        icon: (
+          <TransferAction
+            canTransfer={true}
+            onClick={() => {
+              handleActionClick(new Event("transfer-measure"));
+            }}
+          />
+        ),
+        name: TRANSFER_MEASURE,
       });
     }
     // required order to display

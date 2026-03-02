@@ -1,12 +1,26 @@
+jest.mock("@madie/madie-util", () => ({
+  useFeatureFlags: jest.fn().mockReturnValue({}),
+  useUserRoles: jest.fn().mockReturnValue({ roles: [], isAdmin: false }),
+  useIsAdminTransferEnabled: jest.fn().mockReturnValue(false),
+  routeHandlerStore: {
+    subscribe: () => ({ unsubscribe: () => null }),
+    updateRouteHandlerState: () => null,
+    state: { canTravel: true, pendingPath: "" },
+    initialState: { canTravel: false, pendingPath: "" },
+  },
+  checkUserCanEdit: jest.fn().mockImplementation(() => true),
+}));
 import * as React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, cleanup } from "@testing-library/react";
 import MeasureActionCenter from "./MeasureActionCenter";
 import { Measure, MeasureSet } from "@madie/madie-models";
 import userEvent from "@testing-library/user-event";
 import {
   useFeatureFlags,
+  useUserRoles,
   routeHandlerStore,
   checkUserCanEdit,
+  useIsAdminTransferEnabled,
 } from "@madie/madie-util";
 
 const mockMeasureSet = {
@@ -31,39 +45,18 @@ const versionedMeasure = {
   measureSet: mockMeasureSet,
 } as Measure;
 
-jest.mock("@madie/madie-util", () => ({
-  useFeatureFlags: jest.fn().mockReturnValue({}),
-  routeHandlerStore: {
-    subscribe: () => {
-      return { unsubscribe: () => null };
-    },
-    updateRouteHandlerState: () => null,
-    state: { canTravel: true, pendingPath: "" },
-    initialState: { canTravel: false, pendingPath: "" },
-  },
-  checkUserCanEdit: jest.fn().mockImplementation(() => true),
-}));
+// Admin transfer tests moved to MeasureActionCenter.admin.test.tsx
 
 describe("MeasureActionCenter Component", () => {
   let dispatchEventSpy: jest.SpyInstance<boolean, [event: Event]>;
 
   beforeEach(() => {
     dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+    jest.clearAllMocks();
   });
 
   afterEach(() => {
     dispatchEventSpy.mockRestore();
-  });
-
-  it("renders the action center", () => {
-    render(
-      <MeasureActionCenter
-        canEdit={true}
-        measure={draftMeasure}
-        canDelete={false}
-      />
-    );
-    expect(screen.getByTestId("action-center")).toBeInTheDocument();
   });
 
   it("should open action center on button click", () => {
@@ -580,5 +573,106 @@ describe("MeasureActionCenter Component", () => {
     const disabledVersionBtn = screen.getByTestId("versionDisabled");
     expect(disabledVersionBtn).toBeDefined(); // Ensure a disabled button is found
     expect(disabledVersionBtn).toBeDisabled();
+  });
+
+  describe("Admin user with AdminTransferMeasures feature flag enabled", () => {
+    const nonOwnedMeasure = {
+      id: "measure ID",
+      createdBy: "anotheruser@example.com",
+      model: "QI-Core v4.1.1",
+      measureMetaData: { draft: true },
+      measureSet: {
+        ...mockMeasureSet,
+        owner: "anotheruser@example.com",
+      },
+    } as Measure;
+
+    beforeEach(() => {
+      (useIsAdminTransferEnabled as jest.Mock).mockReturnValue(true);
+      (useFeatureFlags as jest.Mock).mockReturnValue({
+        AdminTransferMeasures: true,
+      });
+      (useUserRoles as jest.Mock).mockReturnValue({
+        roles: ["MADiE-Admin"],
+        isAdmin: true,
+      });
+      (checkUserCanEdit as jest.Mock).mockReturnValue(false);
+    });
+
+    afterEach(() => {
+      cleanup();
+      (useIsAdminTransferEnabled as jest.Mock).mockReturnValue(false);
+      (useFeatureFlags as jest.Mock).mockReturnValue({});
+      (useUserRoles as jest.Mock).mockReturnValue({
+        roles: [],
+        isAdmin: false,
+      });
+      (checkUserCanEdit as jest.Mock).mockReturnValue(true);
+    });
+
+    it("should show Transfer action for admin user on a measure they don't own", async () => {
+      render(
+        <MeasureActionCenter
+          canEdit={false}
+          measure={nonOwnedMeasure}
+          canDelete={false}
+        />
+      );
+
+      const actionCenterButton = screen.getByLabelText("Measure action center");
+      await userEvent.click(actionCenterButton);
+
+      expect(screen.getByTestId("Transfer")).toBeInTheDocument();
+      const transferBtn = screen.getByTestId("transfer-action-btn");
+      expect(transferBtn).toBeEnabled();
+    });
+  });
+
+  describe("Admin user with AdminTransferMeasures feature flag disabled", () => {
+    const nonOwnedMeasure = {
+      id: "measure ID",
+      createdBy: "anotheruser@example.com",
+      model: "QI-Core v4.1.1",
+      measureMetaData: { draft: true },
+      measureSet: {
+        ...mockMeasureSet,
+        owner: "anotheruser@example.com",
+      },
+    } as Measure;
+
+    beforeEach(() => {
+      (useFeatureFlags as jest.Mock).mockReturnValue({
+        AdminTransferMeasures: false,
+      });
+      (useUserRoles as jest.Mock).mockReturnValue({
+        roles: ["MADiE-Admin"],
+        isAdmin: true,
+      });
+      (checkUserCanEdit as jest.Mock).mockReturnValue(false);
+    });
+
+    afterEach(() => {
+      (useFeatureFlags as jest.Mock).mockReturnValue({});
+      (useUserRoles as jest.Mock).mockReturnValue({
+        roles: [],
+        isAdmin: false,
+      });
+      (checkUserCanEdit as jest.Mock).mockReturnValue(true);
+    });
+
+    it("should not show Transfer action for admin user when feature flag is disabled", () => {
+      render(
+        <MeasureActionCenter
+          canEdit={false}
+          measure={nonOwnedMeasure}
+          canDelete={false}
+        />
+      );
+
+      const actionCenterButton = screen.getByLabelText("Measure action center");
+      userEvent.click(actionCenterButton);
+
+      expect(screen.queryByTestId("Transfer")).not.toBeInTheDocument();
+    });
   });
 });
