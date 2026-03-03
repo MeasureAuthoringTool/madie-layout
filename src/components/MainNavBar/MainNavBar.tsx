@@ -123,7 +123,7 @@ const MainNavBar = () => {
                     value="help"
                     onClick={() => {
                       window.open(
-                        "https://www.emeasuretool.cms.gov/madie-mvp",
+                        "https://www.emeasuretool.cms.gov/training-resources",
                         "_blank"
                       );
                     }}
