@@ -54,6 +54,7 @@ declare module "@madie/madie-util" {
     qiCore7: boolean;
     QICoreCompositeMeasure: boolean;
     AdminTransferMeasures: boolean;
+    AdminTransferLibrary: boolean;
   }
 
   export interface UserRoles {
@@ -89,7 +90,6 @@ declare module "@madie/madie-util" {
   };
 
   export function useFeatureFlags(): FeatureFlags;
-
   export function useUserRoles(): UserRoles;
 
   export function useIsAdminTransferEnabled(): boolean;

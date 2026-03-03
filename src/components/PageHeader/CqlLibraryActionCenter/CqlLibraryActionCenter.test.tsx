@@ -7,6 +7,7 @@ import {
   useFeatureFlags,
   routeHandlerStore,
   checkUserCanEdit,
+  useUserRoles,
 } from "@madie/madie-util";
 import { act } from "react-dom/test-utils";
 
@@ -63,6 +64,10 @@ jest.mock("@madie/madie-util", () => ({
     cqlLibraryService: {
       baseUrl: "test-cql-library-service-url",
     },
+  }),
+  useUserRoles: () => ({
+    isAdmin: true,
+    roles: ["MADiE-admin"],
   }),
   checkUserCanEdit: jest
     .fn()
@@ -304,7 +309,10 @@ describe("CqlLibraryActionCenter Component", () => {
     );
   });
 
-  it("should not display Transfer Library when library has different owner", async () => {
+  it("should display disabled transfer Library icon when library has different owner", async () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({
+      AdminTransferLibrary: false,
+    });
     (checkUserCanEdit as jest.Mock).mockReturnValue(false);
     jest.spyOn(require("@madie/madie-util"), "useOktaTokens").mockReturnValue({
       getAccessToken: () => "test.jwt",
@@ -321,12 +329,9 @@ describe("CqlLibraryActionCenter Component", () => {
     await act(async () => {
       userEvent.click(actionCenterButton);
     });
-    await waitFor(() => {
-      expect(screen.queryByTestId("Transfer")).not.toBeInTheDocument();
-      expect(
-        screen.queryByTestId("Youcannottransferalibraryyoudonotown.")
-      ).not.toBeInTheDocument();
-    });
+    const transferLibraryBtn = screen.getByTestId("transfer-disabled");
+    expect(transferLibraryBtn).toBeInTheDocument();
+    expect(transferLibraryBtn).not.toBeEnabled();
   });
 
   it("should trigger transfer library event", async () => {
@@ -359,6 +364,65 @@ describe("CqlLibraryActionCenter Component", () => {
         type: "transfer-library",
       })
     );
+  });
+
+  it("should trigger transfer library when feature flag is enabled and the user is an admin but not the owner", async () => {
+    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+    (checkUserCanEdit as jest.Mock).mockReturnValue(false);
+    (useFeatureFlags as jest.Mock).mockReturnValue({
+      AdminTransferLibrary: true,
+    });
+
+    render(
+      <CqlLibraryActionCenter
+        canEdit={false}
+        library={cqlLibrary}
+        canDelete={false}
+      />
+    );
+
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    await act(async () => {
+      userEvent.click(actionCenterButton);
+    });
+
+    const transferLibraryBtn = screen.getByTestId("Transfer");
+    expect(transferLibraryBtn).toBeInTheDocument();
+    expect(transferLibraryBtn).toBeEnabled();
+
+    await act(async () => {
+      userEvent.click(transferLibraryBtn);
+    });
+
+    expect(dispatchEventSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "transfer-library",
+      })
+    );
+  });
+
+  it("should trigger transfer library when feature flag is disabled and the user is an admin but not the owner", async () => {
+    (checkUserCanEdit as jest.Mock).mockReturnValue(false);
+    (useFeatureFlags as jest.Mock).mockReturnValue({
+      AdminTransferLibrary: false,
+    });
+
+    render(
+      <CqlLibraryActionCenter
+        canEdit={false}
+        library={cqlLibrary}
+        canDelete={false}
+      />
+    );
+
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    await act(async () => {
+      userEvent.click(actionCenterButton);
+    });
+
+    const transferLibraryBtn = screen.getByTestId("transfer-disabled");
+    expect(transferLibraryBtn).toBeInTheDocument();
+    expect(transferLibraryBtn).not.toBeEnabled();
   });
 
   it("should render 'Unshare' menu option when action is 'UnShare Library From Me'", async () => {
