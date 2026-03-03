@@ -128,6 +128,10 @@ jest.mock("@madie/madie-util", () => ({
   checkUserCanEdit: jest.fn().mockImplementation(() => true),
   useFeatureFlags: jest.fn().mockReturnValue({ qdm: false }),
   checkUserCanDelete: jest.fn().mockImplementation(() => true),
+  useUserRoles: () => ({
+    isAdmin: false,
+    roles: ["MADiE-user"],
+  }),
 }));
 
 let postData: object = { status: 201 };

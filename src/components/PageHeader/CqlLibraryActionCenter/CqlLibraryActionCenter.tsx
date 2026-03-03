@@ -12,14 +12,14 @@ import EditCalendarOutlinedIcon from "@mui/icons-material/EditCalendarOutlined";
 import HistoryIcon from "@mui/icons-material/History";
 import { MadieDiscardDialog } from "@madie/madie-design-system/dist/react";
 import { CqlLibrary } from "@madie/madie-models";
-import { blue, red } from "@mui/material/colors";
 import {
   RouteHandlerState,
   routeHandlerStore,
-  useOktaTokens,
   useFeatureFlags,
   useCqlLibraryServiceApi,
   checkUserCanEdit,
+  useUserRoles,
+  UserRoles,
 } from "@madie/madie-util";
 import ShareIcon from "../shareAction/ShareIcon";
 import SwapVertOutlinedIcon from "@mui/icons-material/SwapVertOutlined";
@@ -104,8 +104,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
       setDiscardDialogOpen(true);
     }
   };
-  const { getUserName } = useOktaTokens();
-  const username = getUserName();
+  let userRoles: UserRoles = useUserRoles();
   const isOwnerOfLibrary = (library: CqlLibrary) => {
     return library && checkUserCanEdit(library?.librarySet?.owner, []);
   };
@@ -220,14 +219,29 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
         });
       }
     }
-    if (isOwnerOfLibrary(library)) {
+    if (
+      (featureFlags?.AdminTransferLibrary && userRoles?.isAdmin) ||
+      isOwnerOfLibrary(library)
+    ) {
       actions.set("transfer library", {
         icon: (
           <IconButton>
             <SwapVertOutlinedIcon style={{ transform: "rotate(90deg)" }} />
           </IconButton>
         ),
-        name: owner && owner == username ? TRANSFER_LIBRARY : CANNOT_TRANSFER,
+        name: TRANSFER_LIBRARY,
+        onClick: () => {
+          handleActionClick(new Event("transfer-library"));
+        },
+      });
+    } else {
+      actions.set("transfer library", {
+        icon: (
+          <IconButton disabled data-testid="transfer-disabled">
+            <SwapVertOutlinedIcon style={{ transform: "rotate(90deg)" }} />
+          </IconButton>
+        ),
+        name: CANNOT_TRANSFER,
         onClick: () => {
           handleActionClick(new Event("transfer-library"));
         },
