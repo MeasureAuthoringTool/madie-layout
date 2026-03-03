@@ -48,6 +48,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
   const [shareAnchorEl, setShareAnchorEl] = useState<null | HTMLElement>(null);
   const shareMenuOpen = Boolean(shareAnchorEl);
   const featureFlags = useFeatureFlags();
+  const userRoles: UserRoles = useUserRoles();
 
   useEffect(() => {
     const subscription = routeHandlerStore.subscribe(setRouteHandlerState);
@@ -104,7 +105,6 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
       setDiscardDialogOpen(true);
     }
   };
-  let userRoles: UserRoles = useUserRoles();
   const isOwnerOfLibrary = (library: CqlLibrary) => {
     return library && checkUserCanEdit(library?.librarySet?.owner, []);
   };
