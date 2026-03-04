@@ -174,4 +174,6 @@ declare module "@madie/madie-util" {
   export const ApiContextProvider: React.Provider<ServiceConfig>;
   export const ApiContextConsumer: React.Consumer<ServiceConfig>;
   export const OktaConfig: OktaConfig;
+
+  export function useIsAdminShareLibraryEnabled(): boolean;
 }

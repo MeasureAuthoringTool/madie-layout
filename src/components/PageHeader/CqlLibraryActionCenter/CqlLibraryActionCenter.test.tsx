@@ -7,7 +7,7 @@ import {
   useFeatureFlags,
   routeHandlerStore,
   checkUserCanEdit,
-  useUserRoles,
+  useIsAdminShareLibraryEnabled,
 } from "@madie/madie-util";
 import { act } from "react-dom/test-utils";
 
@@ -44,6 +44,7 @@ const versionedCqlLibrary = {
 
 jest.mock("@madie/madie-util", () => ({
   useFeatureFlags: jest.fn().mockReturnValue({}),
+  useIsAdminShareLibraryEnabled: jest.fn().mockReturnValue(false),
   routeHandlerStore: {
     subscribe: () => {
       return { unsubscribe: () => null };
@@ -305,7 +306,7 @@ describe("CqlLibraryActionCenter Component", () => {
     });
 
     expect(dispatchEventSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ isTrusted: false }, { isTrusted: false })
+      expect.objectContaining({ isTrusted: false })
     );
   });
 
@@ -426,9 +427,11 @@ describe("CqlLibraryActionCenter Component", () => {
   });
 
   it("should render 'Unshare' menu option when action is 'UnShare Library From Me'", async () => {
-    (checkUserCanEdit as jest.Mock)
-      .mockImplementationOnce(() => false) // ownerOfMeasure = false
-      .mockImplementationOnce(() => true); // sharedWithUser = false
+    (checkUserCanEdit as jest.Mock).mockImplementation((owner, acls) => {
+      if (owner) return false;
+      if (acls) return true;
+      return false;
+    });
 
     const sharedLibrary = {
       ...cqlLibrary,
@@ -541,6 +544,106 @@ describe("CqlLibraryActionCenter Component", () => {
 
     expect(dispatchEventSpy).toHaveBeenCalledWith(
       expect.objectContaining({ type: "unshare-library" })
+    );
+  });
+
+  it("should render and handle 'Unshare' menu option when action is 'UnShare Library From Me'", async () => {
+    (checkUserCanEdit as jest.Mock).mockImplementation((owner, acls) => {
+      if (owner) return false;
+      if (acls) return true;
+      return false;
+    });
+
+    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+
+    const sharedLibrary = {
+      ...cqlLibrary,
+      librarySet: {
+        ...mockLibrarySet,
+        owner: "someone-else",
+        acls: ["test-acl"],
+      },
+    } as unknown as CqlLibrary;
+
+    render(
+      <CqlLibraryActionCenter
+        canEdit={true}
+        library={sharedLibrary}
+        canDelete={true}
+      />
+    );
+
+    // Open the SpeedDial
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    userEvent.click(actionCenterButton);
+
+    // Click the 'UnShare Library From Me' action
+    const unshareAction = await screen.findByTestId("UnShareLibraryFromMe");
+    userEvent.click(unshareAction);
+
+    // Wait for the menu to appear
+    await waitFor(() => expect(screen.getByTestId("share-menu")).toBeVisible());
+
+    // Ensure the menu item is present before clicking
+    const unshareMenuItem = await screen.findByTestId(
+      "Unshare-library-from-me-option"
+    );
+    expect(unshareMenuItem).toBeInTheDocument();
+    userEvent.click(unshareMenuItem);
+
+    // Wait for the menu to close
+    await waitFor(() => {
+      expect(screen.queryByTestId("share-menu")).not.toBeInTheDocument();
+    });
+
+    expect(dispatchEventSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "unshare-library-from-me" })
+    );
+  });
+});
+
+describe("Admin user with AdminShareLibrary feature flag enabled", () => {
+  beforeEach(() => {
+    (useIsAdminShareLibraryEnabled as jest.Mock).mockReturnValue(true);
+  });
+
+  it("should render and handle 'Share' menu option when action is 'Share Library'", async () => {
+    (checkUserCanEdit as jest.Mock).mockImplementation((owner, acls) => {
+      if (owner) return false;
+      if (acls) return true;
+      return false;
+    });
+
+    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+
+    render(
+      <CqlLibraryActionCenter
+        canEdit={true}
+        library={cqlLibrary}
+        canDelete={true}
+      />
+    );
+
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    await act(async () => {
+      userEvent.click(actionCenterButton);
+    });
+
+    const shareAction = await screen.findByTestId("Share/Unshare");
+    await act(async () => {
+      userEvent.click(shareAction);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("share-menu")).toBeInTheDocument();
+    });
+
+    await act(async () => {
+      userEvent.click(screen.getByTestId("Share With-option"));
+    });
+
+    expect(dispatchEventSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "share-library" })
     );
   });
 });

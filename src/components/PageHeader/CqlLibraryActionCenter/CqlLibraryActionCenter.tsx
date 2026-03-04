@@ -20,6 +20,7 @@ import {
   checkUserCanEdit,
   useUserRoles,
   UserRoles,
+  useIsAdminShareLibraryEnabled,
 } from "@madie/madie-util";
 import ShareIcon from "../shareAction/ShareIcon";
 import SwapVertOutlinedIcon from "@mui/icons-material/SwapVertOutlined";
@@ -49,6 +50,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
   const shareMenuOpen = Boolean(shareAnchorEl);
   const featureFlags = useFeatureFlags();
   const userRoles: UserRoles = useUserRoles();
+  const isAdminShareLibraryEnabled = useIsAdminShareLibraryEnabled?.() ?? false;
 
   useEffect(() => {
     const subscription = routeHandlerStore.subscribe(setRouteHandlerState);
@@ -76,7 +78,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
 
   useEffect(() => {
     setActions(getActionArray(props.library, props.canEdit, props.canDelete));
-  }, [props, routeHandlerState, owner]);
+  }, [props, routeHandlerState, owner, isAdminShareLibraryEnabled]);
 
   const onContinue = () => {
     // we need every formik instance to use useFormikResetOnEvent on init
@@ -112,6 +114,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
   const isSharedWithUser = (library: CqlLibrary) => {
     return library && checkUserCanEdit(null, library?.librarySet?.acls);
   };
+
   const getActionArray = (
     library: CqlLibrary,
     canEdit: boolean,
@@ -191,33 +194,6 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
           onClick: () => handleActionClick(new Event("draft-library")),
         });
       }
-      if (ownerOfLibrary) {
-        actions.set("share library", {
-          icon: (
-            <IconButton>
-              <ShareIcon />
-            </IconButton>
-          ),
-          name: "Share Library",
-          onClick: (event: React.MouseEvent<HTMLElement>) => {
-            setOpen(false);
-            setShareAnchorEl(event.currentTarget);
-          },
-        });
-      } else if (sharedWithUser) {
-        actions.set("unshare library from me", {
-          icon: (
-            <IconButton>
-              <ShareIcon />
-            </IconButton>
-          ),
-          name: "UnShare Library From Me",
-          onClick: (event: React.MouseEvent<HTMLElement>) => {
-            setOpen(false);
-            setShareAnchorEl(event.currentTarget);
-          },
-        });
-      }
     }
     if (
       (featureFlags?.AdminTransferLibrary && userRoles?.isAdmin) ||
@@ -247,6 +223,37 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
         },
       });
     }
+
+    if ((canEdit && ownerOfLibrary) || isAdminShareLibraryEnabled) {
+      actions.set("share library", {
+        icon: (
+          <IconButton>
+            <ShareIcon />
+          </IconButton>
+        ),
+        name: `${
+          isAdminShareLibraryEnabled ? "Share/Unshare" : "Share Library"
+        }`,
+        onClick: (event: React.MouseEvent<HTMLElement>) => {
+          setOpen(false);
+          setShareAnchorEl(event.currentTarget);
+        },
+      });
+    } else if ((canEdit && sharedWithUser) || isAdminShareLibraryEnabled) {
+      actions.set("unshare library from me", {
+        icon: (
+          <IconButton>
+            <ShareIcon />
+          </IconButton>
+        ),
+        name: "UnShare Library From Me",
+        onClick: (event: React.MouseEvent<HTMLElement>) => {
+          setOpen(false);
+          setShareAnchorEl(event.currentTarget);
+        },
+      });
+    }
+
     // required order to display
     const actionsListOrder = [
       "transfer library",
