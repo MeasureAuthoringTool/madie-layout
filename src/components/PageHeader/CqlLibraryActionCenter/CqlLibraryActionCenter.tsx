@@ -15,12 +15,9 @@ import { CqlLibrary } from "@madie/madie-models";
 import {
   RouteHandlerState,
   routeHandlerStore,
-  useFeatureFlags,
   useCqlLibraryServiceApi,
   checkUserCanEdit,
-  useUserRoles,
-  UserRoles,
-  useIsAdminShareLibraryEnabled,
+  useIsRoleOrFeatureEnabled,
 } from "@madie/madie-util";
 import ShareIcon from "../shareAction/ShareIcon";
 import SwapVertOutlinedIcon from "@mui/icons-material/SwapVertOutlined";
@@ -48,9 +45,11 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
   );
   const [shareAnchorEl, setShareAnchorEl] = useState<null | HTMLElement>(null);
   const shareMenuOpen = Boolean(shareAnchorEl);
-  const featureFlags = useFeatureFlags();
-  const userRoles: UserRoles = useUserRoles();
-  const isAdminShareLibraryEnabled = useIsAdminShareLibraryEnabled?.() ?? false;
+  const isAdminShareLibraryEnabled =
+    useIsRoleOrFeatureEnabled("AdminShareLibrary");
+  const isAdminTransferLibraryEnabled = useIsRoleOrFeatureEnabled(
+    "AdminTransferLibrary"
+  );
 
   useEffect(() => {
     const subscription = routeHandlerStore.subscribe(setRouteHandlerState);
@@ -195,10 +194,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
         });
       }
     }
-    if (
-      (featureFlags?.AdminTransferLibrary && userRoles?.isAdmin) ||
-      isOwnerOfLibrary(library)
-    ) {
+    if (isAdminTransferLibraryEnabled || isOwnerOfLibrary(library)) {
       actions.set("transfer library", {
         icon: (
           <IconButton>

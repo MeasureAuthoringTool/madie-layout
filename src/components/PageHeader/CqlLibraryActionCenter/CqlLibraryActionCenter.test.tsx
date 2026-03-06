@@ -4,10 +4,9 @@ import CqlLibraryActionCenter from "./CqlLibraryActionCenter";
 import { CqlLibrary, LibrarySet, Model } from "@madie/madie-models";
 import userEvent from "@testing-library/user-event";
 import {
-  useFeatureFlags,
   routeHandlerStore,
   checkUserCanEdit,
-  useIsAdminShareLibraryEnabled,
+  useIsRoleOrFeatureEnabled,
 } from "@madie/madie-util";
 import { act } from "react-dom/test-utils";
 
@@ -43,8 +42,7 @@ const versionedCqlLibrary = {
 } as unknown as CqlLibrary;
 
 jest.mock("@madie/madie-util", () => ({
-  useFeatureFlags: jest.fn().mockReturnValue({}),
-  useIsAdminShareLibraryEnabled: jest.fn().mockReturnValue(false),
+  useIsRoleOrFeatureEnabled: jest.fn().mockReturnValue(false),
   routeHandlerStore: {
     subscribe: () => {
       return { unsubscribe: () => null };
@@ -162,7 +160,6 @@ describe("CqlLibraryActionCenter Component", () => {
   });
 
   it("should render 'Version Library' button when canEdit is true and owner matches", async () => {
-    (useFeatureFlags as jest.Mock).mockReturnValue({ ShareLibrary: true });
     (checkUserCanEdit as jest.Mock)
       .mockImplementationOnce(() => true) // ownerOfMeasure = false
       .mockImplementationOnce(() => false); // sharedWithUser = false
@@ -176,7 +173,6 @@ describe("CqlLibraryActionCenter Component", () => {
   });
 
   it("should not render 'Share Library' button when owner doesn't match", () => {
-    (useFeatureFlags as jest.Mock).mockReturnValue({ ShareLibrary: true });
     jest.spyOn(require("@madie/madie-util"), "useOktaTokens").mockReturnValue({
       getAccessToken: () => "test.jwt",
       getUserName: () => "bad user",
@@ -311,9 +307,6 @@ describe("CqlLibraryActionCenter Component", () => {
   });
 
   it("should display disabled transfer Library icon when library has different owner", async () => {
-    (useFeatureFlags as jest.Mock).mockReturnValue({
-      AdminTransferLibrary: false,
-    });
     (checkUserCanEdit as jest.Mock).mockReturnValue(false);
     jest.spyOn(require("@madie/madie-util"), "useOktaTokens").mockReturnValue({
       getAccessToken: () => "test.jwt",
@@ -370,9 +363,7 @@ describe("CqlLibraryActionCenter Component", () => {
   it("should trigger transfer library when feature flag is enabled and the user is an admin but not the owner", async () => {
     const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
     (checkUserCanEdit as jest.Mock).mockReturnValue(false);
-    (useFeatureFlags as jest.Mock).mockReturnValue({
-      AdminTransferLibrary: true,
-    });
+    (useIsRoleOrFeatureEnabled as jest.Mock).mockReturnValue(true);
 
     render(
       <CqlLibraryActionCenter
@@ -404,9 +395,6 @@ describe("CqlLibraryActionCenter Component", () => {
 
   it("should trigger transfer library when feature flag is disabled and the user is an admin but not the owner", async () => {
     (checkUserCanEdit as jest.Mock).mockReturnValue(false);
-    (useFeatureFlags as jest.Mock).mockReturnValue({
-      AdminTransferLibrary: false,
-    });
 
     render(
       <CqlLibraryActionCenter
@@ -604,7 +592,7 @@ describe("CqlLibraryActionCenter Component", () => {
 
 describe("Admin user with AdminShareLibrary feature flag enabled", () => {
   beforeEach(() => {
-    (useIsAdminShareLibraryEnabled as jest.Mock).mockReturnValue(true);
+    (useIsRoleOrFeatureEnabled as jest.Mock).mockReturnValue(true);
   });
 
   it("should render and handle 'Share' menu option when action is 'Share Library'", async () => {
