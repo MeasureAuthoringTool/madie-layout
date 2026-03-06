@@ -51,15 +51,16 @@ describe("MeasureActionCenter Component", () => {
   let dispatchEventSpy: jest.SpyInstance<boolean, [event: Event]>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     // Restore any previous spy before creating a new one
     if (dispatchEventSpy) {
       dispatchEventSpy.mockRestore();
     }
     dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+    jest.clearAllMocks();
   });
 
   afterEach(() => {
+    cleanup();
     if (dispatchEventSpy) {
       dispatchEventSpy.mockRestore();
     }
@@ -475,6 +476,7 @@ describe("MeasureActionCenter Component", () => {
 
   it("pops discard dialog, emits event for resetting forms on continue", async () => {
     const setTimeoutSpy = jest.spyOn(global, "setTimeout");
+    const originalCanTravel = routeHandlerStore.state.canTravel;
     routeHandlerStore.state.canTravel = false;
     render(
       <MeasureActionCenter
@@ -513,6 +515,7 @@ describe("MeasureActionCenter Component", () => {
     );
 
     setTimeoutSpy.mockRestore();
+    routeHandlerStore.state.canTravel = originalCanTravel;
   });
 
   it("should not display Transfer Measure when measure has a different owner", () => {
@@ -546,7 +549,6 @@ describe("MeasureActionCenter Component", () => {
   });
 
   it("should dispatch 'view-measure-history' event when 'View History' action is clicked", () => {
-    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
     render(
       <MeasureActionCenter
         canEdit={true}
@@ -692,33 +694,26 @@ describe("MeasureActionCenter Component", () => {
     } as Measure;
 
     beforeEach(() => {
-      // Clear and reset all mocks explicitly for admin tests
-      jest.clearAllMocks();
+      // Explicitly clear the spy's call history
+      if (dispatchEventSpy) {
+        dispatchEventSpy.mockClear();
+      }
 
-      (useFeatureFlags as jest.Mock).mockReset();
       (useFeatureFlags as jest.Mock).mockReturnValue({
         AdminShareMeasures: true,
       });
 
-      (useUserRoles as jest.Mock).mockReset();
       (useUserRoles as jest.Mock).mockReturnValue({
         roles: ["MADiE-Admin"],
         isAdmin: true,
       });
 
       // Mock checkUserCanEdit to return false (admin doesn't own the measure)
-      // but need to ensure it's properly reset
-      (checkUserCanEdit as jest.Mock).mockReset();
       (checkUserCanEdit as jest.Mock).mockReturnValue(false);
-
-      // Recreate the spy to ensure it's fresh
-      if (dispatchEventSpy) {
-        dispatchEventSpy.mockRestore();
-      }
-      dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
     });
 
     afterEach(() => {
+      cleanup();
       (useFeatureFlags as jest.Mock).mockReturnValue({});
       (useUserRoles as jest.Mock).mockReturnValue({
         roles: [],
@@ -781,7 +776,7 @@ describe("MeasureActionCenter Component", () => {
       expect(screen.queryByTestId("Share/Unshare")).not.toBeInTheDocument();
     });
 
-    it("should trigger share-measure event when admin clicks Share With option", async () => {
+    it("should trigger share-measure event when admin clicks Share With option", () => {
       render(
         <MeasureActionCenter
           canEdit={false}
@@ -793,24 +788,25 @@ describe("MeasureActionCenter Component", () => {
       const actionCenterButton = screen.getByLabelText("Measure action center");
       userEvent.click(actionCenterButton);
 
-      const shareButton = await screen.findByTestId("share-action-btn");
+      const shareButton = screen.getByTestId("share-action-btn");
       userEvent.click(shareButton);
 
-      const menuItem = await screen.findByRole("menuitem", {
-        name: "Share With",
-      });
-      userEvent.click(menuItem);
+      const shareWithMenuItem = screen.getByTestId("Share With-option");
+      const unshareMenuItem = screen.getByTestId("Unshare-option");
 
-      await waitFor(() => {
-        expect(dispatchEventSpy).toHaveBeenCalledWith(
-          expect.objectContaining({
-            type: "share-measure",
-          })
-        );
-      });
+      expect(shareWithMenuItem).toBeInTheDocument();
+      expect(unshareMenuItem).toBeInTheDocument();
+
+      userEvent.click(screen.getByRole("menuitem", { name: "Share With" }));
+
+      expect(dispatchEventSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "share-measure",
+        })
+      );
     });
 
-    it("should trigger unshare-measure event when admin clicks Unshare option", async () => {
+    it("should trigger unshare-measure event when admin clicks Unshare option", () => {
       render(
         <MeasureActionCenter
           canEdit={false}
@@ -822,19 +818,22 @@ describe("MeasureActionCenter Component", () => {
       const actionCenterButton = screen.getByLabelText("Measure action center");
       userEvent.click(actionCenterButton);
 
-      const shareButton = await screen.findByTestId("share-action-btn");
+      const shareButton = screen.getByTestId("share-action-btn");
       userEvent.click(shareButton);
 
-      const menuItem = await screen.findByRole("menuitem", { name: "Unshare" });
-      userEvent.click(menuItem);
+      const shareWithMenuItem = screen.getByTestId("Share With-option");
+      const unshareMenuItem = screen.getByTestId("Unshare-option");
 
-      await waitFor(() => {
-        expect(dispatchEventSpy).toHaveBeenCalledWith(
-          expect.objectContaining({
-            type: "unshare-measure",
-          })
-        );
-      });
+      expect(shareWithMenuItem).toBeInTheDocument();
+      expect(unshareMenuItem).toBeInTheDocument();
+
+      userEvent.click(screen.getByRole("menuitem", { name: "Unshare" }));
+
+      expect(dispatchEventSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "unshare-measure",
+        })
+      );
     });
   });
 });
