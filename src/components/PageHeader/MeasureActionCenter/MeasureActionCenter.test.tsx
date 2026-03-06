@@ -687,7 +687,7 @@ describe("MeasureActionCenter Component", () => {
       ...draftMeasure,
       measureSet: {
         ...mockMeasureSet,
-        owner: "someoneelse@example.com",
+        owner: "someoneelse",
       },
     } as Measure;
 
