@@ -11,6 +11,8 @@ import {
   routeHandlerStore,
   checkUserCanEdit,
   useIsAdminTransferEnabled,
+  useFeatureFlags,
+  useUserRoles,
 } from "@madie/madie-util";
 import FeedOutlinedIcon from "@mui/icons-material/FeedOutlined";
 import ShareAction, { SharedOptions } from "../shareAction/ShareAction";
@@ -41,6 +43,9 @@ const MeasureActionCenter = (props: PropTypes) => {
   const [discardDialogOpen, setDiscardDialogOpen] = useState<boolean>(false);
   const [eventToTrigger, setEventToTrigger] = useState<Event | null>(null);
   const isAdminTransferEnabled = useIsAdminTransferEnabled?.() ?? false;
+  const featureFlags = useFeatureFlags();
+  const userRoles = useUserRoles();
+  const isAdminShareEnabled = featureFlags?.AdminShareMeasures && userRoles?.isAdmin;
 
   const { updateRouteHandlerState } = routeHandlerStore;
   const [routeHandlerState, setRouteHandlerState] = useState<RouteHandlerState>(
@@ -63,7 +68,7 @@ const MeasureActionCenter = (props: PropTypes) => {
         props.measureLockedBy
       )
     );
-  }, [props, routeHandlerState, isAdminTransferEnabled]);
+  }, [props, routeHandlerState, isAdminTransferEnabled, isAdminShareEnabled]);
 
   const onContinue = async () => {
     // we need every formik instance to use useFormikResetOnEvent on init
@@ -207,7 +212,7 @@ const MeasureActionCenter = (props: PropTypes) => {
       }
     }
 
-    if (ownerOfMeasure) {
+    if (ownerOfMeasure || isAdminShareEnabled) {
       actions.set("share/unshare measure", {
         icon: (
           <ShareAction
