@@ -45,7 +45,8 @@ const MeasureActionCenter = (props: PropTypes) => {
   const isAdminTransferEnabled = useIsAdminTransferEnabled?.() ?? false;
   const featureFlags = useFeatureFlags();
   const userRoles = useUserRoles();
-  const isAdminShareEnabled = featureFlags?.AdminShareMeasures && userRoles?.isAdmin;
+  const isAdminShareEnabled =
+    featureFlags?.AdminShareMeasures && userRoles?.isAdmin;
 
   const { updateRouteHandlerState } = routeHandlerStore;
   const [routeHandlerState, setRouteHandlerState] = useState<RouteHandlerState>(

@@ -694,23 +694,23 @@ describe("MeasureActionCenter Component", () => {
     beforeEach(() => {
       // Clear and reset all mocks explicitly for admin tests
       jest.clearAllMocks();
-      
+
       (useFeatureFlags as jest.Mock).mockReset();
       (useFeatureFlags as jest.Mock).mockReturnValue({
         AdminShareMeasures: true,
       });
-      
+
       (useUserRoles as jest.Mock).mockReset();
       (useUserRoles as jest.Mock).mockReturnValue({
         roles: ["MADiE-Admin"],
         isAdmin: true,
       });
-      
+
       // Mock checkUserCanEdit to return false (admin doesn't own the measure)
       // but need to ensure it's properly reset
       (checkUserCanEdit as jest.Mock).mockReset();
       (checkUserCanEdit as jest.Mock).mockReturnValue(false);
-      
+
       // Recreate the spy to ensure it's fresh
       if (dispatchEventSpy) {
         dispatchEventSpy.mockRestore();
@@ -796,7 +796,9 @@ describe("MeasureActionCenter Component", () => {
       const shareButton = await screen.findByTestId("share-action-btn");
       userEvent.click(shareButton);
 
-      const menuItem = await screen.findByRole("menuitem", { name: "Share With" });
+      const menuItem = await screen.findByRole("menuitem", {
+        name: "Share With",
+      });
       userEvent.click(menuItem);
 
       await waitFor(() => {
