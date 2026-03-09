@@ -10,7 +10,6 @@ import {
   measureStore,
   cqlLibraryStore,
   featureFlagsStore,
-  useFeatureFlags,
   checkUserCanEdit,
   checkUserCanDelete,
   axios,
@@ -28,6 +27,7 @@ import Tooltip from "@mui/material/Tooltip";
 const PageHeader = () => {
   const { pathname } = useLocation();
   const [userFirstName, setUserFirstName] = useState<string>();
+
   const { getUserName } = useOktaTokens();
   const userName = getUserName();
 
