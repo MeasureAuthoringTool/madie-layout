@@ -10,7 +10,7 @@ import {
   RouteHandlerState,
   routeHandlerStore,
   checkUserCanEdit,
-  useIsAdminTransferEnabled,
+  useIsRoleOrFeatureEnabled,
 } from "@madie/madie-util";
 import FeedOutlinedIcon from "@mui/icons-material/FeedOutlined";
 import ShareAction, { SharedOptions } from "../shareAction/ShareAction";
@@ -40,7 +40,8 @@ const MeasureActionCenter = (props: PropTypes) => {
   const [actions, setActions] = useState<Array<any>>([]);
   const [discardDialogOpen, setDiscardDialogOpen] = useState<boolean>(false);
   const [eventToTrigger, setEventToTrigger] = useState<Event | null>(null);
-  const isAdminTransferEnabled = useIsAdminTransferEnabled?.() ?? false;
+  const isAdminTransferEnabled =
+    useIsRoleOrFeatureEnabled?.("AdminTransferMeasure") ?? false;
 
   const { updateRouteHandlerState } = routeHandlerStore;
   const [routeHandlerState, setRouteHandlerState] = useState<RouteHandlerState>(
