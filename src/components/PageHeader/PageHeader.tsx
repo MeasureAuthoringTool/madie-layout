@@ -13,6 +13,7 @@ import {
   checkUserCanEdit,
   checkUserCanDelete,
   axios,
+  useOktaTokens,
 } from "@madie/madie-util";
 import "twin.macro";
 import "styled-components/macro";
@@ -26,6 +27,9 @@ import Tooltip from "@mui/material/Tooltip";
 const PageHeader = () => {
   const { pathname } = useLocation();
   const [userFirstName, setUserFirstName] = useState<string>();
+
+  const { getUserName } = useOktaTokens();
+  const userName = getUserName();
 
   useEffect(() => {
     window.addEventListener("storage", () =>
@@ -220,34 +224,37 @@ const PageHeader = () => {
                   Composite
                 </div>
               )}
-              {measureCanEdit && measureState?.measureLock && (
-                <div
-                  className="lock-indicator"
-                  data-testid={`lock-indicator-${measureState?.id}`}
-                  style={{ display: "flex", alignItems: "center" }}
-                >
-                  <Tooltip
-                    title={`Locked while being edited by ${measureState?.measureLock?.lockedBy}`}
-                    aria-describedby="locked-tooltip"
+              {measureCanEdit &&
+                measureState?.measureLock &&
+                measureState?.measureLock?.lockedBy?.toLowerCase() !==
+                  userName?.toLowerCase() && (
+                  <div
+                    className="lock-indicator"
+                    data-testid={`lock-indicator-${measureState?.id}`}
+                    style={{ display: "flex", alignItems: "center" }}
                   >
-                    <Chip
-                      data-testid={`measure-${measureState?.measureName}-inuse-chip`}
-                      label="In-Use"
-                      icon={
-                        <LockOutlinedIcon
-                          fontSize="small"
-                          data-testid="locked-icon"
-                        />
-                      }
-                      sx={{
-                        backgroundColor: "#f5b027",
-                        height: "24px",
-                        ml: 1,
-                      }}
-                    />
-                  </Tooltip>
-                </div>
-              )}
+                    <Tooltip
+                      title={`Locked while being edited by ${measureState?.measureLock?.lockedBy}`}
+                      aria-describedby="locked-tooltip"
+                    >
+                      <Chip
+                        data-testid={`measure-${measureState?.measureName}-inuse-chip`}
+                        label="In-Use"
+                        icon={
+                          <LockOutlinedIcon
+                            fontSize="small"
+                            data-testid="locked-icon"
+                          />
+                        }
+                        sx={{
+                          backgroundColor: "#f5b027",
+                          height: "24px",
+                          ml: 1,
+                        }}
+                      />
+                    </Tooltip>
+                  </div>
+                )}
             </div>
           </div>
         </Fade>
