@@ -43,7 +43,6 @@ const MeasureActionCenter = (props: PropTypes) => {
   const [actions, setActions] = useState<Array<any>>([]);
   const [discardDialogOpen, setDiscardDialogOpen] = useState<boolean>(false);
   const [eventToTrigger, setEventToTrigger] = useState<Event | null>(null);
-  const isAdminTransferEnabled = useIsAdminTransferEnabled?.() ?? false;
   const featureFlags = useFeatureFlags();
   const userRoles = useUserRoles();
   const isAdminShareEnabled =

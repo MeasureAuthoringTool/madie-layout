@@ -1,13 +1,3 @@
-jest.mock("@madie/madie-util", () => ({
-  useIsRoleOrFeatureEnabled: jest.fn().mockReturnValue(false),
-  routeHandlerStore: {
-    subscribe: () => ({ unsubscribe: () => null }),
-    updateRouteHandlerState: () => null,
-    state: { canTravel: true, pendingPath: "" },
-    initialState: { canTravel: false, pendingPath: "" },
-  },
-  checkUserCanEdit: jest.fn().mockImplementation(() => true),
-}));
 import * as React from "react";
 import { render, screen, waitFor, cleanup } from "@testing-library/react";
 import MeasureActionCenter from "./MeasureActionCenter";
@@ -17,6 +7,8 @@ import {
   routeHandlerStore,
   checkUserCanEdit,
   useIsRoleOrFeatureEnabled,
+  useFeatureFlags,
+  useUserRoles,
 } from "@madie/madie-util";
 
 const mockMeasureSet = {
@@ -40,6 +32,19 @@ const versionedMeasure = {
   measureMetaData: { draft: false },
   measureSet: mockMeasureSet,
 } as Measure;
+
+jest.mock("@madie/madie-util", () => ({
+  useIsRoleOrFeatureEnabled: jest.fn().mockReturnValue(false),
+  useFeatureFlags: jest.fn().mockReturnValue({}),
+  useUserRoles: jest.fn().mockReturnValue({ roles: [], isAdmin: false }),
+  routeHandlerStore: {
+    subscribe: () => ({ unsubscribe: () => null }),
+    updateRouteHandlerState: () => null,
+    state: { canTravel: true, pendingPath: "" },
+    initialState: { canTravel: false, pendingPath: "" },
+  },
+  checkUserCanEdit: jest.fn().mockImplementation(() => true),
+}));
 
 // Admin transfer tests moved to MeasureActionCenter.admin.test.tsx
 
