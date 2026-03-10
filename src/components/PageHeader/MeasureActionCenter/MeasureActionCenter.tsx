@@ -13,6 +13,7 @@ import {
   useIsAdminTransferEnabled,
   useFeatureFlags,
   useUserRoles,
+  useIsRoleOrFeatureEnabled,
 } from "@madie/madie-util";
 import FeedOutlinedIcon from "@mui/icons-material/FeedOutlined";
 import ShareAction, { SharedOptions } from "../shareAction/ShareAction";
@@ -47,6 +48,8 @@ const MeasureActionCenter = (props: PropTypes) => {
   const userRoles = useUserRoles();
   const isAdminShareEnabled =
     featureFlags?.AdminShareMeasures && userRoles?.isAdmin;
+  const isAdminTransferEnabled =
+    useIsRoleOrFeatureEnabled?.("AdminTransferMeasure") ?? false;
 
   const { updateRouteHandlerState } = routeHandlerStore;
   const [routeHandlerState, setRouteHandlerState] = useState<RouteHandlerState>(

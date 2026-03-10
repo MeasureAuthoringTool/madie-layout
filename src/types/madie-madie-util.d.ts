@@ -93,8 +93,6 @@ declare module "@madie/madie-util" {
   export function useFeatureFlags(): FeatureFlags;
   export function useUserRoles(): UserRoles;
 
-  export function useIsAdminTransferEnabled(): boolean;
-
   export const userRolesStore: {
     subscribe: (
       setUserRoles: React.Dispatch<React.SetStateAction<UserRoles>>
@@ -175,4 +173,6 @@ declare module "@madie/madie-util" {
   export const ApiContextProvider: React.Provider<ServiceConfig>;
   export const ApiContextConsumer: React.Consumer<ServiceConfig>;
   export const OktaConfig: OktaConfig;
+
+  export function useIsRoleOrFeatureEnabled(feature: string): boolean;
 }
