@@ -10,7 +10,6 @@ import {
   RouteHandlerState,
   routeHandlerStore,
   checkUserCanEdit,
-  useIsAdminTransferEnabled,
   useFeatureFlags,
   useUserRoles,
   useIsRoleOrFeatureEnabled,
