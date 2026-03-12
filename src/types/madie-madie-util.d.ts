@@ -53,6 +53,9 @@ declare module "@madie/madie-util" {
     ShareMeasure: boolean;
     qiCore7: boolean;
     QICoreCompositeMeasure: boolean;
+    AdminTransferMeasures: boolean;
+    AdminTransferLibrary: boolean;
+    AdminShareMeasures: boolean;
   }
 
   export interface UserRoles {

@@ -1,13 +1,3 @@
-jest.mock("@madie/madie-util", () => ({
-  useIsRoleOrFeatureEnabled: jest.fn().mockReturnValue(false),
-  routeHandlerStore: {
-    subscribe: () => ({ unsubscribe: () => null }),
-    updateRouteHandlerState: () => null,
-    state: { canTravel: true, pendingPath: "" },
-    initialState: { canTravel: false, pendingPath: "" },
-  },
-  checkUserCanEdit: jest.fn().mockImplementation(() => true),
-}));
 import * as React from "react";
 import { render, screen, waitFor, cleanup } from "@testing-library/react";
 import MeasureActionCenter from "./MeasureActionCenter";
@@ -17,6 +7,8 @@ import {
   routeHandlerStore,
   checkUserCanEdit,
   useIsRoleOrFeatureEnabled,
+  useFeatureFlags,
+  useUserRoles,
 } from "@madie/madie-util";
 
 const mockMeasureSet = {
@@ -41,18 +33,38 @@ const versionedMeasure = {
   measureSet: mockMeasureSet,
 } as Measure;
 
+jest.mock("@madie/madie-util", () => ({
+  useIsRoleOrFeatureEnabled: jest.fn().mockReturnValue(false),
+  useFeatureFlags: jest.fn().mockReturnValue({}),
+  useUserRoles: jest.fn().mockReturnValue({ roles: [], isAdmin: false }),
+  routeHandlerStore: {
+    subscribe: () => ({ unsubscribe: () => null }),
+    updateRouteHandlerState: () => null,
+    state: { canTravel: true, pendingPath: "" },
+    initialState: { canTravel: false, pendingPath: "" },
+  },
+  checkUserCanEdit: jest.fn().mockImplementation(() => true),
+}));
+
 // Admin transfer tests moved to MeasureActionCenter.admin.test.tsx
 
 describe("MeasureActionCenter Component", () => {
   let dispatchEventSpy: jest.SpyInstance<boolean, [event: Event]>;
 
   beforeEach(() => {
+    // Restore any previous spy before creating a new one
+    if (dispatchEventSpy) {
+      dispatchEventSpy.mockRestore();
+    }
     dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
     jest.clearAllMocks();
   });
 
   afterEach(() => {
-    dispatchEventSpy.mockRestore();
+    cleanup();
+    if (dispatchEventSpy) {
+      dispatchEventSpy.mockRestore();
+    }
   });
 
   it("should open action center on button click", () => {
@@ -458,6 +470,7 @@ describe("MeasureActionCenter Component", () => {
 
   it("pops discard dialog, emits event for resetting forms on continue", async () => {
     const setTimeoutSpy = jest.spyOn(global, "setTimeout");
+    const originalCanTravel = routeHandlerStore.state.canTravel;
     routeHandlerStore.state.canTravel = false;
     render(
       <MeasureActionCenter
@@ -496,6 +509,7 @@ describe("MeasureActionCenter Component", () => {
     );
 
     setTimeoutSpy.mockRestore();
+    routeHandlerStore.state.canTravel = originalCanTravel;
   });
 
   it("should not display Transfer Measure when measure has a different owner", () => {
@@ -526,7 +540,6 @@ describe("MeasureActionCenter Component", () => {
   });
 
   it("should dispatch 'view-measure-history' event when 'View History' action is clicked", () => {
-    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
     render(
       <MeasureActionCenter
         canEdit={true}
@@ -637,6 +650,159 @@ describe("MeasureActionCenter Component", () => {
       userEvent.click(actionCenterButton);
 
       expect(screen.queryByTestId("Transfer")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("Admin Share Measure Tests", () => {
+    const nonOwnedMeasure = {
+      ...draftMeasure,
+      measureSet: {
+        ...mockMeasureSet,
+        owner: "someoneelse",
+      },
+    } as Measure;
+
+    beforeEach(() => {
+      // Explicitly clear the spy's call history
+      if (dispatchEventSpy) {
+        dispatchEventSpy.mockClear();
+      }
+
+      (useFeatureFlags as jest.Mock).mockReturnValue({
+        AdminShareMeasures: true,
+      });
+
+      (useUserRoles as jest.Mock).mockReturnValue({
+        roles: ["MADiE-Admin"],
+        isAdmin: true,
+      });
+
+      // Mock checkUserCanEdit to return false (admin doesn't own the measure)
+      (checkUserCanEdit as jest.Mock).mockReturnValue(false);
+    });
+
+    afterEach(() => {
+      cleanup();
+      (useFeatureFlags as jest.Mock).mockReturnValue({});
+      (useUserRoles as jest.Mock).mockReturnValue({
+        roles: [],
+        isAdmin: false,
+      });
+      (checkUserCanEdit as jest.Mock).mockReturnValue(true);
+    });
+
+    it("should show Share/Unshare action for admin user on non-owned measure when feature flag is enabled", () => {
+      render(
+        <MeasureActionCenter
+          canEdit={false}
+          measure={nonOwnedMeasure}
+          canDelete={false}
+        />
+      );
+
+      const actionCenterButton = screen.getByLabelText("Measure action center");
+      userEvent.click(actionCenterButton);
+
+      expect(screen.getByTestId("Share/Unshare")).toBeInTheDocument();
+    });
+
+    it("should not show Share/Unshare action for admin user when feature flag is disabled", () => {
+      (useFeatureFlags as jest.Mock).mockReturnValue({
+        AdminShareMeasures: false,
+      });
+
+      render(
+        <MeasureActionCenter
+          canEdit={false}
+          measure={nonOwnedMeasure}
+          canDelete={false}
+        />
+      );
+
+      const actionCenterButton = screen.getByLabelText("Measure action center");
+      userEvent.click(actionCenterButton);
+
+      expect(screen.queryByTestId("Share/Unshare")).not.toBeInTheDocument();
+    });
+
+    it("should not show Share/Unshare action for non-admin user even with feature flag enabled", () => {
+      (useUserRoles as jest.Mock).mockReturnValue({
+        roles: ["MADiE-User"],
+        isAdmin: false,
+      });
+
+      render(
+        <MeasureActionCenter
+          canEdit={false}
+          measure={nonOwnedMeasure}
+          canDelete={false}
+        />
+      );
+
+      const actionCenterButton = screen.getByLabelText("Measure action center");
+      userEvent.click(actionCenterButton);
+
+      expect(screen.queryByTestId("Share/Unshare")).not.toBeInTheDocument();
+    });
+
+    it("should trigger share-measure event when admin clicks Share With option", () => {
+      render(
+        <MeasureActionCenter
+          canEdit={false}
+          measure={nonOwnedMeasure}
+          canDelete={false}
+        />
+      );
+
+      const actionCenterButton = screen.getByLabelText("Measure action center");
+      userEvent.click(actionCenterButton);
+
+      const shareButton = screen.getByTestId("share-action-btn");
+      userEvent.click(shareButton);
+
+      const shareWithMenuItem = screen.getByTestId("Share With-option");
+      const unshareMenuItem = screen.getByTestId("Unshare-option");
+
+      expect(shareWithMenuItem).toBeInTheDocument();
+      expect(unshareMenuItem).toBeInTheDocument();
+
+      userEvent.click(screen.getByRole("menuitem", { name: "Share With" }));
+
+      expect(dispatchEventSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "share-measure",
+        })
+      );
+    });
+
+    it("should trigger unshare-measure event when admin clicks Unshare option", () => {
+      render(
+        <MeasureActionCenter
+          canEdit={false}
+          measure={nonOwnedMeasure}
+          canDelete={false}
+        />
+      );
+
+      const actionCenterButton = screen.getByLabelText("Measure action center");
+      userEvent.click(actionCenterButton);
+
+      const shareButton = screen.getByTestId("share-action-btn");
+      userEvent.click(shareButton);
+
+      const shareWithMenuItem = screen.getByTestId("Share With-option");
+      const unshareMenuItem = screen.getByTestId("Unshare-option");
+
+      expect(shareWithMenuItem).toBeInTheDocument();
+      expect(unshareMenuItem).toBeInTheDocument();
+
+      userEvent.click(screen.getByRole("menuitem", { name: "Unshare" }));
+
+      expect(dispatchEventSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "unshare-measure",
+        })
+      );
     });
   });
 });
