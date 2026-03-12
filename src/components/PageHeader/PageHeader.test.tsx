@@ -127,6 +127,7 @@ jest.mock("@madie/madie-util", () => ({
   }),
   checkUserCanEdit: jest.fn().mockImplementation(() => true),
   useFeatureFlags: jest.fn().mockReturnValue({ qdm: false }),
+  useUserRoles: jest.fn().mockReturnValue({ roles: [], isAdmin: false }),
   checkUserCanDelete: jest.fn().mockImplementation(() => true),
   useIsRoleOrFeatureEnabled: jest.fn(),
 }));
