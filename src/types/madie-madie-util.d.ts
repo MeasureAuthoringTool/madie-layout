@@ -53,7 +53,7 @@ declare module "@madie/madie-util" {
     ShareMeasure: boolean;
     qiCore7: boolean;
     QICoreCompositeMeasure: boolean;
-    AdminTransferMeasures: boolean;
+    AdminTransferMeasure: boolean;
     AdminTransferLibrary: boolean;
     AdminShareMeasures: boolean;
   }
