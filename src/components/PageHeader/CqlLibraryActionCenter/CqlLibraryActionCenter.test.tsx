@@ -4,9 +4,9 @@ import CqlLibraryActionCenter from "./CqlLibraryActionCenter";
 import { CqlLibrary, LibrarySet, Model } from "@madie/madie-models";
 import userEvent from "@testing-library/user-event";
 import {
-  useFeatureFlags,
   routeHandlerStore,
   checkUserCanEdit,
+  useIsRoleOrFeatureEnabled,
 } from "@madie/madie-util";
 import { act } from "react-dom/test-utils";
 
@@ -42,7 +42,7 @@ const versionedCqlLibrary = {
 } as unknown as CqlLibrary;
 
 jest.mock("@madie/madie-util", () => ({
-  useFeatureFlags: jest.fn().mockReturnValue({}),
+  useIsRoleOrFeatureEnabled: jest.fn().mockReturnValue(false),
   routeHandlerStore: {
     subscribe: () => {
       return { unsubscribe: () => null };
@@ -63,6 +63,10 @@ jest.mock("@madie/madie-util", () => ({
     cqlLibraryService: {
       baseUrl: "test-cql-library-service-url",
     },
+  }),
+  useUserRoles: () => ({
+    isAdmin: true,
+    roles: ["MADiE-admin"],
   }),
   checkUserCanEdit: jest
     .fn()
@@ -156,7 +160,6 @@ describe("CqlLibraryActionCenter Component", () => {
   });
 
   it("should render 'Version Library' button when canEdit is true and owner matches", async () => {
-    (useFeatureFlags as jest.Mock).mockReturnValue({ ShareLibrary: true });
     (checkUserCanEdit as jest.Mock)
       .mockImplementationOnce(() => true) // ownerOfMeasure = false
       .mockImplementationOnce(() => false); // sharedWithUser = false
@@ -170,7 +173,6 @@ describe("CqlLibraryActionCenter Component", () => {
   });
 
   it("should not render 'Share Library' button when owner doesn't match", () => {
-    (useFeatureFlags as jest.Mock).mockReturnValue({ ShareLibrary: true });
     jest.spyOn(require("@madie/madie-util"), "useOktaTokens").mockReturnValue({
       getAccessToken: () => "test.jwt",
       getUserName: () => "bad user",
@@ -300,11 +302,11 @@ describe("CqlLibraryActionCenter Component", () => {
     });
 
     expect(dispatchEventSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ isTrusted: false }, { isTrusted: false })
+      expect.objectContaining({ isTrusted: false })
     );
   });
 
-  it("should not display Transfer Library when library has different owner", async () => {
+  it("should display disabled transfer Library icon when library has different owner", async () => {
     (checkUserCanEdit as jest.Mock).mockReturnValue(false);
     jest.spyOn(require("@madie/madie-util"), "useOktaTokens").mockReturnValue({
       getAccessToken: () => "test.jwt",
@@ -321,12 +323,9 @@ describe("CqlLibraryActionCenter Component", () => {
     await act(async () => {
       userEvent.click(actionCenterButton);
     });
-    await waitFor(() => {
-      expect(screen.queryByTestId("Transfer")).not.toBeInTheDocument();
-      expect(
-        screen.queryByTestId("Youcannottransferalibraryyoudonotown.")
-      ).not.toBeInTheDocument();
-    });
+    const transferLibraryBtn = screen.getByTestId("transfer-disabled");
+    expect(transferLibraryBtn).toBeInTheDocument();
+    expect(transferLibraryBtn).not.toBeEnabled();
   });
 
   it("should trigger transfer library event", async () => {
@@ -361,10 +360,66 @@ describe("CqlLibraryActionCenter Component", () => {
     );
   });
 
+  it("should trigger transfer library when feature flag is enabled and the user is an admin but not the owner", async () => {
+    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+    (checkUserCanEdit as jest.Mock).mockReturnValue(false);
+    (useIsRoleOrFeatureEnabled as jest.Mock).mockReturnValue(true);
+
+    render(
+      <CqlLibraryActionCenter
+        canEdit={false}
+        library={cqlLibrary}
+        canDelete={false}
+      />
+    );
+
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    await act(async () => {
+      userEvent.click(actionCenterButton);
+    });
+
+    const transferLibraryBtn = screen.getByTestId("Transfer");
+    expect(transferLibraryBtn).toBeInTheDocument();
+    expect(transferLibraryBtn).toBeEnabled();
+
+    await act(async () => {
+      userEvent.click(transferLibraryBtn);
+    });
+
+    expect(dispatchEventSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "transfer-library",
+      })
+    );
+  });
+
+  it("should trigger transfer library when feature flag is disabled and the user is an admin but not the owner", async () => {
+    (checkUserCanEdit as jest.Mock).mockReturnValue(false);
+
+    render(
+      <CqlLibraryActionCenter
+        canEdit={false}
+        library={cqlLibrary}
+        canDelete={false}
+      />
+    );
+
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    await act(async () => {
+      userEvent.click(actionCenterButton);
+    });
+
+    const transferLibraryBtn = screen.getByTestId("transfer-disabled");
+    expect(transferLibraryBtn).toBeInTheDocument();
+    expect(transferLibraryBtn).not.toBeEnabled();
+  });
+
   it("should render 'Unshare' menu option when action is 'UnShare Library From Me'", async () => {
-    (checkUserCanEdit as jest.Mock)
-      .mockImplementationOnce(() => false) // ownerOfMeasure = false
-      .mockImplementationOnce(() => true); // sharedWithUser = false
+    (checkUserCanEdit as jest.Mock).mockImplementation((owner, acls) => {
+      if (owner) return false;
+      if (acls) return true;
+      return false;
+    });
 
     const sharedLibrary = {
       ...cqlLibrary,
@@ -477,6 +532,106 @@ describe("CqlLibraryActionCenter Component", () => {
 
     expect(dispatchEventSpy).toHaveBeenCalledWith(
       expect.objectContaining({ type: "unshare-library" })
+    );
+  });
+
+  it("should render and handle 'Unshare' menu option when action is 'UnShare Library From Me'", async () => {
+    (checkUserCanEdit as jest.Mock).mockImplementation((owner, acls) => {
+      if (owner) return false;
+      if (acls) return true;
+      return false;
+    });
+
+    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+
+    const sharedLibrary = {
+      ...cqlLibrary,
+      librarySet: {
+        ...mockLibrarySet,
+        owner: "someone-else",
+        acls: ["test-acl"],
+      },
+    } as unknown as CqlLibrary;
+
+    render(
+      <CqlLibraryActionCenter
+        canEdit={true}
+        library={sharedLibrary}
+        canDelete={true}
+      />
+    );
+
+    // Open the SpeedDial
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    userEvent.click(actionCenterButton);
+
+    // Click the 'UnShare Library From Me' action
+    const unshareAction = await screen.findByTestId("UnShareLibraryFromMe");
+    userEvent.click(unshareAction);
+
+    // Wait for the menu to appear
+    await waitFor(() => expect(screen.getByTestId("share-menu")).toBeVisible());
+
+    // Ensure the menu item is present before clicking
+    const unshareMenuItem = await screen.findByTestId(
+      "Unshare-library-from-me-option"
+    );
+    expect(unshareMenuItem).toBeInTheDocument();
+    userEvent.click(unshareMenuItem);
+
+    // Wait for the menu to close
+    await waitFor(() => {
+      expect(screen.queryByTestId("share-menu")).not.toBeInTheDocument();
+    });
+
+    expect(dispatchEventSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "unshare-library-from-me" })
+    );
+  });
+});
+
+describe("Admin user with AdminShareLibrary feature flag enabled", () => {
+  beforeEach(() => {
+    (useIsRoleOrFeatureEnabled as jest.Mock).mockReturnValue(true);
+  });
+
+  it("should render and handle 'Share' menu option when action is 'Share Library'", async () => {
+    (checkUserCanEdit as jest.Mock).mockImplementation((owner, acls) => {
+      if (owner) return false;
+      if (acls) return true;
+      return false;
+    });
+
+    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+
+    render(
+      <CqlLibraryActionCenter
+        canEdit={true}
+        library={cqlLibrary}
+        canDelete={true}
+      />
+    );
+
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    await act(async () => {
+      userEvent.click(actionCenterButton);
+    });
+
+    const shareAction = await screen.findByTestId("Share/Unshare");
+    await act(async () => {
+      userEvent.click(shareAction);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("share-menu")).toBeInTheDocument();
+    });
+
+    await act(async () => {
+      userEvent.click(screen.getByTestId("Share With-option"));
+    });
+
+    expect(dispatchEventSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "share-library" })
     );
   });
 });

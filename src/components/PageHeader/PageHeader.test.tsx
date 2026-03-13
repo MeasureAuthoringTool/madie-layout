@@ -12,7 +12,7 @@ import { act, Simulate } from "react-dom/test-utils";
 import { describe, expect, test } from "@jest/globals";
 import userEvent from "@testing-library/user-event";
 import { mockLibraryName, mockMeasureName } from "../NewMeasure/bulkCreate";
-import { axios, useFeatureFlags, checkUserCanEdit } from "@madie/madie-util";
+import { axios, checkUserCanEdit } from "@madie/madie-util";
 import PageHeader from "../PageHeader/PageHeader";
 import { Model } from "@madie/madie-models/dist/Model";
 
@@ -127,7 +127,9 @@ jest.mock("@madie/madie-util", () => ({
   }),
   checkUserCanEdit: jest.fn().mockImplementation(() => true),
   useFeatureFlags: jest.fn().mockReturnValue({ qdm: false }),
+  useUserRoles: jest.fn().mockReturnValue({ roles: [], isAdmin: false }),
   checkUserCanDelete: jest.fn().mockImplementation(() => true),
+  useIsRoleOrFeatureEnabled: jest.fn(),
 }));
 
 let postData: object = { status: 201 };
