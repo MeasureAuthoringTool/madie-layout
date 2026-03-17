@@ -236,6 +236,17 @@ const PageHeader = () => {
                     <Tooltip
                       title={`Locked while being edited by ${measureState?.measureLock?.lockedBy}`}
                       aria-describedby="locked-tooltip"
+                      slotProps={{
+                        tooltip: {
+                          sx: {
+                            zIndex: 99,
+                            backgroundColor: "#333",
+                            "& .MuiTooltip-arrow": {
+                              color: "#333",
+                            },
+                          },
+                        },
+                      }}
                     >
                       <Chip
                         data-testid={`measure-${measureState?.measureName}-inuse-chip`}
@@ -361,6 +372,17 @@ const PageHeader = () => {
                       <Tooltip
                         title={`Locked while being edited by ${libraryState?.cqlLibraryLock?.lockedBy}`}
                         aria-describedby="locked-tooltip"
+                        slotProps={{
+                          tooltip: {
+                            sx: {
+                              zIndex: 99,
+                              backgroundColor: "#333",
+                              "& .MuiTooltip-arrow": {
+                                color: "#333",
+                              },
+                            },
+                          },
+                        }}
                       >
                         <LockOutlinedIcon
                           fontSize="small"

@@ -337,6 +337,18 @@ const MeasureActionCenter = (props: PropTypes) => {
             key={action.name}
             icon={action.icon}
             tooltipTitle={action.name}
+            arrow
+            slotProps={{
+              tooltip: {
+                sx: {
+                  zIndex: 99,
+                  backgroundColor: "#333",
+                  "& .MuiTooltip-arrow": {
+                    color: "#333",
+                  },
+                },
+              },
+            }}
             data-testid={action.name.replace(/\s/g, "")}
             onClick={() => {
               setOpen(false);

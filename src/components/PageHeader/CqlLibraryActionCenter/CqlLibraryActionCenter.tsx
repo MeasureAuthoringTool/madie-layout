@@ -325,6 +325,18 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
               marginRight: 1,
               transitionDelay: "0s",
             }}
+            arrow
+            slotProps={{
+              tooltip: {
+                sx: {
+                  zIndex: 99,
+                  backgroundColor: "#333",
+                  "& .MuiTooltip-arrow": {
+                    color: "#333",
+                  },
+                },
+              },
+            }}
           />
         ))}
       </SpeedDial>
