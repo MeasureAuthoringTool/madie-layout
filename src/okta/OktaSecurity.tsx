@@ -17,10 +17,10 @@ export const transformAuthState = async (oktaAuth, authState) => {
     // eslint-disable-next-line no-console
     console.log(`[${new Date()}] - transformAuthState oktaAuth: `, oktaAuth);
     // eslint-disable-next-line no-console
-    // console.log(
-    //   `[${new Date()}] - transformAuthState authState: `,
-    //   JSON.stringify(authState, null, 2)
-    // );
+    console.log(
+      `[${new Date()}] - transformAuthState authState: `,
+      JSON.stringify(authState, null, 2)
+    );
   }
   if (!authState.isAuthenticated) {
     return authState;
