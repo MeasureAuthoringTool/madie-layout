@@ -24,6 +24,10 @@ module.exports = (webpackConfigEnv, argv) => {
       "@madie/madie-cql-library",
       "@madie/madie-measure",
       "@madie/madie-util",
+      // Shared singleton libraries — loaded once via import map
+      "@emotion/react",
+      "@emotion/styled",
+      "styled-components",
     ],
   };
   const newCssRule = {
