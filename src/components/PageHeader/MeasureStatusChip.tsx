@@ -6,10 +6,10 @@ import "./pageHeader.scss";
 const MeasureStatusChips = ({ measure }) => {
   return (
     <div style={{ display: "inline-flex", gap: 4, flexWrap: "wrap" }}>
-      {`${measure?.measureMetaData?.draft}` === "true" && (
+      {measure?.measureMetaData?.draft && (
         <Chip className="draft-chip" data-testid="draft-chip" label="Draft" />
       )}
-      {`${measure?.measureMetaData?.composite}` === "true" && (
+      {measure?.measureMetaData?.composite && (
         <Chip
           className="composite-chip"
           data-testid="composite-chip"
