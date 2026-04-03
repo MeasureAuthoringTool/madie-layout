@@ -293,7 +293,7 @@ describe("Page Header and Dialogs", () => {
     });
   });
 
-  test("Composite bubble is displayed when composite is true", async () => {
+  test("Composite chip is displayed when composite is true", async () => {
     await act(async () => {
       render(
         <MemoryRouter
@@ -313,6 +313,79 @@ describe("Page Header and Dialogs", () => {
 
       await waitFor(() => {
         expect(queryByText("Composite")).toBeInTheDocument();
+      });
+    });
+  });
+
+  test("In Composite chip is displayed when measure has compositeMeasureIds", async () => {
+    const inCompositeMeasure = {
+      ...mockFormikInfo,
+      id: "test-measure-id",
+      measureSet: { owner: "test", acls: [] },
+      compositeMeasureIds: ["composite-measure-id-1"],
+    };
+    require("@madie/madie-util").measureStore.state = inCompositeMeasure;
+    require("@madie/madie-util").measureStore.subscribe = (set) => {
+      set(inCompositeMeasure);
+      return { unsubscribe: () => null };
+    };
+
+    await act(async () => {
+      render(
+        <MemoryRouter
+          initialEntries={[
+            {
+              pathname: "/measures/test-measure-id/edit/details",
+              search: "",
+              hash: "",
+              state: undefined,
+              key: "1fewtg",
+            },
+          ]}
+        >
+          <PageHeader />
+        </MemoryRouter>
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("component-chip")).toBeInTheDocument();
+      });
+      expect(queryByText("In Composite")).toBeInTheDocument();
+    });
+  });
+
+  test("In Composite chip is not displayed when measure has no compositeMeasureIds", async () => {
+    const notInCompositeMeasure = {
+      ...mockFormikInfo,
+      id: "test-measure-id",
+      measureSet: { owner: "test", acls: [] },
+      compositeMeasureIds: [],
+    };
+    require("@madie/madie-util").measureStore.state = notInCompositeMeasure;
+    require("@madie/madie-util").measureStore.subscribe = (set) => {
+      set(notInCompositeMeasure);
+      return { unsubscribe: () => null };
+    };
+
+    await act(async () => {
+      render(
+        <MemoryRouter
+          initialEntries={[
+            {
+              pathname: "/measures/test-measure-id/edit/details",
+              search: "",
+              hash: "",
+              state: undefined,
+              key: "1fewtg",
+            },
+          ]}
+        >
+          <PageHeader />
+        </MemoryRouter>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("component-chip")).not.toBeInTheDocument();
       });
     });
   });

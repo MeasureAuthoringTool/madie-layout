@@ -23,6 +23,7 @@ import CqlLibraryActionCenter from "./CqlLibraryActionCenter/CqlLibraryActionCen
 import Chip from "@mui/material/Chip";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Tooltip from "@mui/material/Tooltip";
+import MeasureStatusChips from "./MeasureStatusChip";
 
 const PageHeader = () => {
   const { pathname } = useLocation();
@@ -211,19 +212,7 @@ const PageHeader = () => {
                     </p>
                   );
               })}
-              {measureState?.measureMetaData?.draft && (
-                <div className="bubble draft-bubble" data-testid="draft-bubble">
-                  Draft
-                </div>
-              )}
-              {measureState?.measureMetaData?.composite && (
-                <div
-                  className="bubble composite-bubble"
-                  data-testid="composite-bubble"
-                >
-                  Composite
-                </div>
-              )}
+              <MeasureStatusChips measure={measureState} />
               {measureCanEdit &&
                 measureState?.measureLock &&
                 measureState?.measureLock?.lockedBy?.toLowerCase() !==
@@ -339,9 +328,11 @@ const PageHeader = () => {
             <div tw="py-4">
               <h2 tw="text-2xl text-white mb-0">{`${libraryState?.cqlLibraryName}`}</h2>
               {libraryState?.draft && (
-                <div className="bubble draft-bubble" data-testid="draft-bubble">
-                  Draft
-                </div>
+                <Chip
+                  className="draft-chip"
+                  data-testid="draft-chip"
+                  label="Draft"
+                />
               )}
             </div>
             <div>
