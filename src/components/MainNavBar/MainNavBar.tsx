@@ -9,6 +9,7 @@ import UserAvatar from "./UserAvatar";
 import { Tabs, Tab } from "@madie/madie-design-system/dist/react";
 import "./MainNavBar.scss";
 import UserUMLS from "./UserUMLS";
+import Notifications from "./Notifications";
 // @ts-ignore
 import { UsaBanner } from "@uswds/elements";
 
@@ -132,6 +133,9 @@ const MainNavBar = () => {
                 <UserUMLS />
                 <li id="main-nav-bar-tab-user-avatar">
                   <UserAvatar />
+                </li>
+                <li id="main-nav-bar-notfications">
+                  <Notifications />
                 </li>
                 <li id="main-nav-bar-tab-user-profile">
                   <UserProfile />
