@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import logo from "../../assets/images/Logo.svg";
 import logoFull from "../../assets/images/Logo-Full.svg";
 import { DropDown, DropMenu } from "../../styles/styles";
@@ -12,6 +12,7 @@ import UserUMLS from "./UserUMLS";
 import Notifications from "./Notifications";
 // @ts-ignore
 import { UsaBanner } from "@uswds/elements";
+import { useNotificationServiceApi } from "@madie/madie-util";
 
 // Register the web component once (safe in module scope)
 if (!window.customElements.get("usa-banner")) {
@@ -52,6 +53,29 @@ const MainNavBar = () => {
     : pathname.includes("/cql-libraries")
     ? "/cql-libraries"
     : "";
+
+  const notificationServiceApiRef = useRef(useNotificationServiceApi());
+  const [notifications, setNotifications] = useState([]);
+      const fetchNotifications = async () => {
+        try {
+          const notifications =
+            await notificationServiceApiRef.current.getAllNotifications();
+          console.log("fetched notifications: ", notifications);
+          setNotifications(notifications);
+          //   return notifications;
+          // setNotifications(notifications);
+        } catch (error) {
+          console.error("Error fetching notifications", error);
+        }
+      };
+      //   fetchNotifications has to happen every 30 seconds.
+      useEffect(() => {
+        fetchNotifications();
+        const interval = setInterval(() => {
+          fetchNotifications();
+        }, 30000); // 30 seconds
+        return () => clearInterval(interval);
+      }, []);
 
   return (
     <nav>
@@ -135,7 +159,7 @@ const MainNavBar = () => {
                   <UserAvatar />
                 </li>
                 <li id="main-nav-bar-notfications">
-                  <Notifications />
+                  <Notifications notifications={notifications} setNotifications={setNotifications}/>
                 </li>
                 <li id="main-nav-bar-tab-user-profile">
                   <UserProfile />

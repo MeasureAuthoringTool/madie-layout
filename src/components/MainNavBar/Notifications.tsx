@@ -14,7 +14,7 @@ import {
 import Notification from "./Notification";
 import { useNotificationServiceApi } from "@madie/madie-util";
 import "./Notifications.scss";
-const Notifications = () => {
+const Notifications = ({notifications, setNotifications}) => {
   //   function generateNotifications(count) {
   //     const users = ["rohit_k", "edwin_t", "matt_m"];
   //     const actions = [
@@ -53,24 +53,6 @@ const Notifications = () => {
   const anchorRef = useRef<HTMLButtonElement>(null);
   // api
   const notificationServiceApiRef = useRef(useNotificationServiceApi());
-  const [notifications, setNotifications] = useState([]);
-
-  const fetchNotifications = async () => {
-    try {
-      const notifications =
-        await notificationServiceApiRef.current.getAllNotifications();
-      console.log("fetched notifications: ", notifications);
-      setNotifications(notifications);
-      //   return notifications;
-      // setNotifications(notifications);
-    } catch (error) {
-      console.error("Error fetching notifications", error);
-    }
-  };
-  useEffect(() => {
-    fetchNotifications();
-  }, []);
-
   const [open, setOpen] = useState(false);
 
   function handleListKeyDown(event: React.KeyboardEvent) {
