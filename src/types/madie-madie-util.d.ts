@@ -164,9 +164,10 @@ declare module "@madie/madie-util" {
   export class NotificationServiceApi {
     constructor(baseUrl: string, getAccessToken: () => string);
     getAllNotifications(): Promise<any>;
+    createNotifications(notifications: any[]): Promise<any>;
+    markNotificationsSeen(ids: string[]): Promise<void>;
     readOneNotification(notificationID: string): Promise<any>;
-    deleteNotification(notificationID: string): Promise<any>;
-    readAllNotifications(notificationIDs: string[]): Promise<any>;
+    deleteNotification(notificationID: string): Promise<void>;
   }
 
   export function useMeasureServiceApi(): MeasureServiceApi;
