@@ -168,6 +168,7 @@ declare module "@madie/madie-util" {
     markNotificationsSeen(ids: string[]): Promise<void>;
     readOneNotification(notificationID: string): Promise<any>;
     deleteNotification(notificationID: string): Promise<void>;
+    deleteAllNotifications(ids: string[]): Promise<void>;
   }
 
   export function useMeasureServiceApi(): MeasureServiceApi;

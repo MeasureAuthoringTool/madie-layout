@@ -50,9 +50,9 @@ const Notifications = ({ notifications, setNotifications }) => {
       await notificationServiceApiRef.current.readOneNotification(
         notificationID
       );
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === notificationID ? { ...n, isRead: true } : n))
-      );
+      // setNotifications((prev) =>
+      //   prev.map((n) => (n.id === notificationID ? { ...n, isRead: true } : n))
+      // );
     } catch (err) {
       // silently fail — non-critical
     }
@@ -64,6 +64,17 @@ const Notifications = ({ notifications, setNotifications }) => {
         notificationID
       );
       setNotifications((prev) => prev.filter((n) => n.id !== notificationID));
+    } catch (err) {
+      // silently fail — non-critical
+    }
+  };
+
+  const triggerClearAll = async () => {
+    const ids = notifications.map((n) => n.id);
+    if (ids.length === 0) return;
+    try {
+      await notificationServiceApiRef.current.deleteAllNotifications(ids);
+      setNotifications([]);
     } catch (err) {
       // silently fail — non-critical
     }
@@ -99,11 +110,24 @@ const Notifications = ({ notifications, setNotifications }) => {
                 <div className="notifications-panel-inner">
                   <div className="notifications-header">
                     <span className="notifications-title">Notifications</span>
-                    {unreadCount > 0 && (
-                      <span className="notifications-unread-badge">
-                        {unreadCount} unread
-                      </span>
-                    )}
+                    <div className="notifications-header-actions">
+                      {unreadCount > 0 && (
+                        <span className="notifications-unread-badge">
+                          {unreadCount} unread
+                        </span>
+                      )}
+                      {notifications.length > 0 && (
+                        <button
+                          className="notifications-clear-all"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            triggerClearAll();
+                          }}
+                        >
+                          Clear all
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <div className="notifications-scroll-area">
                     {notifications.length === 0 ? (
