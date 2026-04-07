@@ -12,7 +12,8 @@ import UserUMLS from "./UserUMLS";
 import Notifications from "./Notifications";
 // @ts-ignore
 import { UsaBanner } from "@uswds/elements";
-import { useNotificationServiceApi } from "@madie/madie-util";
+import { useNotificationServiceApi, useUserRoles } from "@madie/madie-util";
+import AdminNotification from "./AdminNotification";
 
 // Register the web component once (safe in module scope)
 if (!window.customElements.get("usa-banner")) {
@@ -31,6 +32,8 @@ declare global {
 }
 
 const MainNavBar = () => {
+  const userRoles = useUserRoles();
+  const isAdmin = userRoles?.isAdmin;
   const [showFullLogo, setShowFullLogo] = useState(true);
 
   const { authState } = useOktaAuth();
@@ -158,6 +161,11 @@ const MainNavBar = () => {
                 <li id="main-nav-bar-tab-user-avatar">
                   <UserAvatar />
                 </li>
+                {isAdmin && (
+                  <li id="main-nav-bar-admin-notifications">
+                    <AdminNotification />
+                  </li>
+                )}
                 <li id="main-nav-bar-notfications">
                   <Notifications
                     notifications={notifications}

@@ -86,6 +86,7 @@ const Notifications = ({ notifications, setNotifications }) => {
   return (
     <button
       id="notifications"
+      className="notifications"
       data-badge={unseenCount}
       ref={anchorRef}
       onClick={() => {
