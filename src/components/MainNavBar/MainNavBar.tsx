@@ -56,26 +56,26 @@ const MainNavBar = () => {
 
   const notificationServiceApiRef = useRef(useNotificationServiceApi());
   const [notifications, setNotifications] = useState([]);
-      const fetchNotifications = async () => {
-        try {
-          const notifications =
-            await notificationServiceApiRef.current.getAllNotifications();
-          console.log("fetched notifications: ", notifications);
-          setNotifications(notifications);
-          //   return notifications;
-          // setNotifications(notifications);
-        } catch (error) {
-          console.error("Error fetching notifications", error);
-        }
-      };
-      //   fetchNotifications has to happen every 30 seconds.
-      useEffect(() => {
-        fetchNotifications();
-        const interval = setInterval(() => {
-          fetchNotifications();
-        }, 30000); // 30 seconds
-        return () => clearInterval(interval);
-      }, []);
+  const fetchNotifications = async () => {
+    try {
+      const notifications =
+        await notificationServiceApiRef.current.getAllNotifications();
+      console.log("fetched notifications: ", notifications);
+      setNotifications(notifications);
+      //   return notifications;
+      // setNotifications(notifications);
+    } catch (error) {
+      console.error("Error fetching notifications", error);
+    }
+  };
+  //   fetchNotifications has to happen every 30 seconds.
+  useEffect(() => {
+    fetchNotifications();
+    const interval = setInterval(() => {
+      fetchNotifications();
+    }, 10000); // 30 seconds
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <nav>
@@ -159,7 +159,10 @@ const MainNavBar = () => {
                   <UserAvatar />
                 </li>
                 <li id="main-nav-bar-notfications">
-                  <Notifications notifications={notifications} setNotifications={setNotifications}/>
+                  <Notifications
+                    notifications={notifications}
+                    setNotifications={setNotifications}
+                  />
                 </li>
                 <li id="main-nav-bar-tab-user-profile">
                   <UserProfile />

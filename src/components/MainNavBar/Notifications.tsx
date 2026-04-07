@@ -1,12 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
-import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
+import React, { useState, useRef } from "react";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import {
   ClickAwayListener,
   Grow,
-  Icon,
-  IconButton,
-  MenuItem,
   MenuList,
   Paper,
   Popper,
@@ -14,44 +10,9 @@ import {
 import Notification from "./Notification";
 import { useNotificationServiceApi } from "@madie/madie-util";
 import "./Notifications.scss";
-const Notifications = ({notifications, setNotifications}) => {
-  //   function generateNotifications(count) {
-  //     const users = ["rohit_k", "edwin_t", "matt_m"];
-  //     const actions = [
-  //       "updated the Population Criteria",
-  //       "approved the rule",
-  //       "deleted the configuration",
-  //       "created a new policy",
-  //     ];
-  //     const cmsIds = ["CMS123", "CMS456", "CMS789"];
 
-  //     const randomItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
-
-  //     const randomObjectId = () =>
-  //       Array.from({ length: 24 }, () =>
-  //         Math.floor(Math.random() * 16).toString(16)
-  //       ).join("");
-
-  //     const randomDate = () => {
-  //       const now = Date.now();
-  //       const past = now - Math.floor(Math.random() * 7 * 24 * 60 * 60 * 1000);
-  //       return new Date(past).toISOString();
-  //     };
-
-  //     return Array.from({ length: count }, () => ({
-  //       _id: randomObjectId(),
-  //       userId: randomItem(users),
-  //       message: `${randomItem(users)} ${randomItem(actions)} for ${randomItem(
-  //         cmsIds
-  //       )}`,
-  //       additionalLink: `https://example.com/${randomObjectId()}`,
-  //       isRead: Math.random() < 0.5,
-  //       isSeen: Math.random() < 0.5,
-  //       createdAt: randomDate(),
-  //     }));
-
+const Notifications = ({ notifications, setNotifications }) => {
   const anchorRef = useRef<HTMLButtonElement>(null);
-  // api
   const notificationServiceApiRef = useRef(useNotificationServiceApi());
   const [open, setOpen] = useState(false);
 
@@ -64,40 +25,57 @@ const Notifications = ({notifications, setNotifications}) => {
       setOpen(false);
     }
   }
-  // poll the db
 
-  //   api utilities
-  const triggerSeenAllNotifications = (notifications) => {
-    const seenNotificationIds = notifications
-      .filter((n) => !n.isSeen)
-      .map((n) => n._id);
-    if (seenNotificationIds.length > 0) {
-      // we make an api call
-      console.log("read all notifications with ids: ", seenNotificationIds);
+  const triggerSeenAllNotifications = async (notifications) => {
+    const unseenIds = notifications.filter((n) => !n.isSeen).map((n) => n.id);
+    if (unseenIds.length > 0) {
+      try {
+        await notificationServiceApiRef.current.markNotificationsSeen(
+          unseenIds
+        );
+        // optimistically flip isSeen locally so badge drops to 0 immediately
+        setNotifications((prev) =>
+          prev.map((n) =>
+            unseenIds.includes(n.id) ? { ...n, isSeen: true } : n
+          )
+        );
+      } catch (err) {
+        // silently fail — non-critical
+      }
     }
   };
 
-  const triggerReadOneNotification = (notificationID) => {
-    // we make an api call
-    console.log("read notification with id: ", notificationID);
-    setNotifications((prevNotifications) =>
-      prevNotifications.map((n) =>
-        n._id === notificationID ? { ...n, isRead: true } : n
-      )
-    );
+  const triggerReadOneNotification = async (notificationID) => {
+    try {
+      await notificationServiceApiRef.current.readOneNotification(
+        notificationID
+      );
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === notificationID ? { ...n, isRead: true } : n))
+      );
+    } catch (err) {
+      // silently fail — non-critical
+    }
   };
 
-  const triggerDeleteNotification = (notificationID) => {
-    console.log("delete notification with id: ", notificationID);
-    // setNotifications((prevNotifications) =>
-    //     prevNotifications.filter((n) => n._id !== notificationID)
-    // );
+  const triggerDeleteNotification = async (notificationID) => {
+    try {
+      await notificationServiceApiRef.current.deleteNotification(
+        notificationID
+      );
+      setNotifications((prev) => prev.filter((n) => n.id !== notificationID));
+    } catch (err) {
+      // silently fail — non-critical
+    }
   };
+
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
+  const unseenCount = notifications.filter((n) => !n.isSeen).length;
 
   return (
     <button
       id="notifications"
-      data-badge={notifications?.length || 0}
+      data-badge={unseenCount}
       ref={anchorRef}
       onClick={() => {
         triggerSeenAllNotifications(notifications);
@@ -112,35 +90,53 @@ const Notifications = ({notifications, setNotifications}) => {
         placement="bottom-end"
         transition
         disablePortal={false}
-        sx={{
-          zIndex: 9999,
-          maxHeight: "calc(100vh - 64px)",
-          overflowY: "auto",
-        }}
+        sx={{ zIndex: 9999 }}
       >
-        {({ TransitionProps, placement }) => (
-          <Grow
-            {...TransitionProps}
-            style={{
-              transformOrigin: "left top",
-            }}
-          >
-            <Paper sx={{ zIndex: 9999 }}>
-              <ClickAwayListener
-                onClickAway={() => {
-                  setOpen(false);
-                }}
-              >
-                <MenuList autoFocusItem={open} onKeyDown={handleListKeyDown}>
-                  {notifications.map((notification) => (
-                    <Notification
-                      triggerReadOneNotification={triggerReadOneNotification}
-                      triggerDeleteNotification={triggerDeleteNotification}
-                      key={notification._id}
-                      notification={notification}
-                    />
-                  ))}
-                </MenuList>
+        {({ TransitionProps }) => (
+          <Grow {...TransitionProps} style={{ transformOrigin: "right top" }}>
+            <Paper className="notifications-panel" sx={{ zIndex: 9999 }}>
+              <ClickAwayListener onClickAway={() => setOpen(false)}>
+                <div className="notifications-panel-inner">
+                  <div className="notifications-header">
+                    <span className="notifications-title">Notifications</span>
+                    {unreadCount > 0 && (
+                      <span className="notifications-unread-badge">
+                        {unreadCount} unread
+                      </span>
+                    )}
+                  </div>
+                  <div className="notifications-scroll-area">
+                    {notifications.length === 0 ? (
+                      <div className="notifications-empty">
+                        <span className="notifications-empty-icon">✓</span>
+                        <p className="notifications-empty-title">
+                          You're all caught up!
+                        </p>
+                        <p className="notifications-empty-sub">
+                          No new notifications at this time.
+                        </p>
+                      </div>
+                    ) : (
+                      <MenuList
+                        autoFocusItem={open}
+                        onKeyDown={handleListKeyDown}
+                      >
+                        {notifications.map((notification) => (
+                          <Notification
+                            triggerReadOneNotification={
+                              triggerReadOneNotification
+                            }
+                            triggerDeleteNotification={
+                              triggerDeleteNotification
+                            }
+                            key={notification.id}
+                            notification={notification}
+                          />
+                        ))}
+                      </MenuList>
+                    )}
+                  </div>
+                </div>
               </ClickAwayListener>
             </Paper>
           </Grow>
