@@ -163,9 +163,6 @@ const MainNavBar = () => {
                   />
                 </Tabs>
                 <UserUMLS />
-                <li id="main-nav-bar-tab-user-avatar">
-                  <UserAvatar />
-                </li>
                 {isAdmin && (
                   <li id="main-nav-bar-admin-notifications">
                     <AdminNotification />
@@ -176,6 +173,9 @@ const MainNavBar = () => {
                     notifications={notifications}
                     setNotifications={setNotifications}
                   />
+                </li>
+                <li id="main-nav-bar-tab-user-avatar">
+                  <UserAvatar />
                 </li>
                 <li id="main-nav-bar-tab-user-profile">
                   <UserProfile />
