@@ -12,8 +12,14 @@ import UserUMLS from "./UserUMLS";
 import Notifications from "./Notifications";
 // @ts-ignore
 import { UsaBanner } from "@uswds/elements";
-import { useNotificationServiceApi, useUserRoles } from "@madie/madie-util";
+import {
+  useNotificationServiceApi,
+  useServiceConfig,
+  useOktaTokens,
+  useUserRoles,
+} from "@madie/madie-util";
 import AdminNotification from "./AdminNotification";
+import useWebSocketNotifications from "../../custom-hooks/useWebSocketNotifications";
 
 // Register the web component once (safe in module scope)
 if (!window.customElements.get("usa-banner")) {
@@ -58,27 +64,26 @@ const MainNavBar = () => {
     : "";
 
   const notificationServiceApiRef = useRef(useNotificationServiceApi());
+  const { notificationService } = useServiceConfig();
+  const { getAccessToken } = useOktaTokens();
   const [notifications, setNotifications] = useState([]);
-  const fetchNotifications = async () => {
-    try {
-      const notifications =
-        await notificationServiceApiRef.current.getAllNotifications();
-      console.log("fetched notifications: ", notifications);
-      setNotifications(notifications);
-      //   return notifications;
-      // setNotifications(notifications);
-    } catch (error) {
-      console.error("Error fetching notifications", error);
-    }
-  };
-  //   fetchNotifications has to happen every 30 seconds.
+
+  // Initial fetch on mount
   useEffect(() => {
-    fetchNotifications();
-    const interval = setInterval(() => {
-      fetchNotifications();
-    }, 10000); // 30 seconds
-    return () => clearInterval(interval);
+    notificationServiceApiRef.current
+      .getAllNotifications()
+      .then((data) => setNotifications(data))
+      .catch((err) => console.error("Error fetching notifications", err));
   }, []);
+
+  // Real-time push via WebSocket — prepend incoming notification to state
+  useWebSocketNotifications({
+    wsBaseUrl: notificationService?.baseUrl ?? "",
+    getAccessToken,
+    onNotification: (notification) =>
+      setNotifications((prev) => [notification, ...prev]),
+    enabled: !!authState?.isAuthenticated && !!notificationService?.baseUrl,
+  });
 
   return (
     <nav>

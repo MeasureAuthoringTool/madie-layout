@@ -35,10 +35,24 @@ const MockSignOut = jest.fn().mockImplementation(() => {
   return Promise.resolve();
 });
 
+jest.mock("../../custom-hooks/useWebSocketNotifications", () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
+
 jest.mock("@madie/madie-util", () => ({
   useTerminologyServiceApi: jest.fn(),
   useMeasureServiceApi: jest.fn(),
   useCqlLibraryServiceApi: jest.fn(),
+  useNotificationServiceApi: jest.fn(() => ({
+    getAllNotifications: jest.fn().mockResolvedValue([]),
+    markNotificationsSeen: jest.fn().mockResolvedValue(undefined),
+    readOneNotification: jest.fn().mockResolvedValue(undefined),
+    deleteNotification: jest.fn().mockResolvedValue(undefined),
+    deleteAllNotifications: jest.fn().mockResolvedValue(undefined),
+  })),
+  useOktaTokens: jest.fn(() => ({ getAccessToken: () => "mock-token" })),
+  useUserRoles: jest.fn(() => ({ isAdmin: false })),
   getServiceConfig: () => ({
     measureService: {
       baseUrl: "example-service-url",
@@ -54,6 +68,9 @@ jest.mock("@madie/madie-util", () => ({
     cqlLibraryService: {
       baseUrl: "test-cql-library-service-url",
       fetchAllOwners: jest.fn().mockResolvedValue(["owner1", "owner2"]),
+    },
+    notificationService: {
+      baseUrl: "http://localhost:8090/api",
     },
   }),
 }));
