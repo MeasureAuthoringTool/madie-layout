@@ -28,6 +28,9 @@ declare module "@madie/madie-util" {
     measureService?: {
       baseUrl: string;
     };
+    notificationService?: {
+      baseUrl: string;
+    };
     loggingService?: {
       baseUrl: string;
     };
@@ -158,9 +161,20 @@ declare module "@madie/madie-util" {
     loginUser(accessTokenObj: any): Promise<UserLogin>;
   }
 
+  export class NotificationServiceApi {
+    constructor(baseUrl: string, getAccessToken: () => string);
+    getAllNotifications(): Promise<any>;
+    createNotifications(notifications: any[]): Promise<any>;
+    markNotificationsSeen(ids: string[]): Promise<void>;
+    readOneNotification(notificationID: string): Promise<any>;
+    deleteNotification(notificationID: string): Promise<void>;
+    deleteAllNotifications(ids: string[]): Promise<void>;
+  }
+
   export function useMeasureServiceApi(): MeasureServiceApi;
   export function useCqlLibraryServiceApi(): CqlLibraryServiceApi;
   export function useUserServiceApi(): UserServiceApi;
+  export function useNotificationServiceApi(): NotificationServiceApi;
   export function useDocumentTitle(
     title: string,
     prevailOnMount?: boolean

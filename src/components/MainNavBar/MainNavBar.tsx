@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import logo from "../../assets/images/Logo.svg";
 import logoFull from "../../assets/images/Logo-Full.svg";
 import { DropDown, DropMenu } from "../../styles/styles";
@@ -9,8 +9,17 @@ import UserAvatar from "./UserAvatar";
 import { Tabs, Tab } from "@madie/madie-design-system/dist/react";
 import "./MainNavBar.scss";
 import UserUMLS from "./UserUMLS";
+import Notifications from "./Notifications";
 // @ts-ignore
 import { UsaBanner } from "@uswds/elements";
+import {
+  useNotificationServiceApi,
+  useServiceConfig,
+  useOktaTokens,
+  useUserRoles,
+} from "@madie/madie-util";
+import AdminNotification from "./AdminNotification";
+import useWebSocketNotifications from "../../custom-hooks/useWebSocketNotifications";
 
 // Register the web component once (safe in module scope)
 if (!window.customElements.get("usa-banner")) {
@@ -29,6 +38,8 @@ declare global {
 }
 
 const MainNavBar = () => {
+  const userRoles = useUserRoles();
+  const isAdmin = userRoles?.isAdmin;
   const [showFullLogo, setShowFullLogo] = useState(true);
 
   const { authState } = useOktaAuth();
@@ -51,6 +62,28 @@ const MainNavBar = () => {
     : pathname.includes("/cql-libraries")
     ? "/cql-libraries"
     : "";
+
+  const notificationServiceApiRef = useRef(useNotificationServiceApi());
+  const { notificationService } = useServiceConfig();
+  const { getAccessToken } = useOktaTokens();
+  const [notifications, setNotifications] = useState([]);
+
+  // Initial fetch on mount
+  useEffect(() => {
+    notificationServiceApiRef.current
+      .getAllNotifications()
+      .then((data) => setNotifications(data))
+      .catch((err) => console.error("Error fetching notifications", err));
+  }, []);
+
+  // Real-time push via WebSocket — prepend incoming notification to state
+  useWebSocketNotifications({
+    wsBaseUrl: notificationService?.baseUrl ?? "",
+    getAccessToken,
+    onNotification: (notification) =>
+      setNotifications((prev) => [notification, ...prev]),
+    enabled: !!authState?.isAuthenticated && !!notificationService?.baseUrl,
+  });
 
   return (
     <nav>
@@ -130,6 +163,17 @@ const MainNavBar = () => {
                   />
                 </Tabs>
                 <UserUMLS />
+                {isAdmin && (
+                  <li id="main-nav-bar-admin-notifications">
+                    <AdminNotification />
+                  </li>
+                )}
+                <li id="main-nav-bar-notfications">
+                  <Notifications
+                    notifications={notifications}
+                    setNotifications={setNotifications}
+                  />
+                </li>
                 <li id="main-nav-bar-tab-user-avatar">
                   <UserAvatar />
                 </li>

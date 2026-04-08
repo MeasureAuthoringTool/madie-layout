@@ -1,0 +1,262 @@
+.notifications {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  border: solid 1px red;
+  border-radius: 50%;
+  margin-left: 15px;
+}
+
+.notifications .MuiSvgIcon-root {
+  font-size: 2rem;
+}
+
+#notifications::after {
+  content: attr(data-badge);
+  position: absolute;
+  right: -5px;
+  top: 0px;
+  width: 20px;
+  height: 20px;
+  line-height: 18px;
+  font-size: 9px;
+  font-weight: bold;
+  text-align: center;
+  background-color: #e74c3c;
+  color: white;
+  border: 2px solid white;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+#notifications[data-badge="0"]::after {
+  display: none;
+}
+
+.notifications-panel {
+  width: 360px;
+  max-width: 90vw;
+  background-color: #f7f8fa !important;
+  border: 1px solid #d0d5dd !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14), 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+  overflow: hidden;
+
+  .notifications-panel-inner {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 80px); // never taller than the viewport
+  }
+
+  .notifications-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid #e0e4ea;
+    background-color: #f7f8fa;
+    flex-shrink: 0; // header stays fixed, only list scrolls
+
+    .notifications-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      letter-spacing: 0.01em;
+      margin: 0;
+    }
+
+    .notifications-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .notifications-unread-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      background-color: #e74c3c;
+      color: white;
+      border-radius: 10px;
+      padding: 2px 8px;
+      line-height: 1.6;
+    }
+
+    .notifications-clear-all {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #555;
+      background: none;
+      border: 1px solid #c5cad3;
+      border-radius: 6px;
+      padding: 2px 10px;
+      cursor: pointer;
+      line-height: 1.8;
+      transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+
+      &:hover {
+        color: #c0392b;
+        border-color: #c0392b;
+        background-color: #fff0ee;
+      }
+    }
+  }
+
+  .notifications-scroll-area {
+    overflow-y: auto;
+    flex: 1;
+
+    // Subtle custom scrollbar
+    &::-webkit-scrollbar {
+      width: 5px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: #c5cad3;
+      border-radius: 4px;
+    }
+  }
+
+  .notifications-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    gap: 8px;
+
+    .notifications-empty-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background-color: #d4edda;
+      color: #28a745;
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .notifications-empty-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin: 0;
+    }
+
+    .notifications-empty-sub {
+      font-size: 0.78rem;
+      color: #888;
+      margin: 0;
+      text-align: center;
+    }
+  }
+
+  // Pad the inner MenuList so notifications don't touch the panel edges
+  .MuiList-root {
+    padding: 10px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background-color: #f7f8fa;
+  }
+}
+
+.notification {
+  padding: 12px 14px 12px 12px !important;
+  white-space: normal !important;
+  align-items: flex-start !important;
+  cursor: pointer;
+  border-radius: 8px !important;
+  border-bottom: none !important;
+  position: relative;
+
+  // Prevent MUI hover/focus from changing the background color
+  &:hover,
+  &:focus,
+  &.Mui-focusVisible {
+    background-color: inherit !important;
+  }
+
+  p {
+    color: #000;
+    margin: 0 0 6px 0;
+    word-break: break-word;
+    white-space: normal;
+    line-height: 1.4;
+  }
+
+  &.read {
+    background-color: #f0f1f3;
+    &:hover,
+    &:focus,
+    &.Mui-focusVisible {
+      background-color: #f0f1f3 !important;
+    }
+  }
+
+  &.unread {
+    background-color: #e1f3f8;
+    border-left: 3px solid #0073b1 !important;
+    padding-left: 10px !important;
+
+    &:hover,
+    &:focus,
+    &.Mui-focusVisible {
+      background-color: #e1f3f8 !important;
+    }
+
+    // Unread indicator dot in the top-right corner
+    &::before {
+      content: "";
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #0073b1;
+      flex-shrink: 0;
+    }
+  }
+
+  .notification-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 4px;
+
+    .notification-message {
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding-right: 16px; // avoid overlap with unread dot
+    }
+
+    .notification-date {
+      font-size: 0.72rem;
+      color: #888 !important;
+      margin-bottom: 6px !important;
+    }
+
+    .notification-row {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2px;
+
+      a {
+        font-size: 0.78rem;
+        font-weight: 500;
+        color: #0073b1;
+        text-decoration: none;
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}
