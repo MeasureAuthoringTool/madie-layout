@@ -50,9 +50,9 @@ const Notifications = ({ notifications, setNotifications }) => {
       await notificationServiceApiRef.current.readOneNotification(
         notificationID
       );
-      // setNotifications((prev) =>
-      //   prev.map((n) => (n.id === notificationID ? { ...n, isRead: true } : n))
-      // );
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === notificationID ? { ...n, isRead: true } : n))
+      );
     } catch (err) {
       // silently fail — non-critical
     }
