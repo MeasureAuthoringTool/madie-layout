@@ -457,7 +457,7 @@ describe("Measures Create Dialog", () => {
     expect(getByTestId("measure-model-option-QDM v5.6")).toBeInTheDocument();
   });
 
-  test("Model dropdown does not shows QI-Core v7.0.0", async () => {
+  test("Model dropdown does not shows QI-Core v7.0.2", async () => {
     const { getByTestId, queryByTestId } = render(
       <CreateNewMeasureDialog open={true} onClose={undefined} />
     );
@@ -472,11 +472,11 @@ describe("Measures Create Dialog", () => {
     ).toBeInTheDocument();
     expect(getByTestId("measure-model-option-QDM v5.6")).toBeInTheDocument();
     expect(
-      queryByTestId("measure-model-option-QI-Core v7.0.0")
+      queryByTestId("measure-model-option-QI-Core v7.0.2")
     ).not.toBeInTheDocument();
   });
 
-  test("Model dropdown shows QI-Core v7.0.0 when feature flag is on", async () => {
+  test("Model dropdown shows QI-Core v7.0.2 when feature flag is on", async () => {
     (useFeatureFlags as jest.Mock).mockReturnValue({ qiCore7: true });
     const { getByTestId } = render(
       <CreateNewMeasureDialog open={true} onClose={undefined} />
@@ -492,7 +492,7 @@ describe("Measures Create Dialog", () => {
     ).toBeInTheDocument();
     expect(getByTestId("measure-model-option-QDM v5.6")).toBeInTheDocument();
     expect(
-      getByTestId("measure-model-option-QI-Core v7.0.0")
+      getByTestId("measure-model-option-QI-Core v7.0.2")
     ).toBeInTheDocument();
   });
 
