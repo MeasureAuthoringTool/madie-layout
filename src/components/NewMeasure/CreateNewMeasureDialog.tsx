@@ -67,8 +67,8 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
 
   let modelOptions = Object.keys(Model);
   if (!featureFlags?.qiCore7) {
-    // remove QI-Core 7.0.0 from model options if the feature flag is not enabled
-    modelOptions = modelOptions.filter((model) => model !== "QICORE_7_0_0");
+    // remove QI-Core 7.0.2 from model options if the feature flag is not enabled
+    modelOptions = modelOptions.filter((model) => model !== "QICORE_7_0_2");
   }
   async function createMeasure(measure: Measure) {
     if (!config) {
