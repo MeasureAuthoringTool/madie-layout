@@ -8,6 +8,19 @@
       box-shadow: none !important;
     }
 
+    a:focus {
+      text-decoration: none !important;
+      background: #fafafa;
+      outline: #fafafa;
+      color: #000 !important;
+    }
+
+    a:hover {
+      text-decoration: none !important;
+      color: #fff !important;
+      background: #001f3d;
+    }
+
     > .MuiTab-root.Mui-selected {
       background: #fff !important;
       color: #036 !important;
@@ -19,18 +32,6 @@
       color: #036 !important;
       text-decoration: none !important;
     }
-
-    a:focus {
-      text-decoration: none !important;
-      background: #fafafa;
-      outline: #fafafa;
-      color: #000000 !important;
-    }
-
-    a:hover {
-      text-decoration: none !important;
-      color: #fff !important;
-      background: #001f3d;
-    }
   }
 }
+
