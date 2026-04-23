@@ -1004,3 +1004,19 @@ describe("Page Header and Dialogs", () => {
     ).not.toBeInTheDocument();
   });
 });
+
+describe("Admin Page Header", () => {
+  beforeEach(() => {
+    axios.get.mockResolvedValueOnce(getData);
+  });
+
+  test("renders Administration heading when on /admin route", async () => {
+    render(
+      <MemoryRouter initialEntries={["/admin"]}>
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText("Administration")).toBeInTheDocument();
+  });
+});

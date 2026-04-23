@@ -95,6 +95,35 @@
       }
     }
   }
+  > .admin {
+    padding: 48px 96px 85px 96px;
+    margin: -16px -32px 0 -32px;
+    min-height: 207px;
+    background: linear-gradient(to right, #125496, #8b1a1a);
+
+    > div {
+      display: flex;
+      flex-direction: row;
+      flex-grow: 1;
+      justify-content: space-between;
+
+      > .left-col {
+        display: flex;
+        flex-direction: column;
+        font-family: Rubik, sans-serif;
+        color: #fff;
+
+        > h1 {
+          display: "block";
+          font-size: 42px;
+          font-weight: 400;
+          color: inherit;
+          margin: 0 0 8px 0;
+          line-height: 42px;
+        }
+      }
+    }
+  }
 
   .details {
     padding: 0 0 0 32px;

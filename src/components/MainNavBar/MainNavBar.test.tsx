@@ -14,6 +14,8 @@ import MainNavBar from "./MainNavBar";
 import {
   useTerminologyServiceApi,
   TerminologyServiceApi,
+  useFeatureFlags,
+  useUserRoles,
 } from "@madie/madie-util";
 
 jest.mock("@okta/okta-react", () => ({
@@ -39,6 +41,8 @@ jest.mock("@madie/madie-util", () => ({
   useTerminologyServiceApi: jest.fn(),
   useMeasureServiceApi: jest.fn(),
   useCqlLibraryServiceApi: jest.fn(),
+  useFeatureFlags: jest.fn().mockReturnValue({}),
+  useUserRoles: jest.fn().mockReturnValue({ roles: [], isAdmin: false }),
   getServiceConfig: () => ({
     measureService: {
       baseUrl: "example-service-url",
@@ -173,5 +177,73 @@ describe("MainNavBar Component", () => {
 
     const banner = container.querySelector("usa-banner") as HTMLElement;
     expect(banner).not.toBeInTheDocument();
+  });
+
+  test("Admin tab is visible when AdminUserList feature flag is enabled and user is admin", async () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ AdminUserList: true });
+    (useUserRoles as jest.Mock).mockReturnValue({
+      roles: ["MADiE-Admin"],
+      isAdmin: true,
+    });
+
+    render(
+      <MemoryRouter>
+        <MainNavBar />
+      </MemoryRouter>
+    );
+
+    const adminTab = await screen.findByTestId("main-nav-bar-admin");
+    expect(adminTab).toBeInTheDocument();
+    expect(adminTab).toHaveTextContent("Admin");
+  });
+
+  test("Admin tab is NOT visible when AdminUserList feature flag is disabled", async () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ AdminUserList: false });
+    (useUserRoles as jest.Mock).mockReturnValue({
+      roles: ["MADiE-Admin"],
+      isAdmin: true,
+    });
+
+    render(
+      <MemoryRouter>
+        <MainNavBar />
+      </MemoryRouter>
+    );
+
+    expect(screen.queryByTestId("main-nav-bar-admin")).not.toBeInTheDocument();
+  });
+
+  test("Admin tab is NOT visible when user is not an admin", async () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ AdminUserList: true });
+    (useUserRoles as jest.Mock).mockReturnValue({
+      roles: [],
+      isAdmin: false,
+    });
+
+    render(
+      <MemoryRouter>
+        <MainNavBar />
+      </MemoryRouter>
+    );
+
+    expect(screen.queryByTestId("main-nav-bar-admin")).not.toBeInTheDocument();
+  });
+
+  test("Admin tab navigates to /admin and shows selected state", async () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({ AdminUserList: true });
+    (useUserRoles as jest.Mock).mockReturnValue({
+      roles: ["MADiE-Admin"],
+      isAdmin: true,
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/admin"]}>
+        <MainNavBar />
+      </MemoryRouter>
+    );
+
+    const adminTab = await screen.findByTestId("main-nav-bar-admin");
+    expect(adminTab).toBeInTheDocument();
+    expect(adminTab).toHaveAttribute("aria-selected", "true");
   });
 });
