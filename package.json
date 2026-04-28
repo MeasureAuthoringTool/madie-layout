@@ -76,7 +76,7 @@
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
     "@madie/madie-auth": "^0.0.2",
-    "@madie/madie-admin": "file:../madie-admin",
+    "@madie/madie-admin": "^0.0.1",
     "@madie/madie-design-system": "^1.2.88",
     "@madie/madie-editor": "^0.0.2",
     "@madie/madie-layout": "file:",
