@@ -9,6 +9,7 @@ import UserAvatar from "./UserAvatar";
 import { Tabs, Tab } from "@madie/madie-design-system/dist/react";
 import "./MainNavBar.scss";
 import UserUMLS from "./UserUMLS";
+import { useFeatureFlags, useUserRoles } from "@madie/madie-util";
 // @ts-ignore
 import { UsaBanner } from "@uswds/elements";
 
@@ -32,6 +33,9 @@ const MainNavBar = () => {
   const [showFullLogo, setShowFullLogo] = useState(true);
 
   const { authState } = useOktaAuth();
+  const featureFlags = useFeatureFlags();
+  const userRoles = useUserRoles();
+  const showAdminTab = featureFlags?.AdminUserList && userRoles?.isAdmin;
 
   const resizeWindow = () => {
     const headerWidth =
@@ -50,6 +54,8 @@ const MainNavBar = () => {
     ? "/measures"
     : pathname.includes("/cql-libraries")
     ? "/cql-libraries"
+    : pathname.includes("/admin")
+    ? "/admin"
     : "";
 
   return (
@@ -115,6 +121,19 @@ const MainNavBar = () => {
                     data-testid="main-nav-bar-cql-library"
                     label="Libraries"
                   />
+                  {showAdminTab && (
+                    <Tab
+                      type="B"
+                      value="/admin"
+                      to="/admin"
+                      component={NavLink}
+                      name="admin"
+                      aria-label="Admin"
+                      id="admin-main-nav-bar-tab"
+                      data-testid="main-nav-bar-admin"
+                      label="Admin"
+                    />
+                  )}
                   <Tab
                     type="B"
                     aria-label="Help"

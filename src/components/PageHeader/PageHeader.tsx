@@ -417,6 +417,15 @@ const PageHeader = () => {
           </div>
         </div>
       )}
+      {pathname.includes("/admin") && (
+        <div className="admin">
+          <div>
+            <div className="left-col">
+              <h1> Administration </h1>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

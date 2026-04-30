@@ -11,6 +11,7 @@ import { LoginCallback, useOktaAuth } from "@okta/okta-react";
 import Login from "../components/login/Login";
 import { MadieMeasure } from "@madie/madie-measure";
 import { MadieCqlLibrary } from "@madie/madie-cql-library";
+import { MadieAdmin } from "@madie/madie-admin";
 import NotFound from "../components/notfound/NotFound";
 import "../styles/LayoutStyles.scss";
 import TimeoutHandler from "../components/timeoutHandler/TimeoutHandler";
@@ -59,6 +60,7 @@ function Router({ props }) {
         <Route path="login/callback" element={LoginCallback} />
         <Route path="measures/*" element={<MadieMeasure />} />
         <Route path="cql-libraries/*" element={<MadieCqlLibrary />} />
+        <Route path="admin/*" element={<MadieAdmin />} />
         <Route
           path="login"
           element={<Login config={props.oktaSignInConfig} />}
