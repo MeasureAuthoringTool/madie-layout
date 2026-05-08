@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "styled-components/macro";
 import { Measure } from "@madie/madie-models/dist/Measure";
 import { Model } from "@madie/madie-models/dist/Model";
@@ -64,6 +64,12 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
       await createMeasure(values);
     },
   });
+
+  useEffect(() => {
+    if (!open) {
+      formik.resetForm();
+    }
+  }, [open]);
 
   let modelOptions = Object.keys(Model);
   if (!featureFlags?.qiCore7) {
