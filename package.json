@@ -81,7 +81,7 @@
     "@madie/madie-editor": "^0.0.2",
     "@madie/madie-layout": "file:",
     "@madie/madie-models": "^1.4.62",
-    "@madie/madie-root": "^0.0.2",
+    "@madie/madie-root": "^0.0.3",
     "@mui/icons-material": "^5.16.7",
     "@mui/lab": "^5.0.0-alpha.82",
     "@mui/material": "^5.6.2",
