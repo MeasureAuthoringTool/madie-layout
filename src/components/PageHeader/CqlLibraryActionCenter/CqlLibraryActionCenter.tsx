@@ -17,7 +17,7 @@ import {
   routeHandlerStore,
   useCqlLibraryServiceApi,
   checkUserCanEdit,
-  useIsRoleOrFeatureEnabled,
+  useUserRoles,
 } from "@madie/madie-util";
 import ShareIcon from "../shareAction/ShareIcon";
 import SwapVertOutlinedIcon from "@mui/icons-material/SwapVertOutlined";
@@ -45,11 +45,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
   );
   const [shareAnchorEl, setShareAnchorEl] = useState<null | HTMLElement>(null);
   const shareMenuOpen = Boolean(shareAnchorEl);
-  const isAdminShareLibraryEnabled =
-    useIsRoleOrFeatureEnabled("AdminShareLibrary");
-  const isAdminTransferLibraryEnabled = useIsRoleOrFeatureEnabled(
-    "AdminTransferLibrary"
-  );
+  const isAdmin = useUserRoles()?.isAdmin;
 
   useEffect(() => {
     const subscription = routeHandlerStore.subscribe(setRouteHandlerState);
@@ -77,7 +73,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
 
   useEffect(() => {
     setActions(getActionArray(props.library, props.canEdit, props.canDelete));
-  }, [props, routeHandlerState, owner, isAdminShareLibraryEnabled]);
+  }, [props, routeHandlerState, owner, isAdmin]);
 
   const onContinue = () => {
     // we need every formik instance to use useFormikResetOnEvent on init
@@ -194,7 +190,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
         });
       }
     }
-    if (isAdminTransferLibraryEnabled || isOwnerOfLibrary(library)) {
+    if (isAdmin || isOwnerOfLibrary(library)) {
       actions.set("transfer library", {
         icon: (
           <IconButton>
@@ -220,22 +216,20 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
       });
     }
 
-    if ((canEdit && ownerOfLibrary) || isAdminShareLibraryEnabled) {
+    if ((canEdit && ownerOfLibrary) || isAdmin) {
       actions.set("share library", {
         icon: (
           <IconButton>
             <ShareIcon />
           </IconButton>
         ),
-        name: `${
-          isAdminShareLibraryEnabled ? "Share/Unshare" : "Share Library"
-        }`,
+        name: `${isAdmin ? "Share/Unshare" : "Share Library"}`,
         onClick: (event: React.MouseEvent<HTMLElement>) => {
           setOpen(false);
           setShareAnchorEl(event.currentTarget);
         },
       });
-    } else if ((canEdit && sharedWithUser) || isAdminShareLibraryEnabled) {
+    } else if ((canEdit && sharedWithUser) || isAdmin) {
       actions.set("unshare library from me", {
         icon: (
           <IconButton>
