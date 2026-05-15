@@ -77,7 +77,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
     modelOptions = modelOptions.filter((model) => model !== "QICORE_7_0_2");
   }
   // Discontinue 4.1.1 support when US_Quality_Core is available
-  if (featureFlags?.USQualityCore) {
+  if (featureFlags?.usQualityCore) {
     modelOptions = modelOptions.filter((model) => model !== "QICORE");
   } else {
     // not supporting it yet.

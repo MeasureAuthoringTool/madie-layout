@@ -547,9 +547,9 @@ describe("Measures Create Dialog", () => {
     expect(queryByTestId("composite")).not.toBeInTheDocument();
   });
 
-  test("Model dropdown does not show QI-Core v4.1.1 when USQualityCore flag is ON", async () => {
+  test("Model dropdown does not show QI-Core v4.1.1 when usQualityCore flag is ON", async () => {
     (useFeatureFlags as jest.Mock).mockReturnValue({
-      USQualityCore: true,
+      usQualityCore: true,
     });
 
     const { getByTestId, queryByTestId } = render(
