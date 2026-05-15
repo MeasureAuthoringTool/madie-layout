@@ -1,5 +1,7 @@
 import MadieEditor from "@madie/madie-editor";
 
+global.crypto = require("crypto").webcrypto;
+
 global.System = {
   import: jest.fn(mockImport),
 };
