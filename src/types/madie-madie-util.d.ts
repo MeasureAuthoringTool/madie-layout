@@ -57,6 +57,7 @@ declare module "@madie/madie-util" {
     AdminTransferLibrary: boolean;
     AdminShareMeasures: boolean;
     AdminUserList: boolean;
+    usQualityCore?: boolean;
   }
 
   export interface UserRoles {

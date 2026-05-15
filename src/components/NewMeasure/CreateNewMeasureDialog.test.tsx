@@ -546,4 +546,29 @@ describe("Measures Create Dialog", () => {
 
     expect(queryByTestId("composite")).not.toBeInTheDocument();
   });
+
+  test("Model dropdown does not show QI-Core v4.1.1 when usQualityCore flag is ON", async () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({
+      usQualityCore: true,
+    });
+
+    const { getByTestId, queryByTestId } = render(
+      <CreateNewMeasureDialog open={true} onClose={undefined} />
+    );
+
+    const modelSelectDropDown = getByTestId("measure-model-select");
+    const modelSelectBtn = within(modelSelectDropDown).getByRole("combobox");
+    userEvent.click(modelSelectBtn);
+
+    // QI-Core v4.1.1 should be removed
+    expect(
+      queryByTestId("measure-model-option-QI-Core v4.1.1")
+    ).not.toBeInTheDocument();
+
+    // Other expected options should still exist
+    expect(
+      getByTestId("measure-model-option-QI-Core v6.0.0")
+    ).toBeInTheDocument();
+    expect(getByTestId("measure-model-option-QDM v5.6")).toBeInTheDocument();
+  });
 });
