@@ -54,6 +54,7 @@ declare module "@madie/madie-util" {
     qiCore7: boolean;
     QICoreCompositeMeasure: boolean;
     AdminUserList: boolean;
+    usQualityCore?: boolean;
   }
 
   export interface UserRoles {

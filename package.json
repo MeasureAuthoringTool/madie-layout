@@ -75,19 +75,19 @@
   "dependencies": {
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
-    "@madie/madie-auth": "^0.0.2",
     "@madie/madie-admin": "^0.0.1",
+    "@madie/madie-auth": "^0.0.2",
     "@madie/madie-design-system": "^1.2.92",
     "@madie/madie-editor": "^0.0.2",
     "@madie/madie-layout": "file:",
-    "@madie/madie-models": "^1.4.62",
+    "@madie/madie-models": "^1.4.65",
     "@madie/madie-root": "^0.0.2",
     "@mui/icons-material": "^5.16.7",
     "@mui/lab": "^5.0.0-alpha.82",
     "@mui/material": "^5.6.2",
     "@mui/styles": "^5.8.0",
-    "@okta/okta-auth-js": "^7.5.0",
-    "@okta/okta-react": "^6.9.0",
+    "@okta/okta-auth-js": "^8.0.0",
+    "@okta/okta-react": "^6.11.0",
     "@tailwindcss/forms": "^0.5.3",
     "@uswds/elements": "^1.0.0-alpha.6",
     "axios": "^1.15.0",
@@ -118,6 +118,8 @@
   "overrides": {
     "glob-parent": "^5.1.2",
     "dset": "3.1.3",
-    "@babel/runtime": "^7.26.10"
+    "@babel/runtime": "^7.26.10",
+    "serialize-javascript": "^7.0.4",
+    "webcrypto-core": "^1.8.0"
   }
 }
