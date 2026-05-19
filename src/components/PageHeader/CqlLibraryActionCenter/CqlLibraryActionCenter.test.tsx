@@ -305,7 +305,7 @@ describe("CqlLibraryActionCenter Component", () => {
     );
   });
 
-  it("should display disabled transfer Library icon when library has different owner", async () => {
+  it("should not display transfer icon when user is not the owner and not an admin", async () => {
     (checkUserCanEdit as jest.Mock).mockReturnValue(false);
     jest.spyOn(require("@madie/madie-util"), "useOktaTokens").mockReturnValue({
       getAccessToken: () => "test.jwt",
@@ -322,9 +322,7 @@ describe("CqlLibraryActionCenter Component", () => {
     await act(async () => {
       userEvent.click(actionCenterButton);
     });
-    const transferLibraryBtn = screen.getByTestId("transfer-disabled");
-    expect(transferLibraryBtn).toBeInTheDocument();
-    expect(transferLibraryBtn).not.toBeEnabled();
+    expect(screen.queryByTestId("Transfer")).not.toBeInTheDocument();
   });
 
   it("should trigger transfer library event", async () => {
