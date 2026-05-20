@@ -6,8 +6,6 @@ import userEvent from "@testing-library/user-event";
 import {
   routeHandlerStore,
   checkUserCanEdit,
-  useIsRoleOrFeatureEnabled,
-  useFeatureFlags,
   useUserRoles,
 } from "@madie/madie-util";
 
@@ -34,8 +32,6 @@ const versionedMeasure = {
 } as Measure;
 
 jest.mock("@madie/madie-util", () => ({
-  useIsRoleOrFeatureEnabled: jest.fn().mockReturnValue(false),
-  useFeatureFlags: jest.fn().mockReturnValue({}),
   useUserRoles: jest.fn().mockReturnValue({ roles: [], isAdmin: false }),
   routeHandlerStore: {
     subscribe: () => ({ unsubscribe: () => null }),
@@ -574,7 +570,7 @@ describe("MeasureActionCenter Component", () => {
     expect(disabledVersionBtn).toBeDisabled();
   });
 
-  describe("Admin user with AdminTransferMeasure feature flag enabled", () => {
+  describe("Admin user transfer measure", () => {
     const nonOwnedMeasure = {
       id: "measure ID",
       createdBy: "anotheruser@example.com",
@@ -587,13 +583,19 @@ describe("MeasureActionCenter Component", () => {
     } as Measure;
 
     beforeEach(() => {
-      (useIsRoleOrFeatureEnabled as jest.Mock).mockReturnValue(true);
+      (useUserRoles as jest.Mock).mockReturnValue({
+        roles: ["MADiE-Admin"],
+        isAdmin: true,
+      });
       (checkUserCanEdit as jest.Mock).mockReturnValue(false);
     });
 
     afterEach(() => {
       cleanup();
-      (useIsRoleOrFeatureEnabled as jest.Mock).mockReturnValue(false);
+      (useUserRoles as jest.Mock).mockReturnValue({
+        roles: [],
+        isAdmin: false,
+      });
       (checkUserCanEdit as jest.Mock).mockReturnValue(true);
     });
 
@@ -615,44 +617,6 @@ describe("MeasureActionCenter Component", () => {
     });
   });
 
-  describe("Admin user with AdminTransferMeasure feature flag disabled", () => {
-    const nonOwnedMeasure = {
-      id: "measure ID",
-      createdBy: "anotheruser@example.com",
-      model: "QI-Core v4.1.1",
-      measureMetaData: { draft: true },
-      measureSet: {
-        ...mockMeasureSet,
-        owner: "anotheruser@example.com",
-      },
-    } as Measure;
-
-    beforeEach(() => {
-      (useIsRoleOrFeatureEnabled as jest.Mock).mockReturnValue(false);
-      (checkUserCanEdit as jest.Mock).mockReturnValue(false);
-    });
-
-    afterEach(() => {
-      (useIsRoleOrFeatureEnabled as jest.Mock).mockReturnValue(false);
-      (checkUserCanEdit as jest.Mock).mockReturnValue(true);
-    });
-
-    it("should not show Transfer action for admin user when feature flag is disabled", () => {
-      render(
-        <MeasureActionCenter
-          canEdit={false}
-          measure={nonOwnedMeasure}
-          canDelete={false}
-        />
-      );
-
-      const actionCenterButton = screen.getByLabelText("Measure action center");
-      userEvent.click(actionCenterButton);
-
-      expect(screen.queryByTestId("Transfer")).not.toBeInTheDocument();
-    });
-  });
-
   describe("Admin Share Measure Tests", () => {
     const nonOwnedMeasure = {
       ...draftMeasure,
@@ -668,10 +632,6 @@ describe("MeasureActionCenter Component", () => {
         dispatchEventSpy.mockClear();
       }
 
-      (useFeatureFlags as jest.Mock).mockReturnValue({
-        AdminShareMeasures: true,
-      });
-
       (useUserRoles as jest.Mock).mockReturnValue({
         roles: ["MADiE-Admin"],
         isAdmin: true,
@@ -683,7 +643,6 @@ describe("MeasureActionCenter Component", () => {
 
     afterEach(() => {
       cleanup();
-      (useFeatureFlags as jest.Mock).mockReturnValue({});
       (useUserRoles as jest.Mock).mockReturnValue({
         roles: [],
         isAdmin: false,
@@ -691,7 +650,7 @@ describe("MeasureActionCenter Component", () => {
       (checkUserCanEdit as jest.Mock).mockReturnValue(true);
     });
 
-    it("should show Share/Unshare action for admin user on non-owned measure when feature flag is enabled", () => {
+    it("should show Share/Unshare action for admin user on non-owned measure", () => {
       render(
         <MeasureActionCenter
           canEdit={false}
@@ -706,26 +665,7 @@ describe("MeasureActionCenter Component", () => {
       expect(screen.getByTestId("Share/Unshare")).toBeInTheDocument();
     });
 
-    it("should not show Share/Unshare action for admin user when feature flag is disabled", () => {
-      (useFeatureFlags as jest.Mock).mockReturnValue({
-        AdminShareMeasures: false,
-      });
-
-      render(
-        <MeasureActionCenter
-          canEdit={false}
-          measure={nonOwnedMeasure}
-          canDelete={false}
-        />
-      );
-
-      const actionCenterButton = screen.getByLabelText("Measure action center");
-      userEvent.click(actionCenterButton);
-
-      expect(screen.queryByTestId("Share/Unshare")).not.toBeInTheDocument();
-    });
-
-    it("should not show Share/Unshare action for non-admin user even with feature flag enabled", () => {
+    it("should not show Share/Unshare action for non-admin user", () => {
       (useUserRoles as jest.Mock).mockReturnValue({
         roles: ["MADiE-User"],
         isAdmin: false,
