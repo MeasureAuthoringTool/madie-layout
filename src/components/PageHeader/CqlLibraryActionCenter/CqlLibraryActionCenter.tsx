@@ -30,7 +30,6 @@ interface PropTypes {
 }
 
 const TRANSFER_LIBRARY = "Transfer";
-const CANNOT_TRANSFER = "You cannot transfer a library you do not own.";
 
 const CqlLibraryActionCenter = (props: PropTypes) => {
   const [open, setOpen] = useState(false);
@@ -198,18 +197,6 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
           </IconButton>
         ),
         name: TRANSFER_LIBRARY,
-        onClick: () => {
-          handleActionClick(new Event("transfer-library"));
-        },
-      });
-    } else {
-      actions.set("transfer library", {
-        icon: (
-          <IconButton disabled data-testid="transfer-disabled">
-            <SwapVertOutlinedIcon style={{ transform: "rotate(90deg)" }} />
-          </IconButton>
-        ),
-        name: CANNOT_TRANSFER,
         onClick: () => {
           handleActionClick(new Event("transfer-library"));
         },
