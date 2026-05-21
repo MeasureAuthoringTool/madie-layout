@@ -10,9 +10,7 @@ import {
   RouteHandlerState,
   routeHandlerStore,
   checkUserCanEdit,
-  useFeatureFlags,
   useUserRoles,
-  useIsRoleOrFeatureEnabled,
 } from "@madie/madie-util";
 import FeedOutlinedIcon from "@mui/icons-material/FeedOutlined";
 import ShareAction, { SharedOptions } from "../shareAction/ShareAction";
@@ -42,12 +40,7 @@ const MeasureActionCenter = (props: PropTypes) => {
   const [actions, setActions] = useState<Array<any>>([]);
   const [discardDialogOpen, setDiscardDialogOpen] = useState<boolean>(false);
   const [eventToTrigger, setEventToTrigger] = useState<Event | null>(null);
-  const featureFlags = useFeatureFlags();
   const userRoles = useUserRoles();
-  const isAdminShareEnabled =
-    featureFlags?.AdminShareMeasures && userRoles?.isAdmin;
-  const isAdminTransferEnabled =
-    useIsRoleOrFeatureEnabled?.("AdminTransferMeasure") ?? false;
 
   const { updateRouteHandlerState } = routeHandlerStore;
   const [routeHandlerState, setRouteHandlerState] = useState<RouteHandlerState>(
@@ -70,7 +63,7 @@ const MeasureActionCenter = (props: PropTypes) => {
         props.measureLockedBy
       )
     );
-  }, [props, routeHandlerState, isAdminTransferEnabled, isAdminShareEnabled]);
+  }, [props, routeHandlerState, userRoles]);
 
   const onContinue = async () => {
     // we need every formik instance to use useFormikResetOnEvent on init
@@ -214,7 +207,7 @@ const MeasureActionCenter = (props: PropTypes) => {
       }
     }
 
-    if (ownerOfMeasure || isAdminShareEnabled) {
+    if (ownerOfMeasure || userRoles?.isAdmin) {
       actions.set("share/unshare measure", {
         icon: (
           <ShareAction
@@ -258,8 +251,8 @@ const MeasureActionCenter = (props: PropTypes) => {
         ),
         name: ownerOfMeasure ? TRANSFER_MEASURE : CANNOT_TRANSFER,
       });
-    } else if (isAdminTransferEnabled) {
-      // Admin users with feature flag can transfer any measure
+    } else if (userRoles?.isAdmin) {
+      // Admin users can transfer any measure
       actions.set("transfer measure", {
         icon: (
           <TransferAction
