@@ -28,6 +28,40 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Tooltip from "@mui/material/Tooltip";
 import MeasureStatusChips from "./MeasureStatusChip";
 
+const ADMIN_STATUS_LABEL: Record<string, string> = {
+  ACTIVE: "Active",
+  DEACTIVATED: "Deactivated",
+  ERROR_SUSPENDED: "Suspended",
+};
+
+const getAdminStatusLabel = (status?: string): string =>
+  status ? ADMIN_STATUS_LABEL[status] ?? status : "";
+
+const pad2 = (n: number): string => String(n).padStart(2, "0");
+
+const formatAdminLastLogin = (lastLoginAt?: string | null): string => {
+  if (!lastLoginAt) return "-";
+  const lastDate = new Date(lastLoginAt);
+  const dateStr = `${pad2(lastDate.getMonth() + 1)}/${pad2(
+    lastDate.getDate()
+  )}/${lastDate.getFullYear()}`;
+  const startOfLast = new Date(
+    lastDate.getFullYear(),
+    lastDate.getMonth(),
+    lastDate.getDate()
+  );
+  const now = new Date();
+  const startOfToday = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate()
+  );
+  const days = Math.floor(
+    (startOfToday.getTime() - startOfLast.getTime()) / (1000 * 60 * 60 * 24)
+  );
+  return days > 0 ? `${dateStr} (${days} days ago)` : dateStr;
+};
+
 const PageHeader = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
@@ -449,64 +483,33 @@ const PageHeader = () => {
             </button>
             <h1 data-testid="admin-user-profile-name">{`${adminUserState.firstName} ${adminUserState.lastName}`}</h1>
             <div className="admin-user-profile-meta">
-              <p>
+              <p className="meta-item">
                 <span className="meta-label">HARP ID:</span>
                 <span data-testid="admin-user-profile-harpId">
                   {adminUserState.harpId}
                 </span>
               </p>
-              <p>
+              <p className="meta-item">
                 <span className="meta-label">Email Address:</span>
                 <span data-testid="admin-user-profile-email">
                   {adminUserState.email}
                 </span>
               </p>
-              <p>
+              <p className="meta-item">
                 <span className="meta-label">Status:</span>
                 <Chip
-                  label={
-                    adminUserState.status === "ACTIVE"
-                      ? "Active"
-                      : adminUserState.status === "DEACTIVATED"
-                      ? "Deactivated"
-                      : adminUserState.status === "ERROR_SUSPENDED"
-                      ? "Suspended"
-                      : adminUserState.status
-                  }
+                  label={getAdminStatusLabel(adminUserState.status)}
                   className={`admin-status-chip admin-status-chip--${(
                     adminUserState.status || ""
-                  )
-                    .toString()
-                    .toLowerCase()}`}
+                  ).toLowerCase()}`}
                   size="small"
                   data-testid={`admin-status-chip-${adminUserState.status}`}
                 />
               </p>
-              <p>
+              <p className="meta-item">
                 <span className="meta-label">Last Log In:</span>
                 <span data-testid="admin-user-profile-last-login">
-                  {(() => {
-                    const last = adminUserState.lastLoginAt;
-                    if (!last) return "-";
-                    const lastDate = new Date(last);
-                    const dateStr = lastDate.toLocaleDateString();
-                    const startOfLast = new Date(
-                      lastDate.getFullYear(),
-                      lastDate.getMonth(),
-                      lastDate.getDate()
-                    );
-                    const now = new Date();
-                    const startOfToday = new Date(
-                      now.getFullYear(),
-                      now.getMonth(),
-                      now.getDate()
-                    );
-                    const days = Math.floor(
-                      (startOfToday.getTime() - startOfLast.getTime()) /
-                        (1000 * 60 * 60 * 24)
-                    );
-                    return days > 0 ? `${dateStr} (${days} days ago)` : dateStr;
-                  })()}
+                  {formatAdminLastLogin(adminUserState.lastLoginAt)}
                 </span>
               </p>
             </div>

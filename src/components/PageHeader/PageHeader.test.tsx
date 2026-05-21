@@ -1015,8 +1015,19 @@ describe("Page Header and Dialogs", () => {
 });
 
 describe("Admin Page Header", () => {
+  const setAdminUser = (user: unknown) => {
+    require("@madie/madie-util").adminUserStore.state = user;
+    require("@madie/madie-util").adminUserStore.subscribe = (
+      set: (u: unknown) => void
+    ) => {
+      set(user);
+      return { unsubscribe: () => null };
+    };
+  };
+
   beforeEach(() => {
     axios.get.mockResolvedValueOnce(getData);
+    setAdminUser(null);
   });
 
   test("renders Administration heading when on /admin route", async () => {
@@ -1027,5 +1038,170 @@ describe("Admin Page Header", () => {
     );
 
     expect(screen.getByText("Administration")).toBeInTheDocument();
+  });
+
+  test("renders the user profile header when on /admin/userProfile with a user", () => {
+    setAdminUser({
+      harpId: "jane_doe",
+      firstName: "jane",
+      lastName: "doe",
+      email: "jane.doe@exmaple.com",
+      status: "ACTIVE",
+      lastLoginAt: null,
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/admin/userProfile?harpId=jane_doe"]}>
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByTestId("admin-user-profile-name")).toHaveTextContent(
+      "jane doe"
+    );
+    expect(screen.getByTestId("admin-user-profile-harpId")).toHaveTextContent(
+      "jane_doe"
+    );
+    expect(screen.getByTestId("admin-user-profile-email")).toHaveTextContent(
+      "jane.doe@exmaple.com"
+    );
+    expect(screen.getByTestId("back-to-all-users")).toBeInTheDocument();
+    expect(screen.queryByText("Administration")).not.toBeInTheDocument();
+  });
+
+  test("falls back to Administration heading when on /admin/userProfile but no user is loaded", () => {
+    setAdminUser(null);
+
+    render(
+      <MemoryRouter initialEntries={["/admin/userProfile?harpId=missing_user"]}>
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText("Administration")).toBeInTheDocument();
+    expect(
+      screen.queryByTestId("admin-user-profile-name")
+    ).not.toBeInTheDocument();
+  });
+
+  test("displays the raw status string when not in the known mapping", () => {
+    setAdminUser({
+      harpId: "h",
+      firstName: "F",
+      lastName: "L",
+      email: "e",
+      status: "UNKNOWN_STATUS",
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/admin/userProfile?harpId=h"]}>
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+    expect(
+      screen.getByTestId("admin-status-chip-UNKNOWN_STATUS")
+    ).toHaveTextContent("UNKNOWN_STATUS");
+  });
+
+  test("shows '-' for last login when lastLoginAt is null", () => {
+    setAdminUser({
+      harpId: "h",
+      firstName: "F",
+      lastName: "L",
+      email: "e",
+      status: "ACTIVE",
+      lastLoginAt: null,
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/admin/userProfile?harpId=h"]}>
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+    expect(
+      screen.getByTestId("admin-user-profile-last-login")
+    ).toHaveTextContent("-");
+  });
+
+  test("formats today's last login as MM/DD/YYYY with no 'days ago' suffix", () => {
+    const today = new Date();
+    setAdminUser({
+      harpId: "h",
+      firstName: "F",
+      lastName: "L",
+      email: "e",
+      status: "ACTIVE",
+      lastLoginAt: today.toISOString(),
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/admin/userProfile?harpId=h"]}>
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
+    const yyyy = today.getFullYear();
+    const expected = `${mm}/${dd}/${yyyy}`;
+
+    const lastLogin = screen.getByTestId("admin-user-profile-last-login");
+    expect(lastLogin).toHaveTextContent(expected);
+    expect(lastLogin.textContent).not.toMatch(/days ago/);
+  });
+
+  test("formats a past last login as MM/DD/YYYY with '(N days ago)' suffix", () => {
+    const past = new Date();
+    past.setDate(past.getDate() - 10);
+    setAdminUser({
+      harpId: "h",
+      firstName: "F",
+      lastName: "L",
+      email: "e",
+      status: "ACTIVE",
+      lastLoginAt: past.toISOString(),
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/admin/userProfile?harpId=h"]}>
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+    const mm = String(past.getMonth() + 1).padStart(2, "0");
+    const dd = String(past.getDate()).padStart(2, "0");
+    const yyyy = past.getFullYear();
+    expect(
+      screen.getByTestId("admin-user-profile-last-login")
+    ).toHaveTextContent(`${mm}/${dd}/${yyyy} (10 days ago)`);
+  });
+
+  test("Back to All Users button clears the store and navigates to /admin", () => {
+    setAdminUser({
+      harpId: "h",
+      firstName: "F",
+      lastName: "L",
+      email: "e",
+      status: "ACTIVE",
+    });
+    const updateUserMock = jest.fn();
+    require("@madie/madie-util").adminUserStore.updateUser = updateUserMock;
+
+    render(
+      <MemoryRouter initialEntries={["/admin/userProfile?harpId=h"]}>
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+    userEvent.click(screen.getByTestId("back-to-all-users"));
+
+    expect(updateUserMock).toHaveBeenCalledWith(null);
+    // After navigate('/admin') the conditional render flips to the Administration heading
+    expect(screen.getByText("Administration")).toBeInTheDocument();
+    expect(
+      screen.queryByTestId("admin-user-profile-name")
+    ).not.toBeInTheDocument();
   });
 });
