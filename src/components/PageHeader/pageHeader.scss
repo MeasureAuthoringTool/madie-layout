@@ -125,6 +125,81 @@
     }
   }
 
+  > .admin-user-profile {
+    display: flex;
+    flex-direction: column;
+    font-family: Rubik, sans-serif;
+    color: #fff;
+    padding: 24px 96px 32px 96px;
+
+    .back-to-users {
+      align-self: flex-start;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      color: #fff;
+      font: inherit;
+      font-size: 14px;
+      padding: 0;
+      margin-bottom: 16px;
+      cursor: pointer;
+
+      &:hover,
+      &:focus {
+        text-decoration: underline;
+      }
+    }
+
+    > h1 {
+      font-size: 32px;
+      font-weight: 400;
+      color: inherit;
+      margin: 0 0 16px 0;
+      line-height: 36px;
+    }
+
+    .admin-user-profile-meta {
+      display: flex;
+      flex-wrap: wrap;
+      column-gap: 24px;
+      row-gap: 8px;
+
+      > p {
+        margin: 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        color: #fff;
+
+        .meta-label {
+          font-weight: 700;
+        }
+      }
+    }
+
+    .admin-status-chip {
+      height: 24px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #000;
+
+      &--active {
+        background-color: #e3f2fd;
+      }
+
+      &--deactivated {
+        background-color: #ffebee;
+      }
+
+      &--error_suspended {
+        background-color: #fff8e1;
+      }
+    }
+  }
+
   .details {
     padding: 0 0 0 32px;
     display: flex;

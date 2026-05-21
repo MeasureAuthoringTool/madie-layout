@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import { Fade, Breadcrumbs } from "@mui/material";
 import CreateNewMeasureDialog from "../NewMeasure/CreateNewMeasureDialog";
@@ -14,7 +14,10 @@ import {
   checkUserCanDelete,
   axios,
   useOktaTokens,
+  adminUserStore,
 } from "@madie/madie-util";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { UserDetails } from "@madie/madie-models";
 import "twin.macro";
 import "styled-components/macro";
 import "./pageHeader.scss";
@@ -27,6 +30,7 @@ import MeasureStatusChips from "./MeasureStatusChip";
 
 const PageHeader = () => {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const [userFirstName, setUserFirstName] = useState<string>();
 
   const { getUserName } = useOktaTokens();
@@ -59,6 +63,17 @@ const PageHeader = () => {
 
   useEffect(() => {
     const subscription = measureStore.subscribe(setMeasureState);
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const [adminUserState, setAdminUserState] = useState<UserDetails | null>(
+    adminUserStore.state
+  );
+
+  useEffect(() => {
+    const subscription = adminUserStore.subscribe(setAdminUserState);
     return () => {
       subscription.unsubscribe();
     };
@@ -417,15 +432,94 @@ const PageHeader = () => {
           </div>
         </div>
       )}
-      {pathname.includes("/admin") && (
-        <div className="admin">
-          <div>
-            <div className="left-col">
-              <h1> Administration </h1>
+      {pathname.includes("/admin") &&
+        (pathname.includes("/admin/userProfile") && adminUserState ? (
+          <div className="admin admin-user-profile">
+            <button
+              type="button"
+              className="back-to-users"
+              data-testid="back-to-all-users"
+              onClick={() => {
+                adminUserStore.updateUser(null);
+                navigate("/admin");
+              }}
+            >
+              <ArrowBackIcon fontSize="small" />
+              <span>Back to All Users</span>
+            </button>
+            <h1 data-testid="admin-user-profile-name">{`${adminUserState.firstName} ${adminUserState.lastName}`}</h1>
+            <div className="admin-user-profile-meta">
+              <p>
+                <span className="meta-label">HARP ID:</span>
+                <span data-testid="admin-user-profile-harpId">
+                  {adminUserState.harpId}
+                </span>
+              </p>
+              <p>
+                <span className="meta-label">Email Address:</span>
+                <span data-testid="admin-user-profile-email">
+                  {adminUserState.email}
+                </span>
+              </p>
+              <p>
+                <span className="meta-label">Status:</span>
+                <Chip
+                  label={
+                    adminUserState.status === "ACTIVE"
+                      ? "Active"
+                      : adminUserState.status === "DEACTIVATED"
+                      ? "Deactivated"
+                      : adminUserState.status === "ERROR_SUSPENDED"
+                      ? "Suspended"
+                      : adminUserState.status
+                  }
+                  className={`admin-status-chip admin-status-chip--${(
+                    adminUserState.status || ""
+                  )
+                    .toString()
+                    .toLowerCase()}`}
+                  size="small"
+                  data-testid={`admin-status-chip-${adminUserState.status}`}
+                />
+              </p>
+              <p>
+                <span className="meta-label">Last Log In:</span>
+                <span data-testid="admin-user-profile-last-login">
+                  {(() => {
+                    const last = adminUserState.lastLoginAt;
+                    if (!last) return "-";
+                    const lastDate = new Date(last);
+                    const dateStr = lastDate.toLocaleDateString();
+                    const startOfLast = new Date(
+                      lastDate.getFullYear(),
+                      lastDate.getMonth(),
+                      lastDate.getDate()
+                    );
+                    const now = new Date();
+                    const startOfToday = new Date(
+                      now.getFullYear(),
+                      now.getMonth(),
+                      now.getDate()
+                    );
+                    const days = Math.floor(
+                      (startOfToday.getTime() - startOfLast.getTime()) /
+                        (1000 * 60 * 60 * 24)
+                    );
+                    return days > 0 ? `${dateStr} (${days} days ago)` : dateStr;
+                  })()}
+                </span>
+              </p>
             </div>
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="admin">
+            <div>
+              <div className="left-col">
+                <h1> Administration </h1>
+              </div>
+            </div>
+          </div>
+        ))}
     </div>
   );
 };
