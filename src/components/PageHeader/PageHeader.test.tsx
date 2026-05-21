@@ -1198,7 +1198,6 @@ describe("Admin Page Header", () => {
     userEvent.click(screen.getByTestId("back-to-all-users"));
 
     expect(updateUserMock).toHaveBeenCalledWith(null);
-    // After navigate('/admin') the conditional render flips to the Administration heading
     expect(screen.getByText("Administration")).toBeInTheDocument();
     expect(
       screen.queryByTestId("admin-user-profile-name")
