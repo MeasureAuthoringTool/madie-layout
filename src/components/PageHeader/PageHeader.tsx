@@ -1,10 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  Link,
-  useLocation,
-  useNavigate,
-  useSearchParams,
-} from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import { Fade, Breadcrumbs } from "@mui/material";
 import CreateNewMeasureDialog from "../NewMeasure/CreateNewMeasureDialog";
@@ -19,7 +14,7 @@ import {
   checkUserCanDelete,
   axios,
   useOktaTokens,
-  useUserServiceApi,
+  adminUserStore,
 } from "@madie/madie-util";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { UserDetails } from "@madie/madie-models";
@@ -36,8 +31,6 @@ import MeasureStatusChips from "./MeasureStatusChip";
 const PageHeader = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const userServiceApi = useRef(useUserServiceApi()).current;
   const [userFirstName, setUserFirstName] = useState<string>();
 
   const { getUserName } = useOktaTokens();
@@ -76,28 +69,15 @@ const PageHeader = () => {
   }, []);
 
   const [adminUserState, setAdminUserState] = useState<UserDetails | null>(
-    null
+    adminUserStore.state
   );
 
-  const harpIdParam = searchParams.get("harpId");
-  const isUserProfileRoute = pathname.includes("/admin/userProfile");
-
   useEffect(() => {
-    if (!isUserProfileRoute || !harpIdParam) {
-      setAdminUserState(null);
-      return;
-    }
-    const controller = new AbortController();
-    userServiceApi
-      .getUser(harpIdParam, controller.signal)
-      .then((user) => setAdminUserState(user))
-      .catch((err) => {
-        if (err?.name !== "AbortError" && err?.code !== "ERR_CANCELED") {
-          setAdminUserState(null);
-        }
-      });
-    return () => controller.abort();
-  }, [isUserProfileRoute, harpIdParam, userServiceApi]);
+    const subscription = adminUserStore.subscribe(setAdminUserState);
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   // create
   const openCreate = () => {
@@ -460,6 +440,7 @@ const PageHeader = () => {
               className="back-to-users"
               data-testid="back-to-all-users"
               onClick={() => {
+                adminUserStore.updateUser(null);
                 navigate("/admin");
               }}
             >

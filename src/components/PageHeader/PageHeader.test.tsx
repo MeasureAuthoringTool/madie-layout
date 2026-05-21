@@ -113,9 +113,15 @@ jest.mock("@madie/madie-util", () => ({
     },
     unsubscribe: () => null,
   },
-  useUserServiceApi: () => ({
-    getUser: jest.fn().mockResolvedValue(null),
-  }),
+  adminUserStore: {
+    state: null,
+    initialState: null,
+    subscribe: (set) => {
+      set(null);
+      return { unsubscribe: () => null };
+    },
+    updateUser: jest.fn(),
+  },
   featureFlagsStore: {
     updateFeatureFlags: jest.fn((featureFlags) => featureFlags),
     state: jest.fn().mockImplementation(() => null),
