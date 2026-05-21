@@ -28,18 +28,18 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Tooltip from "@mui/material/Tooltip";
 import MeasureStatusChips from "./MeasureStatusChip";
 
-const ADMIN_STATUS_LABEL: Record<string, string> = {
+const USER_STATUS_LABEL: Record<string, string> = {
   ACTIVE: "Active",
   DEACTIVATED: "Deactivated",
   ERROR_SUSPENDED: "Suspended",
 };
 
-const getAdminStatusLabel = (status?: string): string =>
-  status ? ADMIN_STATUS_LABEL[status] ?? status : "";
+const getUserStatusLabel = (status?: string): string =>
+  status ? USER_STATUS_LABEL[status] ?? status : "";
 
 const pad2 = (n: number): string => String(n).padStart(2, "0");
 
-const formatAdminLastLogin = (lastLoginAt?: string | null): string => {
+const formatUserLastLogin = (lastLoginAt?: string | null): string => {
   if (!lastLoginAt) return "-";
   const lastDate = new Date(lastLoginAt);
   const dateStr = `${pad2(lastDate.getMonth() + 1)}/${pad2(
@@ -498,7 +498,7 @@ const PageHeader = () => {
               <p className="meta-item">
                 <span className="meta-label">Status:</span>
                 <Chip
-                  label={getAdminStatusLabel(userInfo?.status)}
+                  label={getUserStatusLabel(userInfo?.status)}
                   className={`admin-status-chip admin-status-chip--${(
                     userInfo?.status || ""
                   ).toLowerCase()}`}
@@ -509,7 +509,7 @@ const PageHeader = () => {
               <p className="meta-item">
                 <span className="meta-label">Last Log In:</span>
                 <span data-testid="admin-user-profile-last-login">
-                  {formatAdminLastLogin(userInfo?.lastLoginAt)}
+                  {formatUserLastLogin(userInfo?.lastLoginAt)}
                 </span>
               </p>
             </div>

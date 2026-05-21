@@ -1084,6 +1084,40 @@ describe("Admin Page Header", () => {
     ).not.toBeInTheDocument();
   });
 
+  test("maps each known status to its display label and renders the chip", () => {
+    const cases: Array<[string, string]> = [
+      ["ACTIVE", "Active"],
+      ["DEACTIVATED", "Deactivated"],
+      ["ERROR_SUSPENDED", "Suspended"],
+    ];
+
+    for (const [status, label] of cases) {
+      setAdminUser({
+        harpId: "h",
+        firstName: "F",
+        lastName: "L",
+        email: "e",
+        status,
+      });
+      axios.get.mockResolvedValueOnce(getData);
+
+      const { unmount } = render(
+        <MemoryRouter initialEntries={["/admin/userProfile?harpId=h"]}>
+          <PageHeader />
+        </MemoryRouter>
+      );
+
+      const chip = screen.getByTestId(`admin-status-chip-${status}`);
+      expect(chip).toBeInTheDocument();
+      expect(chip).toHaveTextContent(label);
+      expect(chip.className).toContain(
+        `admin-status-chip--${status.toLowerCase()}`
+      );
+
+      unmount();
+    }
+  });
+
   test("displays the raw status string when not in the known mapping", () => {
     setAdminUser({
       harpId: "h",
