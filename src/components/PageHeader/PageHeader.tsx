@@ -102,12 +102,11 @@ const PageHeader = () => {
     };
   }, []);
 
-  const [userInfo, setUserInfo] = useState<UserDetails | null>(
-    adminUserStore.state
-  );
+  const [selectedUserProfileInfo, setSelectedUserProfileInfo] =
+    useState<UserDetails | null>(adminUserStore.state);
 
   useEffect(() => {
-    const subscription = adminUserStore.subscribe(setUserInfo);
+    const subscription = adminUserStore.subscribe(setSelectedUserProfileInfo);
     return () => {
       subscription.unsubscribe();
     };
@@ -467,7 +466,7 @@ const PageHeader = () => {
         </div>
       )}
       {pathname.includes("/admin") &&
-        (pathname.includes("/admin/userProfile") && userInfo ? (
+        (pathname.includes("/admin/userProfile") && selectedUserProfileInfo ? (
           <div className="admin admin-user-profile">
             <button
               type="button"
@@ -481,35 +480,35 @@ const PageHeader = () => {
               <ArrowBackIcon fontSize="small" />
               <span>Back to All Users</span>
             </button>
-            <h1 data-testid="admin-user-profile-name">{`${userInfo?.firstName} ${userInfo?.lastName}`}</h1>
+            <h1 data-testid="admin-user-profile-name">{`${selectedUserProfileInfo?.firstName} ${selectedUserProfileInfo?.lastName}`}</h1>
             <div className="admin-user-profile-meta">
               <p className="meta-item">
                 <span className="meta-label">HARP ID:</span>
                 <span data-testid="admin-user-profile-harpId">
-                  {userInfo?.harpId}
+                  {selectedUserProfileInfo?.harpId}
                 </span>
               </p>
               <p className="meta-item">
                 <span className="meta-label">Email Address:</span>
                 <span data-testid="admin-user-profile-email">
-                  {userInfo?.email}
+                  {selectedUserProfileInfo?.email}
                 </span>
               </p>
               <p className="meta-item">
                 <span className="meta-label">Status:</span>
                 <Chip
-                  label={getUserStatusLabel(userInfo?.status)}
+                  label={getUserStatusLabel(selectedUserProfileInfo?.status)}
                   className={`admin-status-chip admin-status-chip--${(
-                    userInfo?.status || ""
+                    selectedUserProfileInfo?.status || ""
                   ).toLowerCase()}`}
                   size="small"
-                  data-testid={`admin-status-chip-${userInfo?.status}`}
+                  data-testid={`admin-status-chip-${selectedUserProfileInfo?.status}`}
                 />
               </p>
               <p className="meta-item">
                 <span className="meta-label">Last Log In:</span>
                 <span data-testid="admin-user-profile-last-login">
-                  {formatUserLastLogin(userInfo?.lastLoginAt)}
+                  {formatUserLastLogin(selectedUserProfileInfo?.lastLoginAt)}
                 </span>
               </p>
             </div>
