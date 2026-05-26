@@ -101,6 +101,19 @@ declare module "@madie/madie-util" {
     state: UserRoles;
   };
 
+  export const adminUserStore: {
+    subscribe: (
+      setUserState: React.Dispatch<
+        React.SetStateAction<import("@madie/madie-models").UserDetails | null>
+      >
+    ) => import("rxjs").Subscription;
+    updateUser: (
+      user: import("@madie/madie-models").UserDetails | null
+    ) => void;
+    initialState: null;
+    state: import("@madie/madie-models").UserDetails | null;
+  };
+
   export const featureFlagsStore: {
     subscribe: (
       setRouteHandlerState: React.Dispatch<React.SetStateAction<object>>
@@ -155,6 +168,10 @@ declare module "@madie/madie-util" {
   export class UserServiceApi {
     constructor(baseUrl: string, getAccessToken: () => string);
     loginUser(accessTokenObj: any): Promise<UserLogin>;
+    getUser(
+      harpId: string,
+      signal?: AbortSignal
+    ): Promise<import("@madie/madie-models").UserDetails>;
   }
 
   export function useMeasureServiceApi(): MeasureServiceApi;

@@ -105,7 +105,6 @@
       display: flex;
       flex-direction: row;
       flex-grow: 1;
-      justify-content: space-between;
 
       > .left-col {
         display: flex;
@@ -118,9 +117,94 @@
           font-size: 42px;
           font-weight: 400;
           color: inherit;
-          margin: 0 0 8px 0;
+          margin-left: -60px;
           line-height: 42px;
         }
+      }
+    }
+  }
+
+  > .admin-user-profile {
+    display: flex;
+    flex-direction: column;
+    font-family: Rubik, sans-serif;
+    color: #fff;
+    padding: 24px 36px 32px 36px;
+
+    .back-to-users {
+      align-self: flex-start;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      color: #fff;
+      font: inherit;
+      font-size: 14px;
+      padding: 0;
+      margin-bottom: 16px;
+      cursor: pointer;
+
+      &:hover,
+      &:focus {
+        text-decoration: underline;
+      }
+    }
+
+    > h1 {
+      font-size: 32px;
+      font-weight: 400;
+      color: inherit;
+      line-height: 36px;
+    }
+
+    .admin-user-profile-meta {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      column-gap: 8px;
+      row-gap: 8px;
+
+      .meta-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        color: #fff;
+        margin: 0 0 0 16px;
+        padding-left: 16px;
+        line-height: 1;
+        border-left: 2px solid rgb(225 225 225 / 100%);
+
+        &:first-child {
+          margin-left: 0;
+          padding-left: 0;
+          border-left: 0;
+        }
+
+        .meta-label {
+          font-weight: 700;
+        }
+      }
+    }
+
+    .admin-status-chip {
+      height: 24px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #000;
+
+      &--active {
+        background-color: #e3f2fd;
+      }
+
+      &--deactivated {
+        background-color: #ffebee;
+      }
+
+      &--error_suspended {
+        background-color: #fff8e1;
       }
     }
   }

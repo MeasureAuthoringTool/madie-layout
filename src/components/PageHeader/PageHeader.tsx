@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import { Fade, Breadcrumbs } from "@mui/material";
 import CreateNewMeasureDialog from "../NewMeasure/CreateNewMeasureDialog";
@@ -14,7 +14,10 @@ import {
   checkUserCanDelete,
   axios,
   useOktaTokens,
+  adminUserStore,
 } from "@madie/madie-util";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { UserDetails } from "@madie/madie-models";
 import "twin.macro";
 import "styled-components/macro";
 import "./pageHeader.scss";
@@ -25,8 +28,43 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Tooltip from "@mui/material/Tooltip";
 import MeasureStatusChips from "./MeasureStatusChip";
 
+const USER_STATUS_LABEL: Record<string, string> = {
+  ACTIVE: "Active",
+  DEACTIVATED: "Deactivated",
+  ERROR_SUSPENDED: "Suspended",
+};
+
+const getUserStatusLabel = (status?: string): string =>
+  status ? USER_STATUS_LABEL[status] ?? status : "";
+
+const pad2 = (n: number): string => String(n).padStart(2, "0");
+
+const formatUserLastLogin = (lastLoginAt?: string | null): string => {
+  if (!lastLoginAt) return "-";
+  const lastDate = new Date(lastLoginAt);
+  const dateStr = `${pad2(lastDate.getMonth() + 1)}/${pad2(
+    lastDate.getDate()
+  )}/${lastDate.getFullYear()}`;
+  const startOfLast = new Date(
+    lastDate.getFullYear(),
+    lastDate.getMonth(),
+    lastDate.getDate()
+  );
+  const now = new Date();
+  const startOfToday = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate()
+  );
+  const days = Math.floor(
+    (startOfToday.getTime() - startOfLast.getTime()) / (1000 * 60 * 60 * 24)
+  );
+  return days > 0 ? `${dateStr} (${days} days ago)` : dateStr;
+};
+
 const PageHeader = () => {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const [userFirstName, setUserFirstName] = useState<string>();
 
   const { getUserName } = useOktaTokens();
@@ -59,6 +97,16 @@ const PageHeader = () => {
 
   useEffect(() => {
     const subscription = measureStore.subscribe(setMeasureState);
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const [selectedUserProfileInfo, setSelectedUserProfileInfo] =
+    useState<UserDetails | null>(adminUserStore.state);
+
+  useEffect(() => {
+    const subscription = adminUserStore.subscribe(setSelectedUserProfileInfo);
     return () => {
       subscription.unsubscribe();
     };
@@ -417,15 +465,63 @@ const PageHeader = () => {
           </div>
         </div>
       )}
-      {pathname.includes("/admin") && (
-        <div className="admin">
-          <div>
-            <div className="left-col">
-              <h1> Administration </h1>
+      {pathname.includes("/admin") &&
+        (pathname.includes("/admin/userProfile") && selectedUserProfileInfo ? (
+          <div className="admin admin-user-profile">
+            <button
+              type="button"
+              className="back-to-users"
+              data-testid="back-to-all-users"
+              onClick={() => {
+                adminUserStore.updateUser(null);
+                navigate("/admin");
+              }}
+            >
+              <ArrowBackIcon fontSize="small" />
+              <span>Back to All Users</span>
+            </button>
+            <h1 data-testid="admin-user-profile-name">{`${selectedUserProfileInfo?.firstName} ${selectedUserProfileInfo?.lastName}`}</h1>
+            <div className="admin-user-profile-meta">
+              <p className="meta-item">
+                <span className="meta-label">HARP ID:</span>
+                <span data-testid="admin-user-profile-harpId">
+                  {selectedUserProfileInfo?.harpId}
+                </span>
+              </p>
+              <p className="meta-item">
+                <span className="meta-label">Email Address:</span>
+                <span data-testid="admin-user-profile-email">
+                  {selectedUserProfileInfo?.email}
+                </span>
+              </p>
+              <p className="meta-item">
+                <span className="meta-label">Status:</span>
+                <Chip
+                  label={getUserStatusLabel(selectedUserProfileInfo?.status)}
+                  className={`admin-status-chip admin-status-chip--${(
+                    selectedUserProfileInfo?.status || ""
+                  ).toLowerCase()}`}
+                  size="small"
+                  data-testid={`admin-status-chip-${selectedUserProfileInfo?.status}`}
+                />
+              </p>
+              <p className="meta-item">
+                <span className="meta-label">Last Log In:</span>
+                <span data-testid="admin-user-profile-last-login">
+                  {formatUserLastLogin(selectedUserProfileInfo?.lastLoginAt)}
+                </span>
+              </p>
             </div>
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="admin">
+            <div>
+              <div className="left-col">
+                <h1> Administration </h1>
+              </div>
+            </div>
+          </div>
+        ))}
     </div>
   );
 };
