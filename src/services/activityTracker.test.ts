@@ -1,5 +1,5 @@
 import activityTracker, {
-  MADiE_LAST_LAST_ACTIVITY,
+  MADiE_LAST_ACTIVITY,
   MADiE_IDLE_TIMEOUT_OVERRIDE,
   THROTTLE_INTERVAL_MS,
   DEFAULT_IDLE_TIMEOUT_MS,
@@ -32,7 +32,7 @@ describe("activityTracker", () => {
 
   describe("constants", () => {
     it("should have the correct storage key for last activity", () => {
-      expect(MADiE_LAST_LAST_ACTIVITY).toBe("madie_last_activity");
+      expect(MADiE_LAST_ACTIVITY).toBe("madie_last_activity");
     });
 
     it("should have the correct storage key for timeout override", () => {
@@ -71,7 +71,7 @@ describe("activityTracker", () => {
       // Force record first to bypass throttle (sets lastRecordedTime to `now`)
       activityTracker.forceRecordActivity();
 
-      expect(localStorage.getItem(MADiE_LAST_LAST_ACTIVITY)).toBe(String(now));
+      expect(localStorage.getItem(MADiE_LAST_ACTIVITY)).toBe(String(now));
     });
 
     it("should throttle writes to at most once every 15 seconds", () => {
@@ -81,21 +81,17 @@ describe("activityTracker", () => {
       // First call — should record
       dateNowSpy.mockReturnValue(baseTime);
       activityTracker.forceRecordActivity(); // bypass throttle to set baseline
-      expect(localStorage.getItem(MADiE_LAST_LAST_ACTIVITY)).toBe(
-        String(baseTime)
-      );
+      expect(localStorage.getItem(MADiE_LAST_ACTIVITY)).toBe(String(baseTime));
 
       // Second call within 15 seconds — should NOT record
       dateNowSpy.mockReturnValue(baseTime + 10_000); // 10 seconds later
       activityTracker.recordActivity();
-      expect(localStorage.getItem(MADiE_LAST_LAST_ACTIVITY)).toBe(
-        String(baseTime)
-      ); // unchanged
+      expect(localStorage.getItem(MADiE_LAST_ACTIVITY)).toBe(String(baseTime)); // unchanged
 
       // Third call after 15 seconds — should record
       dateNowSpy.mockReturnValue(baseTime + 16_000); // 16 seconds later
       activityTracker.recordActivity();
-      expect(localStorage.getItem(MADiE_LAST_LAST_ACTIVITY)).toBe(
+      expect(localStorage.getItem(MADiE_LAST_ACTIVITY)).toBe(
         String(baseTime + 16_000)
       );
     });
@@ -124,14 +120,12 @@ describe("activityTracker", () => {
       // First force record
       dateNowSpy.mockReturnValue(baseTime);
       activityTracker.forceRecordActivity();
-      expect(localStorage.getItem(MADiE_LAST_LAST_ACTIVITY)).toBe(
-        String(baseTime)
-      );
+      expect(localStorage.getItem(MADiE_LAST_ACTIVITY)).toBe(String(baseTime));
 
       // Immediately force record again (within throttle window)
       dateNowSpy.mockReturnValue(baseTime + 1000); // 1 second later
       activityTracker.forceRecordActivity();
-      expect(localStorage.getItem(MADiE_LAST_LAST_ACTIVITY)).toBe(
+      expect(localStorage.getItem(MADiE_LAST_ACTIVITY)).toBe(
         String(baseTime + 1000)
       ); // Updated!
     });
@@ -144,13 +138,13 @@ describe("activityTracker", () => {
 
     it("should return the stored timestamp", () => {
       const timestamp = 1700000000000;
-      localStorage.setItem(MADiE_LAST_LAST_ACTIVITY, String(timestamp));
+      localStorage.setItem(MADiE_LAST_ACTIVITY, String(timestamp));
 
       expect(activityTracker.getLastActivityTimestamp()).toBe(timestamp);
     });
 
     it("should return 0 for invalid stored values", () => {
-      localStorage.setItem(MADiE_LAST_LAST_ACTIVITY, "not_a_number");
+      localStorage.setItem(MADiE_LAST_ACTIVITY, "not_a_number");
       expect(activityTracker.getLastActivityTimestamp()).toBe(0);
     });
 
@@ -231,10 +225,7 @@ describe("activityTracker", () => {
       jest.spyOn(Date, "now").mockReturnValue(now);
 
       // Activity 10 minutes ago
-      localStorage.setItem(
-        MADiE_LAST_LAST_ACTIVITY,
-        String(now - 10 * 60 * 1000)
-      );
+      localStorage.setItem(MADiE_LAST_ACTIVITY, String(now - 10 * 60 * 1000));
 
       expect(activityTracker.isIdleTimeoutExceeded()).toBe(false);
     });
@@ -244,10 +235,7 @@ describe("activityTracker", () => {
       jest.spyOn(Date, "now").mockReturnValue(now);
 
       // Activity 31 minutes ago
-      localStorage.setItem(
-        MADiE_LAST_LAST_ACTIVITY,
-        String(now - 31 * 60 * 1000)
-      );
+      localStorage.setItem(MADiE_LAST_ACTIVITY, String(now - 31 * 60 * 1000));
 
       expect(activityTracker.isIdleTimeoutExceeded()).toBe(true);
     });
@@ -258,7 +246,7 @@ describe("activityTracker", () => {
 
       // Activity exactly 30 minutes ago
       localStorage.setItem(
-        MADiE_LAST_LAST_ACTIVITY,
+        MADiE_LAST_ACTIVITY,
         String(now - DEFAULT_IDLE_TIMEOUT_MS)
       );
 
@@ -274,10 +262,7 @@ describe("activityTracker", () => {
       localStorage.setItem(MADiE_IDLE_TIMEOUT_OVERRIDE, String(fiveMinutes));
 
       // Activity 6 minutes ago — should be exceeded with 5 min timeout
-      localStorage.setItem(
-        MADiE_LAST_LAST_ACTIVITY,
-        String(now - 6 * 60 * 1000)
-      );
+      localStorage.setItem(MADiE_LAST_ACTIVITY, String(now - 6 * 60 * 1000));
 
       expect(activityTracker.isIdleTimeoutExceeded()).toBe(true);
     });
@@ -291,10 +276,7 @@ describe("activityTracker", () => {
       localStorage.setItem(MADiE_IDLE_TIMEOUT_OVERRIDE, String(fiveMinutes));
 
       // Activity 3 minutes ago — should NOT be exceeded with 5 min timeout
-      localStorage.setItem(
-        MADiE_LAST_LAST_ACTIVITY,
-        String(now - 3 * 60 * 1000)
-      );
+      localStorage.setItem(MADiE_LAST_ACTIVITY, String(now - 3 * 60 * 1000));
 
       expect(activityTracker.isIdleTimeoutExceeded()).toBe(false);
     });
@@ -319,7 +301,7 @@ describe("activityTracker", () => {
 
       activityTracker.startTracking();
 
-      expect(localStorage.getItem(MADiE_LAST_LAST_ACTIVITY)).toBe(String(now));
+      expect(localStorage.getItem(MADiE_LAST_ACTIVITY)).toBe(String(now));
     });
 
     it("should not attach listeners more than once", () => {
@@ -358,11 +340,11 @@ describe("activityTracker", () => {
     it("should remove the last activity key from localStorage", () => {
       activityTracker.startTracking();
       // Verify activity was recorded
-      expect(localStorage.getItem(MADiE_LAST_LAST_ACTIVITY)).not.toBeNull();
+      expect(localStorage.getItem(MADiE_LAST_ACTIVITY)).not.toBeNull();
 
       activityTracker.stopTracking();
 
-      expect(localStorage.getItem(MADiE_LAST_LAST_ACTIVITY)).toBeNull();
+      expect(localStorage.getItem(MADiE_LAST_ACTIVITY)).toBeNull();
     });
 
     it("should remove the idle timeout override key from localStorage", () => {
@@ -415,16 +397,14 @@ describe("activityTracker", () => {
       activityTracker.startTracking();
 
       // The initial forceRecordActivity in startTracking sets the timestamp
-      expect(localStorage.getItem(MADiE_LAST_LAST_ACTIVITY)).toBe(String(now));
+      expect(localStorage.getItem(MADiE_LAST_ACTIVITY)).toBe(String(now));
 
       // Simulate time passing beyond throttle and trigger event
       const laterTime = now + 20_000;
       jest.spyOn(Date, "now").mockReturnValue(laterTime);
       document.dispatchEvent(new Event("mousemove"));
 
-      expect(localStorage.getItem(MADiE_LAST_LAST_ACTIVITY)).toBe(
-        String(laterTime)
-      );
+      expect(localStorage.getItem(MADiE_LAST_ACTIVITY)).toBe(String(laterTime));
     });
   });
 });

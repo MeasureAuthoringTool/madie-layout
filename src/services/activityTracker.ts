@@ -12,7 +12,7 @@
 
 // --- Constants ---
 
-const MADiE_LAST_LAST_ACTIVITY = "madie_last_activity";
+const MADiE_LAST_ACTIVITY = "madie_last_activity";
 const MADiE_IDLE_TIMEOUT_OVERRIDE = "madie_idle_timeout_override";
 const THROTTLE_INTERVAL_MS = 15_000; // 15 seconds
 const DEFAULT_IDLE_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
@@ -45,7 +45,7 @@ function recordActivity(): void {
   }
   lastRecordedTime = now;
   try {
-    localStorage.setItem(MADiE_LAST_LAST_ACTIVITY, String(now));
+    localStorage.setItem(MADiE_LAST_ACTIVITY, String(now));
   } catch (e) {
     console.warn(
       "[ActivityTracker] Unable to write last activity to localStorage",
@@ -62,7 +62,7 @@ function forceRecordActivity(): void {
   const now = Date.now();
   lastRecordedTime = now;
   try {
-    localStorage.setItem(MADiE_LAST_LAST_ACTIVITY, String(now));
+    localStorage.setItem(MADiE_LAST_ACTIVITY, String(now));
   } catch (e) {
     console.warn(
       "[ActivityTracker] Unable to write last activity to localStorage",
@@ -77,7 +77,7 @@ function forceRecordActivity(): void {
  */
 function getLastActivityTimestamp(): number {
   try {
-    const stored = localStorage.getItem(MADiE_LAST_LAST_ACTIVITY);
+    const stored = localStorage.getItem(MADiE_LAST_ACTIVITY);
     if (stored) {
       const parsed = Number(stored);
       return Number.isFinite(parsed) ? parsed : 0;
@@ -162,7 +162,7 @@ function stopTracking(): void {
   lastRecordedTime = 0;
 
   try {
-    localStorage.removeItem(MADiE_LAST_LAST_ACTIVITY);
+    localStorage.removeItem(MADiE_LAST_ACTIVITY);
     localStorage.removeItem(MADiE_IDLE_TIMEOUT_OVERRIDE);
   } catch (e) {
     console.warn("[ActivityTracker] Unable to clear localStorage on stop", e);
@@ -202,7 +202,7 @@ export default activityTracker;
 
 // Export constants for testing
 export {
-  MADiE_LAST_LAST_ACTIVITY,
+  MADiE_LAST_ACTIVITY,
   MADiE_IDLE_TIMEOUT_OVERRIDE,
   THROTTLE_INTERVAL_MS,
   DEFAULT_IDLE_TIMEOUT_MS,
