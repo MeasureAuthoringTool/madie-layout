@@ -33,7 +33,7 @@ function Router({ props }) {
 
   // Start activity tracking when user is authenticated.
   // This attaches DOM listeners (mousemove, mousedown, keydown, scroll, touchstart, click)
-  // and writes the last activity timestamp to localStorage for cross-microfrontend sharing.
+  // and writes the last activity timestamp to localStorage for cross-micro-frontend sharing.
   useEffect(() => {
     if (authenticated) {
       activityTracker.startTracking();

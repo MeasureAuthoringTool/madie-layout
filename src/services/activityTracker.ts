@@ -12,8 +12,8 @@
 
 // --- Constants ---
 
-const STORAGE_KEY_LAST_ACTIVITY = "madie_last_activity";
-const STORAGE_KEY_TIMEOUT_OVERRIDE = "madie_idle_timeout_override";
+const MADiE_LAST_LAST_ACTIVITY = "madie_last_activity";
+const MADiE_IDLE_TIMEOUT_OVERRIDE = "madie_idle_timeout_override";
 const THROTTLE_INTERVAL_MS = 15_000; // 15 seconds
 const DEFAULT_IDLE_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
 const MAX_IDLE_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes (hard cap)
@@ -45,7 +45,7 @@ function recordActivity(): void {
   }
   lastRecordedTime = now;
   try {
-    localStorage.setItem(STORAGE_KEY_LAST_ACTIVITY, String(now));
+    localStorage.setItem(MADiE_LAST_LAST_ACTIVITY, String(now));
   } catch (e) {
     console.warn(
       "[ActivityTracker] Unable to write last activity to localStorage",
@@ -62,7 +62,7 @@ function forceRecordActivity(): void {
   const now = Date.now();
   lastRecordedTime = now;
   try {
-    localStorage.setItem(STORAGE_KEY_LAST_ACTIVITY, String(now));
+    localStorage.setItem(MADiE_LAST_LAST_ACTIVITY, String(now));
   } catch (e) {
     console.warn(
       "[ActivityTracker] Unable to write last activity to localStorage",
@@ -77,7 +77,7 @@ function forceRecordActivity(): void {
  */
 function getLastActivityTimestamp(): number {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY_LAST_ACTIVITY);
+    const stored = localStorage.getItem(MADiE_LAST_LAST_ACTIVITY);
     if (stored) {
       const parsed = Number(stored);
       return Number.isFinite(parsed) ? parsed : 0;
@@ -98,7 +98,7 @@ function getLastActivityTimestamp(): number {
  */
 function getIdleTimeoutMs(): number {
   try {
-    const override = localStorage.getItem(STORAGE_KEY_TIMEOUT_OVERRIDE);
+    const override = localStorage.getItem(MADiE_IDLE_TIMEOUT_OVERRIDE);
     if (override) {
       const parsed = Number(override);
       if (Number.isFinite(parsed) && parsed > 0) {
@@ -148,7 +148,8 @@ function startTracking(): void {
 }
 
 /**
- * Removes all DOM event listeners for user activity tracking.
+ * Removes all DOM event listeners for user activity tracking and
+ * clears stored activity state from localStorage.
  */
 function stopTracking(): void {
   if (!listenersAttached) {
@@ -158,6 +159,14 @@ function stopTracking(): void {
     document.removeEventListener(event, recordActivity);
   });
   listenersAttached = false;
+  lastRecordedTime = 0;
+
+  try {
+    localStorage.removeItem(MADiE_LAST_LAST_ACTIVITY);
+    localStorage.removeItem(MADiE_IDLE_TIMEOUT_OVERRIDE);
+  } catch (e) {
+    console.warn("[ActivityTracker] Unable to clear localStorage on stop", e);
+  }
 }
 
 /*
@@ -193,8 +202,8 @@ export default activityTracker;
 
 // Export constants for testing
 export {
-  STORAGE_KEY_LAST_ACTIVITY,
-  STORAGE_KEY_TIMEOUT_OVERRIDE,
+  MADiE_LAST_LAST_ACTIVITY,
+  MADiE_IDLE_TIMEOUT_OVERRIDE,
   THROTTLE_INTERVAL_MS,
   DEFAULT_IDLE_TIMEOUT_MS,
   MAX_IDLE_TIMEOUT_MS,
