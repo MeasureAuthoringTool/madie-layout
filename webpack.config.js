@@ -18,7 +18,6 @@ module.exports = (webpackConfigEnv, argv) => {
   // so that we can add postcss-loader to the chain
   const externalsConfig = {
     externals: [
-      "@madie/madie-editor",
       "@madie/madie-auth",
       "@madie/madie-root",
       "@madie/madie-cql-library",
@@ -87,13 +86,6 @@ module.exports = (webpackConfigEnv, argv) => {
             "node_modules/@madie/madie-root/dist/"
           ),
           publicPath: "/",
-        },
-        {
-          directory: path.join(
-            __dirname,
-            "node_modules/@madie/madie-editor/dist/"
-          ),
-          publicPath: "/madie-editor",
         },
         {
           directory: path.join(

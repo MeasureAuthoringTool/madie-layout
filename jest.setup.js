@@ -1,5 +1,3 @@
-import MadieEditor from "@madie/madie-editor";
-
 global.crypto = require("crypto").webcrypto;
 
 global.System = {
@@ -7,10 +5,6 @@ global.System = {
 };
 
 function mockImport(importName) {
-  if (importName === "@madie/madie-editor") {
-    return Promise.resolve(MadieEditor);
-  } else {
-    console.warn("No mock module found");
-    return Promise.resolve({});
-  }
+  console.warn("No mock module found");
+  return Promise.resolve({});
 }

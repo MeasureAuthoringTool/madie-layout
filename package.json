@@ -78,7 +78,6 @@
     "@madie/madie-admin": "^0.0.1",
     "@madie/madie-auth": "^0.0.2",
     "@madie/madie-design-system": "^1.2.92",
-    "@madie/madie-editor": "^0.0.2",
     "@madie/madie-layout": "file:",
     "@madie/madie-models": "^1.4.65",
     "@madie/madie-root": "^0.0.2",
