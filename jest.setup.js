@@ -1,4 +1,3 @@
-
 global.crypto = require("crypto").webcrypto;
 
 global.System = {
@@ -6,6 +5,6 @@ global.System = {
 };
 
 function mockImport(importName) {
-    console.warn("No mock module found");
-    return Promise.resolve({});
+  console.warn("No mock module found");
+  return Promise.resolve({});
 }
