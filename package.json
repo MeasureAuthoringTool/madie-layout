@@ -80,7 +80,7 @@
     "@madie/madie-design-system": "^1.2.92",
     "@madie/madie-layout": "file:",
     "@madie/madie-models": "^1.4.65",
-    "@madie/madie-root": "file:../madie-root/madie-madie-root-0.0.3.tgz",
+    "@madie/madie-root": "^0.0.2",
     "@mui/icons-material": "^5.16.7",
     "@mui/lab": "^5.0.0-alpha.82",
     "@mui/material": "^5.6.2",
