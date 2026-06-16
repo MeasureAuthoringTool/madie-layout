@@ -187,8 +187,8 @@ describe("Measures Create Dialog", () => {
     const modelSelectBtn = within(modelSelect).getByRole("combobox");
     userEvent.click(modelSelectBtn);
     const options = await screen.findAllByRole("option");
-    expect(options.length).toEqual(3);
-    userEvent.click(options[2]);
+    expect(options.length).toEqual(5);
+    userEvent.click(options[3]);
 
     const measurementPeriodStartNode = getByTestId("measurement-period-start");
     const measurementPeriodStartInput = within(
@@ -413,7 +413,7 @@ describe("Measures Create Dialog", () => {
     const modelSelectBtn = within(modelSelect).getByRole("combobox");
     userEvent.click(modelSelectBtn);
     const options = await screen.findAllByRole("option");
-    expect(options.length).toEqual(3);
+    expect(options.length).toEqual(5);
     userEvent.click(options[0]);
 
     const measurementPeriodStartNode = getByTestId("measurement-period-start");
