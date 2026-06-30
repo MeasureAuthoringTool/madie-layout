@@ -16,6 +16,7 @@ import FeedOutlinedIcon from "@mui/icons-material/FeedOutlined";
 import ShareAction, { SharedOptions } from "../shareAction/ShareAction";
 import ExportAction from "../exportAction/ExportAction";
 import TransferAction from "../transferAction/TransferAction";
+import ReviewIcon from "../../../icons/ReviewIcon";
 
 interface PropTypes {
   canEdit: boolean;
@@ -102,6 +103,10 @@ const MeasureActionCenter = (props: PropTypes) => {
   ): any[] => {
     const ownerOfMeasure = isOwnerOfMeasure(measure);
     const sharedWithUser = isSharedWithUser(measure);
+    const canReviewMeasure = checkUserCanEdit(
+      measure?.measureSet?.owner,
+      measure?.measureSet?.acls
+    );
 
     const actions = new Map<string, any>();
 
@@ -265,6 +270,19 @@ const MeasureActionCenter = (props: PropTypes) => {
         name: TRANSFER_MEASURE,
       });
     }
+
+    if (canReviewMeasure) {
+      actions.set("review measure", {
+        icon: (
+          <IconButton>
+            <ReviewIcon />
+          </IconButton>
+        ),
+        name: "Review",
+        onClick: () => handleActionClick(new Event("review-measure")),
+      });
+    }
+
     // required order to display
     const actionsListOrder = [
       "transfer measure",
@@ -276,6 +294,7 @@ const MeasureActionCenter = (props: PropTypes) => {
       "unshare measure from me",
       "export measure",
       "delete measure",
+      "review measure",
     ];
     return actionsListOrder.map((key) => actions.get(key)).filter(Boolean);
   };
