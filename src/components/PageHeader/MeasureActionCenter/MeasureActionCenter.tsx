@@ -11,6 +11,7 @@ import {
   routeHandlerStore,
   checkUserCanEdit,
   useUserRoles,
+  useFeatureFlags,
 } from "@madie/madie-util";
 import FeedOutlinedIcon from "@mui/icons-material/FeedOutlined";
 import ShareAction, { SharedOptions } from "../shareAction/ShareAction";
@@ -42,6 +43,7 @@ const MeasureActionCenter = (props: PropTypes) => {
   const [discardDialogOpen, setDiscardDialogOpen] = useState<boolean>(false);
   const [eventToTrigger, setEventToTrigger] = useState<Event | null>(null);
   const userRoles = useUserRoles();
+  const featureFlags = useFeatureFlags();
 
   const { updateRouteHandlerState } = routeHandlerStore;
   const [routeHandlerState, setRouteHandlerState] = useState<RouteHandlerState>(
@@ -271,7 +273,7 @@ const MeasureActionCenter = (props: PropTypes) => {
       });
     }
 
-    if (canReviewMeasure) {
+    if (canReviewMeasure && featureFlags?.MeasureReviewStatus) {
       actions.set("review measure", {
         icon: (
           <IconButton>
