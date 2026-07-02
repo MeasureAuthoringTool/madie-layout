@@ -252,6 +252,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
 
     // required order to display
     const actionsListOrder = [
+      "review library",
       "transfer library",
       "history library",
       "draft library",
@@ -259,7 +260,6 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
       "share library",
       "unshare library from me",
       "delete library",
-      "review library",
     ];
     return actionsListOrder.map((key) => actions.get(key)).filter(Boolean);
   };

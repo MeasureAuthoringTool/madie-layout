@@ -287,6 +287,7 @@ const MeasureActionCenter = (props: PropTypes) => {
 
     // required order to display
     const actionsListOrder = [
+      "review measure",
       "transfer measure",
       "human readable",
       "history",
@@ -296,7 +297,6 @@ const MeasureActionCenter = (props: PropTypes) => {
       "unshare measure from me",
       "export measure",
       "delete measure",
-      "review measure",
     ];
     return actionsListOrder.map((key) => actions.get(key)).filter(Boolean);
   };
