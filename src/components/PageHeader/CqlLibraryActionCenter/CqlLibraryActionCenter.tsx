@@ -18,9 +18,11 @@ import {
   useCqlLibraryServiceApi,
   checkUserCanEdit,
   useUserRoles,
+  useFeatureFlags,
 } from "@madie/madie-util";
 import ShareIcon from "../shareAction/ShareIcon";
 import SwapVertOutlinedIcon from "@mui/icons-material/SwapVertOutlined";
+import ReviewIcon from "../../../icons/ReviewIcon";
 
 interface PropTypes {
   canEdit: boolean;
@@ -45,6 +47,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
   const [shareAnchorEl, setShareAnchorEl] = useState<null | HTMLElement>(null);
   const shareMenuOpen = Boolean(shareAnchorEl);
   const isAdmin = useUserRoles()?.isAdmin;
+  const featureFlags = useFeatureFlags();
 
   useEffect(() => {
     const subscription = routeHandlerStore.subscribe(setRouteHandlerState);
@@ -72,7 +75,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
 
   useEffect(() => {
     setActions(getActionArray(props.library, props.canEdit, props.canDelete));
-  }, [props, routeHandlerState, owner, isAdmin]);
+  }, [props, routeHandlerState, owner, isAdmin, featureFlags]);
 
   const onContinue = () => {
     // we need every formik instance to use useFormikResetOnEvent on init
@@ -117,6 +120,10 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
     const actions = new Map<string, any>();
     const ownerOfLibrary = isOwnerOfLibrary(library);
     const sharedWithUser = isSharedWithUser(library);
+    const canReviewLibrary = checkUserCanEdit(
+      library?.librarySet?.owner,
+      library?.librarySet?.acls
+    );
 
     actions.set("history library", {
       icon: (
@@ -231,6 +238,18 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
       });
     }
 
+    if (canReviewLibrary && featureFlags?.LibraryReviewStatus) {
+      actions.set("review library", {
+        icon: (
+          <IconButton>
+            <ReviewIcon />
+          </IconButton>
+        ),
+        name: "Review Library",
+        onClick: () => handleActionClick(new Event("review-library")),
+      });
+    }
+
     // required order to display
     const actionsListOrder = [
       "transfer library",
@@ -240,6 +259,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
       "share library",
       "unshare library from me",
       "delete library",
+      "review library",
     ];
     return actionsListOrder.map((key) => actions.get(key)).filter(Boolean);
   };

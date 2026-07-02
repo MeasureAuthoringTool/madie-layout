@@ -56,6 +56,7 @@ declare module "@madie/madie-util" {
     AdminUserList: boolean;
     usQualityCore?: boolean;
     MeasureReviewStatus?: boolean;
+    LibraryReviewStatus?: boolean;
   }
 
   export interface UserRoles {

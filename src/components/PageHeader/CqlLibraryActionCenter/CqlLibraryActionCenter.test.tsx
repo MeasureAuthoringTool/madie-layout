@@ -6,8 +6,8 @@ import userEvent from "@testing-library/user-event";
 import {
   routeHandlerStore,
   checkUserCanEdit,
-  useIsRoleOrFeatureEnabled,
   useUserRoles,
+  useFeatureFlags,
 } from "@madie/madie-util";
 import { act } from "react-dom/test-utils";
 
@@ -43,7 +43,9 @@ const versionedCqlLibrary = {
 } as unknown as CqlLibrary;
 
 jest.mock("@madie/madie-util", () => ({
-  useIsRoleOrFeatureEnabled: jest.fn().mockReturnValue(false),
+  useFeatureFlags: jest.fn().mockReturnValue({
+    LibraryReviewStatus: true,
+  }),
   routeHandlerStore: {
     subscribe: () => {
       return { unsubscribe: () => null };
@@ -77,6 +79,9 @@ describe("CqlLibraryActionCenter Component", () => {
     jest.resetAllMocks();
     routeHandlerStore.state = { canTravel: true, pendingPath: "" };
     (useUserRoles as jest.Mock).mockReturnValue({ isAdmin: false, roles: [] });
+    (useFeatureFlags as jest.Mock).mockReturnValue({
+      LibraryReviewStatus: true,
+    });
     jest.spyOn(require("@madie/madie-util"), "useOktaTokens").mockReturnValue({
       getAccessToken: () => "test.jwt",
       getUserName: () => mockUser,
@@ -143,6 +148,58 @@ describe("CqlLibraryActionCenter Component", () => {
     expect(screen.queryByTestId("DeleteLibrary")).not.toBeInTheDocument();
     expect(screen.queryByTestId("VersionLibrary")).not.toBeInTheDocument();
     expect(screen.queryByTestId("Transfer")).toBeInTheDocument();
+    expect(screen.queryByTestId("ReviewLibrary")).toBeInTheDocument();
+  });
+
+  it("should trigger review-library event when 'Review Library' action is clicked", async () => {
+    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+    (checkUserCanEdit as jest.Mock).mockReturnValue(true);
+
+    render(
+      <CqlLibraryActionCenter
+        canEdit={true}
+        library={cqlLibrary}
+        canDelete={true}
+      />
+    );
+
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    await act(async () => {
+      userEvent.click(actionCenterButton);
+    });
+
+    const reviewLibraryButton = screen.getByTestId("ReviewLibrary");
+    await act(async () => {
+      userEvent.click(reviewLibraryButton);
+    });
+
+    expect(dispatchEventSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "review-library",
+      })
+    );
+  });
+
+  it("should not render 'Review Library' action when LibraryReviewStatus flag is disabled", async () => {
+    (checkUserCanEdit as jest.Mock).mockReturnValue(true);
+    (useFeatureFlags as jest.Mock).mockReturnValue({
+      LibraryReviewStatus: false,
+    });
+
+    render(
+      <CqlLibraryActionCenter
+        canEdit={true}
+        library={cqlLibrary}
+        canDelete={true}
+      />
+    );
+
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    await act(async () => {
+      userEvent.click(actionCenterButton);
+    });
+
+    expect(screen.queryByTestId("ReviewLibrary")).not.toBeInTheDocument();
   });
 
   it("should render 'Delete Library' button only for draft libraries when canEdit is true", () => {
@@ -162,7 +219,13 @@ describe("CqlLibraryActionCenter Component", () => {
     (checkUserCanEdit as jest.Mock)
       .mockImplementationOnce(() => true) // ownerOfMeasure = false
       .mockImplementationOnce(() => false); // sharedWithUser = false
-    render(<CqlLibraryActionCenter canEdit={true} library={cqlLibrary} />);
+    render(
+      <CqlLibraryActionCenter
+        canEdit={true}
+        library={cqlLibrary}
+        canDelete={false}
+      />
+    );
     const actionCenterButton = screen.getByLabelText("Library action center");
     await act(async () => {
       userEvent.click(actionCenterButton);
@@ -176,7 +239,13 @@ describe("CqlLibraryActionCenter Component", () => {
       getAccessToken: () => "test.jwt",
       getUserName: () => "bad user",
     });
-    render(<CqlLibraryActionCenter canEdit={true} library={cqlLibrary} />);
+    render(
+      <CqlLibraryActionCenter
+        canEdit={true}
+        library={cqlLibrary}
+        canDelete={false}
+      />
+    );
     const actionCenterButton = screen.getByLabelText("Library action center");
     userEvent.click(actionCenterButton);
     expect(screen.queryByTestId("ShareLibrary")).not.toBeInTheDocument();
@@ -396,8 +465,7 @@ describe("CqlLibraryActionCenter Component", () => {
   it("should render 'Unshare' menu option when action is 'UnShare Library From Me'", async () => {
     (checkUserCanEdit as jest.Mock).mockImplementation((owner, acls) => {
       if (owner) return false;
-      if (acls) return true;
-      return false;
+      return !!acls;
     });
 
     const sharedLibrary = {
@@ -517,8 +585,7 @@ describe("CqlLibraryActionCenter Component", () => {
   it("should render and handle 'Unshare' menu option when action is 'UnShare Library From Me'", async () => {
     (checkUserCanEdit as jest.Mock).mockImplementation((owner, acls) => {
       if (owner) return false;
-      if (acls) return true;
-      return false;
+      return !!acls;
     });
 
     const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
@@ -580,8 +647,7 @@ describe("Admin user share library", () => {
   it("should render and handle 'Share' menu option when action is 'Share Library'", async () => {
     (checkUserCanEdit as jest.Mock).mockImplementation((owner, acls) => {
       if (owner) return false;
-      if (acls) return true;
-      return false;
+      return !!acls;
     });
 
     const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
