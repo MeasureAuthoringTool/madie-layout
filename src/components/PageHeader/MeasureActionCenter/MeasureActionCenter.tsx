@@ -11,11 +11,13 @@ import {
   routeHandlerStore,
   checkUserCanEdit,
   useUserRoles,
+  useFeatureFlags,
 } from "@madie/madie-util";
 import FeedOutlinedIcon from "@mui/icons-material/FeedOutlined";
 import ShareAction, { SharedOptions } from "../shareAction/ShareAction";
 import ExportAction from "../exportAction/ExportAction";
 import TransferAction from "../transferAction/TransferAction";
+import ReviewIcon from "../../../icons/ReviewIcon";
 
 interface PropTypes {
   canEdit: boolean;
@@ -41,6 +43,7 @@ const MeasureActionCenter = (props: PropTypes) => {
   const [discardDialogOpen, setDiscardDialogOpen] = useState<boolean>(false);
   const [eventToTrigger, setEventToTrigger] = useState<Event | null>(null);
   const userRoles = useUserRoles();
+  const featureFlags = useFeatureFlags();
 
   const { updateRouteHandlerState } = routeHandlerStore;
   const [routeHandlerState, setRouteHandlerState] = useState<RouteHandlerState>(
@@ -102,6 +105,10 @@ const MeasureActionCenter = (props: PropTypes) => {
   ): any[] => {
     const ownerOfMeasure = isOwnerOfMeasure(measure);
     const sharedWithUser = isSharedWithUser(measure);
+    const canReviewMeasure = checkUserCanEdit(
+      measure?.measureSet?.owner,
+      measure?.measureSet?.acls
+    );
 
     const actions = new Map<string, any>();
 
@@ -265,8 +272,22 @@ const MeasureActionCenter = (props: PropTypes) => {
         name: TRANSFER_MEASURE,
       });
     }
+
+    if (canReviewMeasure && featureFlags?.MeasureReviewStatus) {
+      actions.set("review measure", {
+        icon: (
+          <IconButton>
+            <ReviewIcon />
+          </IconButton>
+        ),
+        name: "Review",
+        onClick: () => handleActionClick(new Event("review-measure")),
+      });
+    }
+
     // required order to display
     const actionsListOrder = [
+      "review measure",
       "transfer measure",
       "human readable",
       "history",
