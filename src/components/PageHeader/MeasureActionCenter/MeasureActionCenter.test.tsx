@@ -7,6 +7,7 @@ import {
   routeHandlerStore,
   checkUserCanEdit,
   useUserRoles,
+  useFeatureFlags,
 } from "@madie/madie-util";
 
 const mockMeasureSet = {
@@ -40,6 +41,9 @@ jest.mock("@madie/madie-util", () => ({
     initialState: { canTravel: false, pendingPath: "" },
   },
   checkUserCanEdit: jest.fn().mockImplementation(() => true),
+  useFeatureFlags: jest.fn().mockReturnValue({
+    MeasureReviewStatus: true,
+  }),
 }));
 
 // Admin transfer tests moved to MeasureActionCenter.admin.test.tsx
@@ -54,6 +58,9 @@ describe("MeasureActionCenter Component", () => {
     }
     dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
     jest.clearAllMocks();
+    (useFeatureFlags as jest.Mock).mockReturnValue({
+      MeasureReviewStatus: true,
+    });
   });
 
   afterEach(() => {
@@ -82,6 +89,7 @@ describe("MeasureActionCenter Component", () => {
     expect(screen.getByTestId("Viewhumanreadable")).toBeInTheDocument();
     expect(screen.getByTestId("ViewHistory")).toBeInTheDocument();
     expect(screen.getByTestId("Transfer")).toBeInTheDocument();
+    expect(screen.getByTestId("Review")).toBeInTheDocument();
 
     userEvent.click(draftMeasureBtn);
     expect(dispatchEventSpy).toHaveBeenCalledWith(
@@ -119,6 +127,82 @@ describe("MeasureActionCenter Component", () => {
         type: "transfer-measure",
       })
     );
+  });
+
+  it("should render Review action when user has edit access", () => {
+    render(
+      <MeasureActionCenter
+        canEdit={true}
+        measure={draftMeasure}
+        canDelete={false}
+      />
+    );
+
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+
+    expect(screen.getByTestId("Review")).toBeInTheDocument();
+  });
+
+  it("should trigger review-measure event when Review action is clicked", () => {
+    render(
+      <MeasureActionCenter
+        canEdit={true}
+        measure={draftMeasure}
+        canDelete={false}
+      />
+    );
+
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+
+    const reviewButton = screen.getByTestId("Review");
+    userEvent.click(reviewButton);
+
+    expect(dispatchEventSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "review-measure",
+      })
+    );
+  });
+
+  it("should not render Review action when user does not have edit access", () => {
+    (checkUserCanEdit as jest.Mock)
+      .mockImplementationOnce(() => false)
+      .mockImplementationOnce(() => false)
+      .mockImplementationOnce(() => false);
+
+    render(
+      <MeasureActionCenter
+        canEdit={false}
+        measure={draftMeasure}
+        canDelete={false}
+      />
+    );
+
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+
+    expect(screen.queryByTestId("Review")).not.toBeInTheDocument();
+  });
+
+  it("should not render Review action when MeasureReviewStatus feature flag is disabled", () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({
+      MeasureReviewStatus: false,
+    });
+
+    render(
+      <MeasureActionCenter
+        canEdit={true}
+        measure={draftMeasure}
+        canDelete={false}
+      />
+    );
+
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+
+    expect(screen.queryByTestId("Review")).not.toBeInTheDocument();
   });
 
   it("should render 'Delete Measure' button only for draft measures and user has delete right when canEdit is true", () => {
