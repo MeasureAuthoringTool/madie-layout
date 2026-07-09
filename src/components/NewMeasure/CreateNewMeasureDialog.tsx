@@ -72,6 +72,10 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
   }, [open]);
 
   let modelOptions = Object.keys(Model);
+  // remove FHIR v4.0.1 and US-Core v6.1.0 from model options when creating a new measure
+  modelOptions = modelOptions.filter(
+    (model) => model !== "FHIR_4_0_1" && model !== "US_CORE_6_1_0"
+  );
   if (!featureFlags?.qiCore7) {
     // remove QI-Core 7.0.2 from model options if the feature flag is not enabled
     modelOptions = modelOptions.filter((model) => model !== "QICORE_7_0_2");
