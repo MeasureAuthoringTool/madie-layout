@@ -187,8 +187,8 @@ describe("Measures Create Dialog", () => {
     const modelSelectBtn = within(modelSelect).getByRole("combobox");
     userEvent.click(modelSelectBtn);
     const options = await screen.findAllByRole("option");
-    expect(options.length).toEqual(5);
-    userEvent.click(options[3]);
+    expect(options.length).toEqual(3);
+    userEvent.click(options[2]);
 
     const measurementPeriodStartNode = getByTestId("measurement-period-start");
     const measurementPeriodStartInput = within(
@@ -413,7 +413,7 @@ describe("Measures Create Dialog", () => {
     const modelSelectBtn = within(modelSelect).getByRole("combobox");
     userEvent.click(modelSelectBtn);
     const options = await screen.findAllByRole("option");
-    expect(options.length).toEqual(5);
+    expect(options.length).toEqual(3);
     userEvent.click(options[0]);
 
     const measurementPeriodStartNode = getByTestId("measurement-period-start");
@@ -565,7 +565,44 @@ describe("Measures Create Dialog", () => {
       queryByTestId("measure-model-option-QI-Core v4.1.1")
     ).not.toBeInTheDocument();
 
+    // FHIR v4.0.1 and US-Core v6.1.0 shouldn't be present in the options
+    expect(
+      queryByTestId("measure-model-option-FHIR v4.0.1")
+    ).not.toBeInTheDocument();
+    expect(
+      queryByTestId("measure-model-option-US-Core v6.1.0")
+    ).not.toBeInTheDocument();
+
     // Other expected options should still exist
+    expect(
+      getByTestId("measure-model-option-QI-Core v6.0.0")
+    ).toBeInTheDocument();
+    expect(getByTestId("measure-model-option-QDM v5.6")).toBeInTheDocument();
+  });
+
+  test("Measure Creation model dropdown does not show FHIR v4.0.1 or US-Core v6.1.0", async () => {
+    (useFeatureFlags as jest.Mock).mockReturnValue({
+      usQualityCore: false,
+    });
+    const { getByTestId, queryByTestId } = render(
+      <CreateNewMeasureDialog open={true} onClose={undefined} />
+    );
+    const modelSelectDropDown = getByTestId("measure-model-select");
+    const modelSelectBtn = within(modelSelectDropDown).getByRole("combobox");
+    userEvent.click(modelSelectBtn);
+
+    // FHIR v4.0.1 and US-Core v6.1.0 shouldn't be present in the options
+    expect(
+      queryByTestId("measure-model-option-FHIR v4.0.1")
+    ).not.toBeInTheDocument();
+    expect(
+      queryByTestId("measure-model-option-US-Core v6.1.0")
+    ).not.toBeInTheDocument();
+
+    // Other expected options should still exist
+    expect(
+      getByTestId("measure-model-option-QI-Core v4.1.1")
+    ).toBeInTheDocument();
     expect(
       getByTestId("measure-model-option-QI-Core v6.0.0")
     ).toBeInTheDocument();
