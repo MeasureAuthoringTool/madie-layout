@@ -1,10 +1,12 @@
 {
   "imports": {
-    "@madie/root-config": "/madie-root-config.js",
+    "@madie/root-config": "//localhost:9000/madie-root-config.js",
     "@madie/madie-layout": "//localhost:8500/madie-madie-layout.js",
-    "@madie/madie-auth": "/madie-auth/madie-madie-auth.js",
-    "@madie/maide-cql-library": "/madie-cql-library/madie-madie-cql-library.js",
-    "@madie/madie-madie-util": "/madie-util/madie-madie-util.js",
+    "@madie/madie-auth": "//localhost:8502/madie-madie-auth.js",
+    "@madie/madie-measure": "//localhost:8505/madie-madie-measure.js",
+    "@madie/madie-cql-library": "//localhost:8507/madie-madie-cql-library.js",
+    "@madie/madie-util": "//localhost:8508/madie-madie-util.js",
+    "@madie/madie-admin": "//localhost:8509/madie-madie-admin.js",
     "react": "https://unpkg.com/react@17/umd/react.development.js",
     "react-dom": "https://unpkg.com/react-dom@17/umd/react-dom.development.js"
   }
