@@ -5,7 +5,10 @@ import {
   useInactivityLogout,
   IDLE_CHECK_INTERVAL_MS,
 } from "./useInactivityLogout";
-import { activityTracker } from "../services/activityTracker";
+import {
+  activityTracker,
+  MADiE_LAST_ACTIVITY,
+} from "../services/activityTracker";
 
 jest.mock("@okta/okta-react");
 
@@ -166,5 +169,71 @@ describe("useInactivityLogout", () => {
       jest.advanceTimersByTime(IDLE_CHECK_INTERVAL_MS);
     });
     expect(mockSignOut).toHaveBeenCalledTimes(2);
+  });
+
+  describe("cross-tab activity with StorageEvent", () => {
+    const dispatchStorage = (key: string | null) => {
+      act(() => {
+        window.dispatchEvent(
+          new StorageEvent("storage", {
+            key,
+            newValue: String(Date.now()),
+          })
+        );
+      });
+    };
+
+    it("re-evaluates idle immediately on a storage event for the activity key, without waiting for the poll", () => {
+      render(<HookHarness />);
+      idleSpy.mockReturnValue(true);
+
+      // No timer advance — the storage event alone should trigger the check.
+      dispatchStorage(MADiE_LAST_ACTIVITY);
+
+      expect(mockSignOut).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not log out when another tab records fresh activity (still active)", () => {
+      render(<HookHarness />);
+      // Another tab just wrote a fresh timestamp → not idle.
+      idleSpy.mockReturnValue(false);
+
+      dispatchStorage(MADiE_LAST_ACTIVITY);
+
+      expect(mockSignOut).not.toHaveBeenCalled();
+    });
+
+    it("ignores storage events for unrelated keys", () => {
+      render(<HookHarness />);
+      idleSpy.mockReturnValue(true);
+
+      dispatchStorage("some_other_app_key");
+      // key === null happens on localStorage.clear() — must also be ignored.
+      dispatchStorage(null);
+
+      expect(mockSignOut).not.toHaveBeenCalled();
+    });
+
+    it("removes the storage listener on unmount", () => {
+      const { unmount } = render(<HookHarness />);
+      idleSpy.mockReturnValue(true);
+      unmount();
+
+      dispatchStorage(MADiE_LAST_ACTIVITY);
+
+      expect(mockSignOut).not.toHaveBeenCalled();
+    });
+
+    it("stops responding to storage events once the user logs out", () => {
+      const { rerender } = render(<HookHarness />);
+      idleSpy.mockReturnValue(true);
+
+      setAuth(false);
+      rerender(<HookHarness />);
+
+      dispatchStorage(MADiE_LAST_ACTIVITY);
+
+      expect(mockSignOut).not.toHaveBeenCalled();
+    });
   });
 });
