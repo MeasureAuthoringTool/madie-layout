@@ -883,9 +883,7 @@ describe("Page Header and Dialogs", () => {
     userEvent.hover(tooltipIcon);
     await waitFor(() => {
       expect(
-        screen.getByText(
-          "Locked while being edited by John Smith (test user)"
-        )
+        screen.getByText("Locked while being edited by John Smith (test user)")
       ).toBeInTheDocument();
     });
     require("@madie/madie-util").useUserServiceApi = () => ({
@@ -1043,9 +1041,7 @@ describe("Page Header and Dialogs", () => {
     userEvent.hover(chip);
     await waitFor(() => {
       expect(
-        screen.getByText(
-          "Locked while being edited by Jane Doe (another user)"
-        )
+        screen.getByText("Locked while being edited by Jane Doe (another user)")
       ).toBeInTheDocument();
     });
     require("@madie/madie-util").useUserServiceApi = () => ({
