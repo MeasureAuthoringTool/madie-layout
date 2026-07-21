@@ -20,7 +20,7 @@ describe("TimeoutWarningDialog", () => {
     jest.useFakeTimers();
     remainingSpy = jest
       .spyOn(activityTracker, "getRemainingIdleMs")
-      .mockReturnValue(WARNING_THRESHOLD_MS + 60_000); // plenty of time left
+      .mockReturnValue(WARNING_THRESHOLD_MS + 60_000);
     forceSpy = jest
       .spyOn(activityTracker, "forceRecordActivity")
       .mockImplementation(() => undefined);
