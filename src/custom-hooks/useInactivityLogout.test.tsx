@@ -12,6 +12,13 @@ import {
 
 jest.mock("@okta/okta-react");
 
+const mockUnlockMeasures = jest.fn();
+const mockUnlockLibraries = jest.fn();
+jest.mock("@madie/madie-util", () => ({
+  useMeasureServiceApi: () => ({ unlockMeasures: mockUnlockMeasures }),
+  useCqlLibraryServiceApi: () => ({ unlockLibraries: mockUnlockLibraries }),
+}));
+
 // A trivial component that mounts the hook under test.
 const HookHarness = () => {
   useInactivityLogout();
@@ -27,6 +34,13 @@ const setAuth = (isAuthenticated: boolean | undefined) => {
   }));
 };
 
+// Drain the async cleanup-then-signOut promise chain under fake timers.
+const flushPromises = async () => {
+  for (let i = 0; i < 6; i++) {
+    await Promise.resolve();
+  }
+};
+
 describe("useInactivityLogout", () => {
   let startSpy: jest.SpyInstance;
   let stopSpy: jest.SpyInstance;
@@ -35,6 +49,8 @@ describe("useInactivityLogout", () => {
   beforeEach(() => {
     jest.useFakeTimers();
     mockSignOut.mockReset().mockResolvedValue(undefined);
+    mockUnlockMeasures.mockReset().mockResolvedValue(undefined);
+    mockUnlockLibraries.mockReset().mockResolvedValue(undefined);
     startSpy = jest
       .spyOn(activityTracker, "startTracking")
       .mockImplementation(() => undefined);
@@ -95,22 +111,55 @@ describe("useInactivityLogout", () => {
     expect(mockSignOut).not.toHaveBeenCalled();
   });
 
-  it("signs the user out once the idle timeout is exceeded", () => {
+  it("signs the user out once the idle timeout is exceeded", async () => {
     render(<HookHarness />);
     idleSpy.mockReturnValue(true);
 
-    act(() => {
+    await act(async () => {
       jest.advanceTimersByTime(IDLE_CHECK_INTERVAL_MS);
+      await flushPromises();
     });
     expect(mockSignOut).toHaveBeenCalledTimes(1);
   });
 
-  it("only signs out once even if later intervals still report idle", () => {
+  it("unlocks measures and libraries before signing out on idle timeout", async () => {
     render(<HookHarness />);
     idleSpy.mockReturnValue(true);
 
-    act(() => {
+    await act(async () => {
+      jest.advanceTimersByTime(IDLE_CHECK_INTERVAL_MS);
+      await flushPromises();
+    });
+    expect(mockUnlockMeasures).toHaveBeenCalledTimes(1);
+    expect(mockUnlockLibraries).toHaveBeenCalledTimes(1);
+    expect(mockSignOut).toHaveBeenCalledTimes(1);
+    // Cleanup must precede sign out.
+    expect(mockUnlockMeasures.mock.invocationCallOrder[0]).toBeLessThan(
+      mockSignOut.mock.invocationCallOrder[0]
+    );
+  });
+
+  it("still signs out when unlock cleanup fails", async () => {
+    const errorSpy = jest.spyOn(console, "error").mockImplementation();
+    mockUnlockMeasures.mockRejectedValueOnce(new Error("unlock failed"));
+    render(<HookHarness />);
+    idleSpy.mockReturnValue(true);
+
+    await act(async () => {
+      jest.advanceTimersByTime(IDLE_CHECK_INTERVAL_MS);
+      await flushPromises();
+    });
+    expect(mockSignOut).toHaveBeenCalledTimes(1);
+    errorSpy.mockRestore();
+  });
+
+  it("only signs out once even if later intervals still report idle", async () => {
+    render(<HookHarness />);
+    idleSpy.mockReturnValue(true);
+
+    await act(async () => {
       jest.advanceTimersByTime(IDLE_CHECK_INTERVAL_MS * 3);
+      await flushPromises();
     });
     expect(mockSignOut).toHaveBeenCalledTimes(1);
   });
@@ -155,8 +204,8 @@ describe("useInactivityLogout", () => {
 
     await act(async () => {
       jest.advanceTimersByTime(IDLE_CHECK_INTERVAL_MS);
-      // Allow the rejected signOut promise to settle and reset the guard.
-      await Promise.resolve();
+      // Allow the cleanup + rejected signOut promise to settle and reset guard.
+      await flushPromises();
     });
     expect(mockSignOut).toHaveBeenCalledTimes(1);
     expect(errorSpy).toHaveBeenCalledWith(
@@ -165,73 +214,87 @@ describe("useInactivityLogout", () => {
     );
 
     // A subsequent tick should attempt sign out again.
-    act(() => {
+    await act(async () => {
       jest.advanceTimersByTime(IDLE_CHECK_INTERVAL_MS);
+      await flushPromises();
     });
     expect(mockSignOut).toHaveBeenCalledTimes(2);
   });
 
   describe("cross-tab activity with StorageEvent", () => {
     const dispatchStorage = (key: string | null) => {
-      act(() => {
-        window.dispatchEvent(
-          new StorageEvent("storage", {
-            key,
-            newValue: String(Date.now()),
-          })
-        );
-      });
+      window.dispatchEvent(
+        new StorageEvent("storage", {
+          key,
+          newValue: String(Date.now()),
+        })
+      );
     };
 
-    it("re-evaluates idle immediately on a storage event for the activity key, without waiting for the poll", () => {
+    it("re-evaluates idle immediately on a storage event for the activity key, without waiting for the poll", async () => {
       render(<HookHarness />);
       idleSpy.mockReturnValue(true);
 
       // No timer advance — the storage event alone should trigger the check.
-      dispatchStorage(MADiE_LAST_ACTIVITY);
+      await act(async () => {
+        dispatchStorage(MADiE_LAST_ACTIVITY);
+        await flushPromises();
+      });
 
       expect(mockSignOut).toHaveBeenCalledTimes(1);
     });
 
-    it("does not log out when another tab records fresh activity (still active)", () => {
+    it("does not log out when another tab records fresh activity (still active)", async () => {
       render(<HookHarness />);
       // Another tab just wrote a fresh timestamp → not idle.
       idleSpy.mockReturnValue(false);
 
-      dispatchStorage(MADiE_LAST_ACTIVITY);
+      await act(async () => {
+        dispatchStorage(MADiE_LAST_ACTIVITY);
+        await flushPromises();
+      });
 
       expect(mockSignOut).not.toHaveBeenCalled();
     });
 
-    it("ignores storage events for unrelated keys", () => {
+    it("ignores storage events for unrelated keys", async () => {
       render(<HookHarness />);
       idleSpy.mockReturnValue(true);
 
-      dispatchStorage("some_other_app_key");
-      // key === null happens on localStorage.clear() — must also be ignored.
-      dispatchStorage(null);
+      await act(async () => {
+        dispatchStorage("some_other_app_key");
+        // key === null happens on localStorage.clear() — must also be ignored.
+        dispatchStorage(null);
+        await flushPromises();
+      });
 
       expect(mockSignOut).not.toHaveBeenCalled();
     });
 
-    it("removes the storage listener on unmount", () => {
+    it("removes the storage listener on unmount", async () => {
       const { unmount } = render(<HookHarness />);
       idleSpy.mockReturnValue(true);
       unmount();
 
-      dispatchStorage(MADiE_LAST_ACTIVITY);
+      await act(async () => {
+        dispatchStorage(MADiE_LAST_ACTIVITY);
+        await flushPromises();
+      });
 
       expect(mockSignOut).not.toHaveBeenCalled();
     });
 
-    it("stops responding to storage events once the user logs out", () => {
+    it("stops responding to storage events once the user logs out", async () => {
       const { rerender } = render(<HookHarness />);
       idleSpy.mockReturnValue(true);
 
       setAuth(false);
       rerender(<HookHarness />);
 
-      dispatchStorage(MADiE_LAST_ACTIVITY);
+      await act(async () => {
+        dispatchStorage(MADiE_LAST_ACTIVITY);
+        await flushPromises();
+      });
 
       expect(mockSignOut).not.toHaveBeenCalled();
     });

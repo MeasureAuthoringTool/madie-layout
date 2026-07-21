@@ -11,6 +11,7 @@ import {
   useServiceConfig,
   ServiceConfig,
 } from "@madie/madie-util";
+import { performLogoutCleanup } from "../../services/logoutCleanup";
 const FormControl = styled.section(() => ({
   marginLeft: "10px",
 }));
@@ -38,12 +39,13 @@ function UserProfile() {
   const logout = async () => {
     //breaks because logoutLogger is using a hook
     logoutLogger(userInfo, config);
-    try {
-      await measureServiceApiRef.current.unlockMeasures();
-      await cqlLibraryServiceApiRef.current.unlockLibraries();
-    } catch (error) {
-      console.error("Error unlocking measures for user", error);
-    }
+    // Release any measures/CQL libraries locked by this user before signing out
+    // so other team members aren't blocked. Failures are logged but never block
+    // logout (handled inside performLogoutCleanup).
+    await performLogoutCleanup(
+      measureServiceApiRef.current,
+      cqlLibraryServiceApiRef.current
+    );
     oktaAuth.signOut();
   };
 
