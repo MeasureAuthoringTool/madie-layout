@@ -2,6 +2,7 @@ import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import OktaSecurity from "./OktaSecurity";
 import * as madieUtil from "@madie/madie-util";
+import { OktaAuth } from "@okta/okta-auth-js";
 
 // Mock dependencies
 jest.mock("@madie/madie-util", () => ({
@@ -11,6 +12,13 @@ jest.mock("@okta/okta-react", () => ({
   Security: jest.fn(({ children }) => (
     <div data-testid="security">{children}</div>
   )),
+}));
+// Mock the Okta SDK so we exercise OktaSecurity's wiring/config without the
+// real constructor (which does browser storage feature-detection that fails
+// under jsdom when storage: "localStorage" is set explicitly).
+jest.mock("@okta/okta-auth-js", () => ({
+  OktaAuth: jest.fn().mockImplementation((config) => ({ options: config })),
+  toRelativeUrl: jest.fn((uri) => uri),
 }));
 jest.mock("./../router/Router", () =>
   jest.fn(() => <div data-testid="router" />)
@@ -52,6 +60,29 @@ describe("OktaSecurity", () => {
     await waitFor(() => {
       expect(screen.getByTestId("security")).toBeInTheDocument();
       expect(screen.getByTestId("router")).toBeInTheDocument();
+    });
+  });
+
+  it("configures OktaAuth for cross-tab token renewal and sync", async () => {
+    (madieUtil.getOktaConfig as jest.Mock).mockResolvedValue({
+      issuer: "https://example.com/oauth2/default",
+      clientId: "clientId",
+      redirectUri: "http://localhost:3000/login/callback",
+      scopes: ["openid", "profile", "email"],
+    });
+    render(<OktaSecurity />);
+    await waitFor(() => expect(OktaAuth).toHaveBeenCalled());
+
+    const config = (OktaAuth as unknown as jest.Mock).mock.calls[0][0];
+    expect(config.tokenManager).toEqual({
+      autoRenew: true,
+      storage: "localStorage",
+    });
+    expect(config.services).toEqual({
+      autoRenew: false,
+      syncStorage: true,
+      renewOnTabActivation: true,
+      tabInactivityDuration: 1800,
     });
   });
 });

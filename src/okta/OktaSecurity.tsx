@@ -79,6 +79,22 @@ function OktaSecurity() {
     const oktaAuth = new OktaAuth({
       ...oktaConfig, // other config
       transformAuthState,
+      // Keep tokens valid and synchronized across all open tabs so background
+      // tabs don't hit auth errors / unexpected logouts.
+      // NOTE: `scopes` (incl. `offline_access` for refresh-token silent renewal)
+      // is intentionally left to the env-provided oktaConfig for now — enabling
+      // offline_access depends on the Okta/HARP app allowing refresh tokens and
+      // is being decided separately.
+      tokenManager: {
+        autoRenew: true, // passively renew tokens when they are accessed
+        storage: "localStorage", // required for cross-tab token sync
+      },
+      services: {
+        autoRenew: false, // disable timer-based renewal (unreliable in throttled bg tabs)
+        syncStorage: true, // propagate renewed tokens to all tabs via storage events
+        renewOnTabActivation: true, // refresh tokens when a background tab regains focus
+        tabInactivityDuration: 1800, // seconds (30 min) — matches the idle timeout
+      },
     });
     return (
       <Security
