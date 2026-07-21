@@ -83,10 +83,11 @@ function Router({ props }) {
   return (
     <div>
       <ApiContextProvider value={serviceConfig}>
-        {/* Rendered inside the provider so the service hooks used for
-            pre-logout unlock cleanup can read the service config. Tracks
-            activity and drives idle logout while authenticated. */}
-        <InactivityLogout />
+        {/* Both rendered inside the provider (so the service hooks used for
+            pre-logout unlock cleanup can read the service config) and gated on
+            `authenticated` so no idle tracking / timers run while logged out.
+            The hook also guards internally, so this gating is defense-in-depth. */}
+        {authenticated && <InactivityLogout />}
         {authenticated && <TimeoutWarningDialog />}
         <RouterProvider router={BrowserRouter} key={firstLogin ? 1 : 2} />
       </ApiContextProvider>
