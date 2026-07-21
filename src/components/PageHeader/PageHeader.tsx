@@ -15,6 +15,7 @@ import {
   axios,
   useOktaTokens,
   adminUserStore,
+  useUserServiceApi,
 } from "@madie/madie-util";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { UserDetails } from "@madie/madie-models";
@@ -36,6 +37,17 @@ const USER_STATUS_LABEL: Record<string, string> = {
 
 const getUserStatusLabel = (status?: string): string =>
   status ? USER_STATUS_LABEL[status] ?? status : "";
+
+const formatLockedByDisplayName = (
+  details: UserDetails | undefined | null,
+  harpId: string | undefined
+): string => {
+  const name = [details?.firstName, details?.lastName]
+    .map((n) => n?.trim())
+    .filter(Boolean)
+    .join(" ");
+  return name ? `${name} (${harpId})` : harpId ?? "";
+};
 
 const pad2 = (n: number): string => String(n).padStart(2, "0");
 
@@ -70,6 +82,14 @@ const PageHeader = () => {
   const { getUserName } = useOktaTokens();
   const userName = getUserName();
 
+  const userServiceApiRef = useRef(useUserServiceApi());
+  const [measureLockOwner, setMeasureLockOwner] = useState<UserDetails | null>(
+    null
+  );
+  const [libraryLockOwner, setLibraryLockOwner] = useState<UserDetails | null>(
+    null
+  );
+
   useEffect(() => {
     window.addEventListener("storage", () =>
       setUserFirstName(window.localStorage.getItem("givenName"))
@@ -101,6 +121,30 @@ const PageHeader = () => {
       subscription.unsubscribe();
     };
   }, []);
+
+  const measureLockedByHarpId = measureState?.measureLock?.lockedBy;
+  useEffect(() => {
+    if (measureLockedByHarpId) {
+      userServiceApiRef.current
+        .getOwnerDetails(measureLockedByHarpId)
+        .then(setMeasureLockOwner)
+        .catch(() => setMeasureLockOwner(null));
+    } else {
+      setMeasureLockOwner(null);
+    }
+  }, [measureLockedByHarpId]);
+
+  const libraryLockedByHarpId = libraryState?.cqlLibraryLock?.lockedBy;
+  useEffect(() => {
+    if (libraryLockedByHarpId) {
+      userServiceApiRef.current
+        .getOwnerDetails(libraryLockedByHarpId)
+        .then(setLibraryLockOwner)
+        .catch(() => setLibraryLockOwner(null));
+    } else {
+      setLibraryLockOwner(null);
+    }
+  }, [libraryLockedByHarpId]);
 
   const [selectedUserProfileInfo, setSelectedUserProfileInfo] =
     useState<UserDetails | null>(adminUserStore.state);
@@ -142,7 +186,8 @@ const PageHeader = () => {
   );
 
   const measureLockedBy = measureState?.measureLock
-    ? "Locked while being edited by " + measureState?.measureLock?.lockedBy
+    ? "Locked while being edited by " +
+      formatLockedByDisplayName(measureLockOwner, measureLockedByHarpId)
     : undefined;
 
   const libraryCanEdit: boolean = checkUserCanEdit(
@@ -151,7 +196,8 @@ const PageHeader = () => {
     true
   );
   const libraryLockedBy = libraryState?.cqlLibraryLock
-    ? "Locked while being edited by " + libraryState?.cqlLibraryLock.lockedBy
+    ? "Locked while being edited by " +
+      formatLockedByDisplayName(libraryLockOwner, libraryLockedByHarpId)
     : undefined;
 
   const libraryCanDelete: boolean = checkUserCanDelete(
@@ -271,7 +317,10 @@ const PageHeader = () => {
                     style={{ display: "flex", alignItems: "center" }}
                   >
                     <Tooltip
-                      title={`Locked while being edited by ${measureState?.measureLock?.lockedBy}`}
+                      title={`Locked while being edited by ${formatLockedByDisplayName(
+                        measureLockOwner,
+                        measureLockedByHarpId
+                      )}`}
                       aria-describedby="locked-tooltip"
                       slotProps={{
                         tooltip: {
@@ -409,7 +458,10 @@ const PageHeader = () => {
                     label="In-Use"
                     icon={
                       <Tooltip
-                        title={`Locked while being edited by ${libraryState?.cqlLibraryLock?.lockedBy}`}
+                        title={`Locked while being edited by ${formatLockedByDisplayName(
+                          libraryLockOwner,
+                          libraryLockedByHarpId
+                        )}`}
                         aria-describedby="locked-tooltip"
                         slotProps={{
                           tooltip: {
