@@ -139,6 +139,9 @@ jest.mock("@madie/madie-util", () => ({
   useUserRoles: jest.fn().mockReturnValue({ roles: [], isAdmin: false }),
   checkUserCanDelete: jest.fn().mockImplementation(() => true),
   useIsRoleOrFeatureEnabled: jest.fn(),
+  useUserServiceApi: () => ({
+    getOwnerDetails: jest.fn().mockRejectedValue(new Error("not found")),
+  }),
 }));
 
 let postData: object = { status: 201 };
@@ -170,6 +173,9 @@ describe("Page Header and Dialogs", () => {
     useOktaTokens: () => ({
       getAccessToken: () => "test.jwt",
       getUserName: () => mockUser,
+    }),
+    useUserServiceApi: () => ({
+      getOwnerDetails: jest.fn().mockRejectedValue(new Error("not found")),
     }),
   }));
   beforeEach(() => {
@@ -843,6 +849,48 @@ describe("Page Header and Dialogs", () => {
     });
   });
 
+  test("shows locking user's name and harp id in the library In Use chip tooltip", async () => {
+    (checkUserCanEdit as jest.Mock).mockReturnValue(true);
+    require("@madie/madie-util").useUserServiceApi = () => ({
+      getOwnerDetails: jest.fn().mockResolvedValue({
+        firstName: "John",
+        lastName: "Smith",
+        harpId: "test user",
+      }),
+    });
+    const lockedLibrary = {
+      ...mockLibraryInfo,
+      cqlLibraryLock: {
+        lockedBy: "test user",
+      },
+      librarySet: { owner: "test user", acls: [] },
+    };
+    require("@madie/madie-util").cqlLibraryStore.state = lockedLibrary;
+    require("@madie/madie-util").cqlLibraryStore.subscribe = (set) => {
+      set(lockedLibrary);
+      return { unsubscribe: () => null };
+    };
+
+    render(
+      <MemoryRouter
+        initialEntries={["/cql-libraries/randomstring/edit/details"]}
+      >
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+    const tooltipIcon = await screen.findByTestId("locked-icon");
+    userEvent.hover(tooltipIcon);
+    await waitFor(() => {
+      expect(
+        screen.getByText("Locked while being edited by John Smith (test user)")
+      ).toBeInTheDocument();
+    });
+    require("@madie/madie-util").useUserServiceApi = () => ({
+      getOwnerDetails: jest.fn().mockRejectedValue(new Error("not found")),
+    });
+  });
+
   test("Should not show In Use chip when user cannot edit", async () => {
     (checkUserCanEdit as jest.Mock).mockReturnValue(false);
     const lockedLibrary = {
@@ -952,6 +1000,52 @@ describe("Page Header and Dialogs", () => {
       expect(
         screen.getByText("Locked while being edited by another user")
       ).toBeInTheDocument();
+    });
+  });
+
+  test("shows locking user's name and harp id in the measure In Use chip tooltip", async () => {
+    (checkUserCanEdit as jest.Mock).mockReturnValue(true);
+    require("@madie/madie-util").useUserServiceApi = () => ({
+      getOwnerDetails: jest.fn().mockResolvedValue({
+        firstName: "Jane",
+        lastName: "Doe",
+        harpId: "another user",
+      }),
+    });
+    const lockedMeasure = {
+      ...mockFormikInfo,
+      id: "test-measure-id",
+      measureLock: {
+        id: "lock-id",
+        measureId: "test-measure-id",
+        lockedBy: "another user",
+        lockedAt: "2025-11-07T10:00:00Z",
+      },
+      measureSet: { owner: "test user", acls: [] },
+    };
+    require("@madie/madie-util").measureStore.state = lockedMeasure;
+    require("@madie/madie-util").measureStore.subscribe = (set) => {
+      set(lockedMeasure);
+      return { unsubscribe: () => null };
+    };
+
+    render(
+      <MemoryRouter initialEntries={["/measures/test-measure-id/edit/details"]}>
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+    const chip = await screen.findByTestId(
+      `measure-${lockedMeasure.measureName}-inuse-chip`
+    );
+    userEvent.hover(chip);
+    await waitFor(() => {
+      expect(
+        screen.getByText("Locked while being edited by Jane Doe (another user)")
+      ).toBeInTheDocument();
+    });
+    require("@madie/madie-util").useUserServiceApi = () => ({
+      getOwnerDetails: jest.fn().mockRejectedValue(new Error("not found")),
     });
   });
 
