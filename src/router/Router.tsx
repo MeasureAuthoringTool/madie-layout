@@ -17,7 +17,7 @@ import "../styles/LayoutStyles.scss";
 import TimeoutHandler from "../components/timeoutHandler/TimeoutHandler";
 import LayoutWrapper from "./LayoutWrapper";
 import { ApiContextProvider, getServiceConfig } from "@madie/madie-util";
-import { activityTracker } from "../services/activityTracker";
+import { useInactivityLogout } from "../custom-hooks/useInactivityLogout";
 
 function Router({ props }) {
   const { authState } = useOktaAuth();
@@ -31,19 +31,11 @@ function Router({ props }) {
       .catch((err) => setError(err.message));
   }, []);
 
-  // Start activity tracking when user is authenticated.
-  // This attaches DOM listeners (mousemove, mousedown, keydown, scroll, touchstart, click)
-  // and writes the last activity timestamp to localStorage for cross-micro-frontend sharing.
-  useEffect(() => {
-    if (authenticated) {
-      activityTracker.startTracking();
-    } else {
-      activityTracker.stopTracking();
-    }
-    return () => {
-      activityTracker.stopTracking();
-    };
-  }, [authenticated]);
+  // Track user activity while authenticated and automatically sign the user out
+  // after the idle timeout is exceeded. This attaches the DOM activity listeners
+  // (mousemove, mousedown, keydown, scroll, touchstart, click), writes the last
+  // activity timestamp to localStorage, and runs the periodic inactivity check.
+  useInactivityLogout();
   /*
     On initial page load we want to trigger a hard refresh because single spa loads the apps sequentially based on what contains what
     This init pattern pattern influences tab order so we need to refresh on first login.
