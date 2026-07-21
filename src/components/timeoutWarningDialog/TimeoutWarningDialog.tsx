@@ -35,10 +35,6 @@ export const WARNING_POLL_INTERVAL_MS = 1_000; // 1 second
  * idle countdown and dismisses the warning. If the user never interacts, the
  * countdown continues and `useInactivityLogout` signs them out.
  *
- * This component replaces the previous timer-based `TimeoutHandler`; the
- * pre-logout unlock cleanup that lived there now runs in `useInactivityLogout`
- * (see `performLogoutCleanup`). It should only be rendered while the user is
- * authenticated.
  */
 const TimeoutWarningDialog = (): React.ReactElement => {
   const [open, setOpen] = useState<boolean>(false);

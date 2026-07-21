@@ -174,6 +174,12 @@ declare module "@madie/madie-util" {
       harpId: string,
       signal?: AbortSignal
     ): Promise<import("@madie/madie-models").UserDetails>;
+    getOwnerDetails(
+      harpId: string
+    ): Promise<import("@madie/madie-models").UserDetails>;
+    getBulkUserDetails(
+      harpIds: string[]
+    ): Promise<Record<string, import("@madie/madie-models").UserDetails>>;
   }
 
   export function useMeasureServiceApi(): MeasureServiceApi;
