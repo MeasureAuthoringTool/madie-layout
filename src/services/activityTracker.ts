@@ -128,6 +128,22 @@ function isIdleTimeoutExceeded(): boolean {
   return elapsed >= getIdleTimeoutMs();
 }
 
+/**
+ * Returns how many milliseconds remain before the idle timeout is exceeded.
+ * Used to decide when to show the pre-logout warning (e.g. at 5 minutes left).
+ * @returns The remaining idle time in ms, clamped to 0 once exceeded. When no
+ *   activity has been recorded yet (module not initialized), returns the full
+ *   idle timeout so callers do not surface a premature warning.
+ */
+function getRemainingIdleMs(): number {
+  const lastActivity = getLastActivityTimestamp();
+  if (lastActivity === 0) {
+    return getIdleTimeoutMs();
+  }
+  const remaining = getIdleTimeoutMs() - (Date.now() - lastActivity);
+  return remaining > 0 ? remaining : 0;
+}
+
 // --- Event Listener Management ---
 
 /**
@@ -179,6 +195,7 @@ function stopTracking(): void {
  * activityTracker.getLastActivityTimestamp(); // Read last activity (ms)
  * activityTracker.getIdleTimeoutMs();         // Get configured timeout
  * activityTracker.isIdleTimeoutExceeded();    // Check if idle too long
+ * activityTracker.getRemainingIdleMs();       // Ms left before timeout
  */
 // --- Exported API ---
 export const activityTracker = {
@@ -196,6 +213,8 @@ export const activityTracker = {
   getIdleTimeoutMs,
   /** Check if the idle timeout has been exceeded */
   isIdleTimeoutExceeded,
+  /** Get the ms remaining before the idle timeout is exceeded */
+  getRemainingIdleMs,
 };
 
 export default activityTracker;

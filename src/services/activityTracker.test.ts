@@ -282,6 +282,46 @@ describe("activityTracker", () => {
     });
   });
 
+  describe("getRemainingIdleMs", () => {
+    it("should return the full idle timeout when no activity has been recorded", () => {
+      expect(activityTracker.getRemainingIdleMs()).toBe(
+        DEFAULT_IDLE_TIMEOUT_MS
+      );
+    });
+
+    it("should return the remaining time within the timeout window", () => {
+      const now = 1700000000000;
+      jest.spyOn(Date, "now").mockReturnValue(now);
+
+      // Activity 25 minutes ago → 5 minutes remain of the 30 minute window
+      localStorage.setItem(MADiE_LAST_ACTIVITY, String(now - 25 * 60 * 1000));
+
+      expect(activityTracker.getRemainingIdleMs()).toBe(5 * 60 * 1000);
+    });
+
+    it("should clamp to 0 once the timeout has been exceeded", () => {
+      const now = 1700000000000;
+      jest.spyOn(Date, "now").mockReturnValue(now);
+
+      // Activity 31 minutes ago → past the 30 minute window
+      localStorage.setItem(MADiE_LAST_ACTIVITY, String(now - 31 * 60 * 1000));
+
+      expect(activityTracker.getRemainingIdleMs()).toBe(0);
+    });
+
+    it("should respect the configurable timeout override", () => {
+      const now = 1700000000000;
+      jest.spyOn(Date, "now").mockReturnValue(now);
+
+      const fiveMinutes = 5 * 60 * 1000;
+      localStorage.setItem(MADiE_IDLE_TIMEOUT_OVERRIDE, String(fiveMinutes));
+      // Activity 2 minutes ago → 3 minutes remain of the 5 minute override
+      localStorage.setItem(MADiE_LAST_ACTIVITY, String(now - 2 * 60 * 1000));
+
+      expect(activityTracker.getRemainingIdleMs()).toBe(3 * 60 * 1000);
+    });
+  });
+
   describe("startTracking", () => {
     it("should attach event listeners for all tracked events", () => {
       activityTracker.startTracking();
