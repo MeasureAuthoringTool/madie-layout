@@ -16,9 +16,16 @@ import {
   useOktaTokens,
   adminUserStore,
   useUserServiceApi,
+  useMeasureReviewServiceApi,
+  useCqlLibraryReviewServiceApi,
 } from "@madie/madie-util";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { UserDetails } from "@madie/madie-models";
+import {
+  UserDetails,
+  MeasureReview,
+  CqlLibraryReview,
+  ReviewStatus,
+} from "@madie/madie-models";
 import "twin.macro";
 import "styled-components/macro";
 import "./pageHeader.scss";
@@ -83,10 +90,18 @@ const PageHeader = () => {
   const userName = getUserName();
 
   const userServiceApiRef = useRef(useUserServiceApi());
+  const measureReviewServiceApiRef = useRef(useMeasureReviewServiceApi());
+  const cqlLibraryReviewServiceApiRef = useRef(useCqlLibraryReviewServiceApi());
   const [measureLockOwner, setMeasureLockOwner] = useState<UserDetails | null>(
     null
   );
   const [libraryLockOwner, setLibraryLockOwner] = useState<UserDetails | null>(
+    null
+  );
+  const [measureReview, setMeasureReview] = useState<MeasureReview | null>(
+    null
+  );
+  const [libraryReview, setLibraryReview] = useState<CqlLibraryReview | null>(
     null
   );
 
@@ -134,7 +149,55 @@ const PageHeader = () => {
     }
   }, [measureLockedByHarpId]);
 
+  useEffect(() => {
+    let isMounted = true;
+    const measureId = measureState?.id;
+    if (measureId) {
+      measureReviewServiceApiRef.current
+        .getMeasureReview(measureId)
+        .then((review) => {
+          if (isMounted) {
+            setMeasureReview(review);
+          }
+        })
+        .catch(() => {
+          if (isMounted) {
+            setMeasureReview(null);
+          }
+        });
+    } else {
+      setMeasureReview(null);
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [measureState?.id]);
+
   const libraryLockedByHarpId = libraryState?.cqlLibraryLock?.lockedBy;
+  useEffect(() => {
+    let isMounted = true;
+    const libraryId = libraryState?.id;
+    if (libraryId) {
+      cqlLibraryReviewServiceApiRef.current
+        .getCqlLibraryReview(libraryId)
+        .then((review) => {
+          if (isMounted) {
+            setLibraryReview(review);
+          }
+        })
+        .catch(() => {
+          if (isMounted) {
+            setLibraryReview(null);
+          }
+        });
+    } else {
+      setLibraryReview(null);
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [libraryState?.id]);
+
   useEffect(() => {
     if (libraryLockedByHarpId) {
       userServiceApiRef.current
@@ -163,11 +226,6 @@ const PageHeader = () => {
 
   const handleClose = () => {
     setCreateOpen(false);
-  };
-
-  //waf error
-  const openWaf = () => {
-    setWafOpen(true);
   };
 
   const handleWafClose = () => {
@@ -234,7 +292,7 @@ const PageHeader = () => {
       .catch((reason) => {
         console.error(reason);
       });
-  }, []);
+  }, [updateFeatureFlags]);
 
   const overflowingText = useRef<HTMLHeadingElement>(null);
   const isOverflow = useIsOverflow(overflowingText, () => {});
@@ -291,21 +349,37 @@ const PageHeader = () => {
             </div>
             <div className="header-metadata-info">
               <p tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0">{`Version ${measureState?.version}`}</p>
-              {[
-                measureState?.model,
-                readablePeriodStart + " - " + readablePeriodEnd,
-              ].map((val, key) => {
-                if (val)
-                  return (
-                    <p
-                      data-testid={`info-${val}-${key}`}
-                      key={`info-${val}-${key}`}
-                      tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0"
-                    >
-                      {val}
-                    </p>
-                  );
-              })}
+              {measureState?.model && (
+                <p
+                  data-testid={`info-${measureState?.model}-0`}
+                  tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0"
+                >
+                  {measureState?.model}
+                </p>
+              )}
+              {measureCanEdit &&
+                measureReview?.status === ReviewStatus.READY_FOR_REVIEW && (
+                  <p
+                    data-testid="measure-review-status"
+                    tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0"
+                  >
+                    Review Status: Ready
+                  </p>
+                )}
+              {[readablePeriodStart + " - " + readablePeriodEnd].map(
+                (val, key) => {
+                  if (val)
+                    return (
+                      <p
+                        data-testid={`info-${val}-${key + 1}`}
+                        key={`info-${val}-${key + 1}`}
+                        tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0"
+                      >
+                        {val}
+                      </p>
+                    );
+                }
+              )}
               <MeasureStatusChips measure={measureState} />
               {measureCanEdit &&
                 measureState?.measureLock &&
@@ -448,6 +522,15 @@ const PageHeader = () => {
                     );
                 }
               )}
+              {libraryCanEdit &&
+                libraryReview?.status === ReviewStatus.READY_FOR_REVIEW && (
+                  <p
+                    data-testid="cql-library-status"
+                    tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0"
+                  >
+                    Review Status: Ready
+                  </p>
+                )}
               {libraryCanEdit && libraryState?.cqlLibraryLock && (
                 <div
                   className="lock-indicator"
