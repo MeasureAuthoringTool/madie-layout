@@ -1,4 +1,3 @@
-import "@testing-library/jest-dom/extend-expect";
 import * as React from "react";
 import {
   screen,
@@ -9,9 +8,9 @@ import {
 } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { act, Simulate } from "react-dom/test-utils";
-import { describe, expect, test } from "@jest/globals";
 import userEvent from "@testing-library/user-event";
 import { mockLibraryName, mockMeasureName } from "../NewMeasure/bulkCreate";
+// @ts-ignore
 import { axios, checkUserCanEdit } from "@madie/madie-util";
 import PageHeader from "../PageHeader/PageHeader";
 import { Model } from "@madie/madie-models/dist/Model";
@@ -126,7 +125,7 @@ jest.mock("@madie/madie-util", () => ({
     updateFeatureFlags: jest.fn((featureFlags) => featureFlags),
     state: jest.fn().mockImplementation(() => null),
     initialState: jest.fn().mockImplementation(() => null),
-    subscribe: (set) => {
+    subscribe: () => {
       return { unsubscribe: () => null };
     },
   },
@@ -141,6 +140,18 @@ jest.mock("@madie/madie-util", () => ({
   useIsRoleOrFeatureEnabled: jest.fn(),
   useUserServiceApi: () => ({
     getOwnerDetails: jest.fn().mockRejectedValue(new Error("not found")),
+  }),
+  useMeasureReviewServiceApi: () => ({
+    getMeasureReview: jest.fn().mockResolvedValue(null),
+    createMeasureReview: jest.fn(),
+    updateMeasureReview: jest.fn(),
+    getMeasureReviewsByMeasureSetId: jest.fn().mockResolvedValue([]),
+  }),
+  useCqlLibraryReviewServiceApi: () => ({
+    getCqlLibraryReview: jest.fn().mockResolvedValue(null),
+    createCqlLibraryReview: jest.fn(),
+    updateCqlLibraryReview: jest.fn(),
+    getCqlLibraryReviewsByLibrarySetId: jest.fn().mockResolvedValue([]),
   }),
 }));
 
@@ -226,8 +237,6 @@ describe("Page Header and Dialogs", () => {
   });
 
   test("Clicking on new library button retains the same library page", () => {
-    let testHistory, testLocation;
-
     render(
       <MemoryRouter
         initialEntries={[
@@ -246,11 +255,11 @@ describe("Page Header and Dialogs", () => {
     act(async () => {
       const libraryButton = await findByTestId("create-new-cql-library-button");
       expect(libraryButton).toBeTruthy();
-      fireEvent.click(libraryButton);
+      userEvent.click(libraryButton);
       const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
 
       const button = screen.getByTestId("create-new-cql-library-button");
-      fireEvent.click(button);
+      userEvent.click(button);
       expect(dispatchEventSpy).toHaveBeenCalledWith(
         new Event("openCreateLibraryDialog")
       );
@@ -269,7 +278,7 @@ describe("Page Header and Dialogs", () => {
     ]);
     const dialogButton = await findByTestId("create-new-measure-button");
     expect(dialogButton).toBeTruthy();
-    fireEvent.click(dialogButton);
+    userEvent.click(dialogButton);
     const dialog = await findByTestId("dialog-form");
     expect(dialog).toBeTruthy();
   });
@@ -424,7 +433,7 @@ describe("Page Header and Dialogs", () => {
       );
       const dialogButton = await findByTestId("create-new-measure-button");
       expect(dialogButton).toBeTruthy();
-      fireEvent.click(dialogButton);
+      userEvent.click(dialogButton);
       expect(await findByTestId("measure-name-text-field")).toBeInTheDocument();
       expect(await findByTestId("measure-model-select")).toBeInTheDocument();
       expect(await findByTestId("cql-library-name")).toBeInTheDocument();
@@ -453,10 +462,10 @@ describe("Page Header and Dialogs", () => {
       );
       const dialogButton = await findByTestId("create-new-measure-button");
       expect(dialogButton).toBeTruthy();
-      fireEvent.click(dialogButton);
+      userEvent.click(dialogButton);
       const manualCheck = await findByTestId("manual-generate-checkbox");
       expect(manualCheck).toBeInTheDocument();
-      fireEvent.click(manualCheck);
+      userEvent.click(manualCheck);
       const autoCheck = await findByTestId("auto-generate-checkbox");
       expect(autoCheck).toBeInTheDocument();
     });
@@ -483,29 +492,33 @@ describe("Page Header and Dialogs", () => {
       const dialogButton = await findByTestId("create-new-measure-button");
       expect(queryByTestId("create-dialog")).not.toBeInTheDocument();
       expect(dialogButton).toBeTruthy();
-      fireEvent.click(dialogButton);
+      userEvent.click(dialogButton);
       // we gotta hit the input to change the value of material ui components. make sure they have ids
-      const nameNode = await getByTestId("measure-name-input");
+      const nameNode = getByTestId("measure-name-input") as HTMLInputElement;
       userEvent.type(nameNode, mockFormikInfo.measureName);
       expect(nameNode.value).toBe(mockFormikInfo.measureName);
       Simulate.change(nameNode);
 
-      fireEvent.click(getByTestId("measure-name-text-field"));
+      userEvent.click(getByTestId("measure-name-text-field"));
       fireEvent.blur(getByTestId("measure-name-text-field"));
 
-      const libraryNode = await getByTestId("cql-library-name-input");
+      const libraryNode = getByTestId(
+        "cql-library-name-input"
+      ) as HTMLInputElement;
       userEvent.type(libraryNode, mockFormikInfo.cqlLibraryName);
       expect(libraryNode.value).toBe(mockFormikInfo.cqlLibraryName);
       Simulate.change(libraryNode);
 
-      const ecqmNode = await getByTestId("ecqm-input");
+      const ecqmNode = getByTestId("ecqm-input") as HTMLInputElement;
       userEvent.type(ecqmNode, mockFormikInfo.ecqmTitle);
       expect(ecqmNode.value).toBe(mockFormikInfo.ecqmTitle);
       Simulate.change(ecqmNode);
 
-      const modelSelect = await getByTestId("measure-model-select");
-      fireEvent.click(modelSelect);
-      const modelNode = await getByTestId("measure-model-input");
+      const modelSelect = getByTestId(
+        "measure-model-select"
+      ) as HTMLSelectElement;
+      userEvent.click(modelSelect);
+      const modelNode = getByTestId("measure-model-input") as HTMLSelectElement;
       fireEvent.select(modelNode, { target: { value: mockFormikInfo.model } });
       expect(modelNode.value).toBe(mockFormikInfo.model);
       Simulate.change(modelNode);
@@ -515,7 +528,7 @@ describe("Page Header and Dialogs", () => {
       );
       const measurementPeriodStartInput = within(
         measurementPeriodStartNode
-      ).getByRole("textbox");
+      ).getByRole("textbox") as HTMLInputElement;
 
       userEvent.type(
         measurementPeriodStartInput,
@@ -532,7 +545,7 @@ describe("Page Header and Dialogs", () => {
       const measurementPeriodEndNode = getByTestId("measurement-period-end");
       const measurementPeriodEndInput = within(
         measurementPeriodEndNode
-      ).getByRole("textbox");
+      ).getByRole("textbox") as HTMLInputElement;
       userEvent.type(
         measurementPeriodEndInput,
         mockFormikInfo.measurementPeriodEnd
@@ -545,12 +558,9 @@ describe("Page Header and Dialogs", () => {
       await waitFor(() => expect(submitButton).not.toBeDisabled(), {
         timeout: 5000,
       });
-      fireEvent.click(submitButton);
-      await waitFor(() => {
-        expect(axios.post).toHaveBeenCalled(),
-          {
-            timeout: 5000,
-          };
+      userEvent.click(submitButton);
+      await waitFor(() => expect(axios.post).toHaveBeenCalled(), {
+        timeout: 5000,
       });
       await waitFor(() => {
         expect(queryByTestId("server-error-alerts")).not.toBeInTheDocument();
@@ -587,29 +597,33 @@ describe("Page Header and Dialogs", () => {
     const dialogButton = await findByTestId("create-new-measure-button");
     expect(queryByTestId("create-dialog")).not.toBeInTheDocument();
     expect(dialogButton).toBeTruthy();
-    fireEvent.click(dialogButton);
+    userEvent.click(dialogButton);
     // we gotta hit the input to change the value of material ui components. make sure they have ids
-    const nameNode = await getByTestId("measure-name-input");
+    const nameNode = getByTestId("measure-name-input") as HTMLInputElement;
     userEvent.type(nameNode, mockFormikInfo.measureName);
     expect(nameNode.value).toBe(mockFormikInfo.measureName);
     Simulate.change(nameNode);
 
-    fireEvent.click(getByTestId("measure-name-text-field"));
+    userEvent.click(getByTestId("measure-name-text-field"));
     fireEvent.blur(getByTestId("measure-name-text-field"));
 
-    const libraryNode = await getByTestId("cql-library-name-input");
+    const libraryNode = getByTestId(
+      "cql-library-name-input"
+    ) as HTMLInputElement;
     userEvent.type(libraryNode, mockFormikInfo.cqlLibraryName);
     expect(libraryNode.value).toBe(mockFormikInfo.cqlLibraryName);
     Simulate.change(libraryNode);
 
-    const ecqmNode = await getByTestId("ecqm-input");
+    const ecqmNode = getByTestId("ecqm-input") as HTMLInputElement;
     userEvent.type(ecqmNode, mockFormikInfo.ecqmTitle);
     expect(ecqmNode.value).toBe(mockFormikInfo.ecqmTitle);
     Simulate.change(ecqmNode);
 
-    const modelSelect = await getByTestId("measure-model-select");
-    fireEvent.click(modelSelect);
-    const modelNode = await getByTestId("measure-model-input");
+    const modelSelect = getByTestId(
+      "measure-model-select"
+    ) as HTMLSelectElement;
+    userEvent.click(modelSelect);
+    const modelNode = getByTestId("measure-model-input") as HTMLInputElement;
     fireEvent.select(modelNode, { target: { value: mockFormikInfo.model } });
     expect(modelNode.value).toBe(mockFormikInfo.model);
     Simulate.change(modelNode);
@@ -617,7 +631,7 @@ describe("Page Header and Dialogs", () => {
     const measurementPeriodStartNode = getByTestId("measurement-period-start");
     const measurementPeriodStartInput = within(
       measurementPeriodStartNode
-    ).getByRole("textbox");
+    ).getByRole("textbox") as HTMLInputElement;
     userEvent.type(
       measurementPeriodStartInput,
       mockFormikInfo.measurementPeriodStart
@@ -629,7 +643,7 @@ describe("Page Header and Dialogs", () => {
     const measurementPeriodEndNode = getByTestId("measurement-period-end");
     const measurementPeriodEndInput = within(
       measurementPeriodEndNode
-    ).getByRole("textbox");
+    ).getByRole("textbox") as HTMLInputElement;
     userEvent.type(
       measurementPeriodEndInput,
       mockFormikInfo.measurementPeriodEnd
@@ -642,18 +656,15 @@ describe("Page Header and Dialogs", () => {
     await waitFor(() => expect(submitButton).not.toBeDisabled(), {
       timeout: 5000,
     });
-    fireEvent.click(submitButton);
-    await waitFor(() => {
-      expect(axios.post).toHaveBeenCalled(),
-        {
-          timeout: 5000,
-        };
+    userEvent.click(submitButton);
+    await waitFor(() => expect(axios.post).toHaveBeenCalled(), {
+      timeout: 5000,
     });
     await waitFor(() => {
       expect(queryByTestId("server-error-alerts")).toBeInTheDocument();
     });
     expect(getByTestId("close-error-button")).toBeInTheDocument();
-    fireEvent.click(getByTestId("close-error-button"));
+    userEvent.click(getByTestId("close-error-button"));
     await waitFor(() => {
       expect(queryByTestId("server-error-alerts")).not.toBeInTheDocument();
     });
@@ -688,29 +699,33 @@ describe("Page Header and Dialogs", () => {
       const dialogButton = await findByTestId("create-new-measure-button");
       expect(queryByTestId("dialog-form")).not.toBeInTheDocument();
       expect(dialogButton).toBeTruthy();
-      fireEvent.click(dialogButton);
+      userEvent.click(dialogButton);
       // we gotta hit the input to change the value of material ui components. make sure they have ids
-      const nameNode = await getByTestId("measure-name-input");
+      const nameNode = getByTestId("measure-name-input") as HTMLInputElement;
       userEvent.type(nameNode, mockFormikInfo.measureName);
       expect(nameNode.value).toBe(mockFormikInfo.measureName);
       Simulate.change(nameNode);
 
-      fireEvent.click(getByTestId("measure-name-text-field"));
+      userEvent.click(getByTestId("measure-name-text-field"));
       fireEvent.blur(getByTestId("measure-name-text-field"));
 
-      const libraryNode = await getByTestId("cql-library-name-input");
+      const libraryNode = getByTestId(
+        "cql-library-name-input"
+      ) as HTMLInputElement;
       userEvent.type(libraryNode, mockFormikInfo.cqlLibraryName);
       expect(libraryNode.value).toBe(mockFormikInfo.cqlLibraryName);
       Simulate.change(libraryNode);
 
-      const ecqmNode = await getByTestId("ecqm-input");
+      const ecqmNode = getByTestId("ecqm-input") as HTMLInputElement;
       userEvent.type(ecqmNode, mockFormikInfo.ecqmTitle);
       expect(ecqmNode.value).toBe(mockFormikInfo.ecqmTitle);
       Simulate.change(ecqmNode);
 
-      const modelSelect = await getByTestId("measure-model-select");
-      fireEvent.click(modelSelect);
-      const modelNode = await getByTestId("measure-model-input");
+      const modelSelect = getByTestId(
+        "measure-model-select"
+      ) as HTMLSelectElement;
+      userEvent.click(modelSelect);
+      const modelNode = getByTestId("measure-model-input") as HTMLInputElement;
       fireEvent.select(modelNode, { target: { value: mockFormikInfo.model } });
       expect(modelNode.value).toBe(mockFormikInfo.model);
       Simulate.change(modelNode);
@@ -720,7 +735,7 @@ describe("Page Header and Dialogs", () => {
       );
       const measurementPeriodStartInput = within(
         measurementPeriodStartNode
-      ).getByRole("textbox");
+      ).getByRole("textbox") as HTMLInputElement;
       userEvent.type(
         measurementPeriodStartInput,
         mockFormikInfo.measurementPeriodStart
@@ -731,7 +746,7 @@ describe("Page Header and Dialogs", () => {
       const measurementPeriodEndNode = getByTestId("measurement-period-end");
       const measurementPeriodEndInput = within(
         measurementPeriodEndNode
-      ).getByRole("textbox");
+      ).getByRole("textbox") as HTMLInputElement;
       userEvent.type(
         measurementPeriodEndInput,
         mockFormikInfo.measurementPeriodEnd
@@ -743,12 +758,9 @@ describe("Page Header and Dialogs", () => {
       await waitFor(() => expect(submitButton).not.toBeDisabled(), {
         timeout: 5000,
       });
-      fireEvent.click(submitButton);
-      await waitFor(() => {
-        expect(axios.post).toHaveBeenCalled(),
-          {
-            timeout: 5000,
-          };
+      userEvent.click(submitButton);
+      await waitFor(() => expect(axios.post).toHaveBeenCalled(), {
+        timeout: 5000,
       });
       await waitFor(() => {
         expect(queryByTestId("server-error-alerts")).toBeInTheDocument();
@@ -774,12 +786,12 @@ describe("Page Header and Dialogs", () => {
     );
     const dialogButton = await findByTestId("create-new-measure-button");
     expect(dialogButton).toBeTruthy();
-    fireEvent.click(dialogButton);
+    userEvent.click(dialogButton);
     const dialog = await findByTestId("dialog-form");
     expect(dialog).toBeTruthy();
     const closeButton = await findByTestId("close-button");
     expect(closeButton).toBeTruthy();
-    fireEvent.click(closeButton);
+    userEvent.click(closeButton);
     await waitFor(() => {
       expect(queryByTestId("close-button")).not.toBeInTheDocument();
     });
@@ -915,9 +927,7 @@ describe("Page Header and Dialogs", () => {
     );
 
     expect(
-      await screen.queryByTestId(
-        `library-${lockedLibrary.cqlLibraryName}-inuse-chip`
-      )
+      screen.queryByTestId(`library-${lockedLibrary.cqlLibraryName}-inuse-chip`)
     ).not.toBeInTheDocument();
   });
 
@@ -938,7 +948,7 @@ describe("Page Header and Dialogs", () => {
     );
 
     expect(
-      await screen.queryByTestId(
+      screen.queryByTestId(
         `library-${mockLibraryInfo.cqlLibraryName}-inuse-chip`
       )
     ).not.toBeInTheDocument();
@@ -1075,9 +1085,7 @@ describe("Page Header and Dialogs", () => {
     );
 
     expect(
-      await screen.queryByTestId(
-        `measure-${lockedMeasure.measureName}-inuse-chip`
-      )
+      screen.queryByTestId(`measure-${lockedMeasure.measureName}-inuse-chip`)
     ).not.toBeInTheDocument();
   });
 
@@ -1101,10 +1109,189 @@ describe("Page Header and Dialogs", () => {
     );
 
     expect(
-      await screen.queryByTestId(
-        `measure-${unlockedMeasure.measureName}-inuse-chip`
-      )
+      screen.queryByTestId(`measure-${unlockedMeasure.measureName}-inuse-chip`)
     ).not.toBeInTheDocument();
+  });
+
+  test("shows 'Review Status: Ready' when measure is READY_FOR_REVIEW and user can edit", async () => {
+    (checkUserCanEdit as jest.Mock).mockReturnValue(true);
+    const readyMeasure = {
+      ...mockFormikInfo,
+      id: "test-measure-id",
+      measureSet: { owner: "test user", acls: [] },
+    };
+    require("@madie/madie-util").measureStore.state = readyMeasure;
+    require("@madie/madie-util").measureStore.subscribe = (set) => {
+      set(readyMeasure);
+      return { unsubscribe: () => null };
+    };
+    require("@madie/madie-util").useMeasureReviewServiceApi = () => ({
+      getMeasureReview: jest
+        .fn()
+        .mockResolvedValue({ status: "READY_FOR_REVIEW" }),
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/measures/test-measure-id/edit/details"]}>
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+    expect(
+      await screen.findByTestId("measure-review-status")
+    ).toHaveTextContent("Review Status: Ready");
+  });
+
+  test("does not show 'Review Status: Ready' when measure is NOT_READY_FOR_REVIEW", async () => {
+    (checkUserCanEdit as jest.Mock).mockReturnValue(true);
+    const notReadyMeasure = {
+      ...mockFormikInfo,
+      id: "test-measure-id",
+      measureSet: { owner: "test user", acls: [] },
+    };
+    require("@madie/madie-util").measureStore.state = notReadyMeasure;
+    require("@madie/madie-util").measureStore.subscribe = (set) => {
+      set(notReadyMeasure);
+      return { unsubscribe: () => null };
+    };
+    require("@madie/madie-util").useMeasureReviewServiceApi = () => ({
+      getMeasureReview: jest
+        .fn()
+        .mockResolvedValue({ status: "NOT_READY_FOR_REVIEW" }),
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/measures/test-measure-id/edit/details"]}>
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+    await waitFor(() =>
+      expect(queryByTestId("info-QI-Core v4.1.1-0")).toBeInTheDocument()
+    );
+    expect(queryByTestId("measure-review-status")).not.toBeInTheDocument();
+  });
+
+  test("does not show 'Review Status: Ready' when user cannot edit even if READY_FOR_REVIEW", async () => {
+    (checkUserCanEdit as jest.Mock).mockReturnValue(false);
+    const readyMeasure = {
+      ...mockFormikInfo,
+      id: "test-measure-id",
+      measureSet: { owner: "another user", acls: [] },
+    };
+    require("@madie/madie-util").measureStore.state = readyMeasure;
+    require("@madie/madie-util").measureStore.subscribe = (set) => {
+      set(readyMeasure);
+      return { unsubscribe: () => null };
+    };
+    require("@madie/madie-util").useMeasureReviewServiceApi = () => ({
+      getMeasureReview: jest
+        .fn()
+        .mockResolvedValue({ status: "READY_FOR_REVIEW" }),
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/measures/test-measure-id/edit/details"]}>
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+    await waitFor(() =>
+      expect(queryByTestId("info-QI-Core v4.1.1-0")).toBeInTheDocument()
+    );
+    expect(queryByTestId("measure-review-status")).not.toBeInTheDocument();
+  });
+
+  test("shows 'Review Status: Ready' when library is READY_FOR_REVIEW and user can edit", async () => {
+    (checkUserCanEdit as jest.Mock).mockReturnValue(true);
+    const readyLibrary = {
+      ...mockLibraryInfo,
+      librarySet: { owner: "test user", acls: [] },
+    };
+    require("@madie/madie-util").cqlLibraryStore.state = readyLibrary;
+    require("@madie/madie-util").cqlLibraryStore.subscribe = (set) => {
+      set(readyLibrary);
+      return { unsubscribe: () => null };
+    };
+    require("@madie/madie-util").useCqlLibraryReviewServiceApi = () => ({
+      getCqlLibraryReview: jest
+        .fn()
+        .mockResolvedValue({ status: "READY_FOR_REVIEW" }),
+    });
+
+    render(
+      <MemoryRouter
+        initialEntries={["/cql-libraries/randomstring/edit/details"]}
+      >
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+    expect(await screen.findByTestId("cql-library-status")).toHaveTextContent(
+      "Review Status: Ready"
+    );
+  });
+
+  test("does not show 'Review Status: Ready' when library is NOT_READY_FOR_REVIEW", async () => {
+    (checkUserCanEdit as jest.Mock).mockReturnValue(true);
+    const notReadyLibrary = {
+      ...mockLibraryInfo,
+      librarySet: { owner: "test user", acls: [] },
+    };
+    require("@madie/madie-util").cqlLibraryStore.state = notReadyLibrary;
+    require("@madie/madie-util").cqlLibraryStore.subscribe = (set) => {
+      set(notReadyLibrary);
+      return { unsubscribe: () => null };
+    };
+    require("@madie/madie-util").useCqlLibraryReviewServiceApi = () => ({
+      getCqlLibraryReview: jest
+        .fn()
+        .mockResolvedValue({ status: "NOT_READY_FOR_REVIEW" }),
+    });
+
+    render(
+      <MemoryRouter
+        initialEntries={["/cql-libraries/randomstring/edit/details"]}
+      >
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(queryByText("QI-Core v4.1.1")).toBeInTheDocument();
+    });
+    expect(queryByTestId("cql-library-status")).not.toBeInTheDocument();
+  });
+
+  test("does not show 'Review Status: Ready' when user cannot edit even if library is READY_FOR_REVIEW", async () => {
+    (checkUserCanEdit as jest.Mock).mockReturnValue(false);
+    const readyLibrary = {
+      ...mockLibraryInfo,
+      librarySet: { owner: "another user", acls: [] },
+    };
+    require("@madie/madie-util").cqlLibraryStore.state = readyLibrary;
+    require("@madie/madie-util").cqlLibraryStore.subscribe = (set) => {
+      set(readyLibrary);
+      return { unsubscribe: () => null };
+    };
+    require("@madie/madie-util").useCqlLibraryReviewServiceApi = () => ({
+      getCqlLibraryReview: jest
+        .fn()
+        .mockResolvedValue({ status: "READY_FOR_REVIEW" }),
+    });
+
+    render(
+      <MemoryRouter
+        initialEntries={["/cql-libraries/randomstring/edit/details"]}
+      >
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(queryByText("QI-Core v4.1.1")).toBeInTheDocument();
+    });
+    expect(queryByTestId("cql-library-status")).not.toBeInTheDocument();
   });
 });
 

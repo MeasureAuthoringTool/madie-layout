@@ -1,7 +1,14 @@
 declare module "@madie/madie-util" {
   import { LifeCycleFn } from "single-spa";
   import { AxiosInstance } from "axios";
-  import { CqlLibrary, Measure, Acl, UserLogin } from "@madie/madie-models";
+  import {
+    CqlLibrary,
+    Measure,
+    Acl,
+    UserLogin,
+    MeasureReview,
+    CqlLibraryReview,
+  } from "@madie/madie-models";
 
   export interface OktaConfig {
     baseUrl: string;
@@ -185,6 +192,41 @@ declare module "@madie/madie-util" {
   export function useMeasureServiceApi(): MeasureServiceApi;
   export function useCqlLibraryServiceApi(): CqlLibraryServiceApi;
   export function useUserServiceApi(): UserServiceApi;
+
+  export class MeasureReviewServiceApi {
+    constructor(baseUrl: string, getAccessToken: () => string);
+    createMeasureReview(
+      measureId: string,
+      review: MeasureReview
+    ): Promise<MeasureReview>;
+    updateMeasureReview(
+      measureId: string,
+      review: MeasureReview
+    ): Promise<MeasureReview>;
+    getMeasureReview(measureId: string): Promise<MeasureReview | null>;
+    getMeasureReviewsByMeasureSetId(
+      measureSetId: string
+    ): Promise<MeasureReview[]>;
+  }
+  export function useMeasureReviewServiceApi(): MeasureReviewServiceApi;
+
+  export class CqlLibraryReviewServiceApi {
+    constructor(baseUrl: string, getAccessToken: () => string);
+    createCqlLibraryReview(
+      libraryId: string,
+      review: CqlLibraryReview
+    ): Promise<CqlLibraryReview>;
+    updateCqlLibraryReview(
+      libraryId: string,
+      review: CqlLibraryReview
+    ): Promise<CqlLibraryReview>;
+    getCqlLibraryReview(libraryId: string): Promise<CqlLibraryReview | null>;
+    getCqlLibraryReviewsByLibrarySetId(
+      librarySetId: string
+    ): Promise<CqlLibraryReview[]>;
+  }
+  export function useCqlLibraryReviewServiceApi(): CqlLibraryReviewServiceApi;
+
   export function useDocumentTitle(
     title: string,
     prevailOnMount?: boolean
