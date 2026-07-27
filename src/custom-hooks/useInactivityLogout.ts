@@ -1,9 +1,14 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useOktaAuth } from "@okta/okta-react";
+import {
+  useMeasureServiceApi,
+  useCqlLibraryServiceApi,
+} from "@madie/madie-util";
 import {
   activityTracker,
   MADiE_LAST_ACTIVITY,
 } from "../services/activityTracker";
+import { performLogoutCleanup } from "../services/logoutCleanup";
 
 /**
  * Interval (ms) at which the hook checks whether the idle timeout has been
@@ -27,9 +32,13 @@ export const IDLE_CHECK_INTERVAL_MS = 30_000; // 30 seconds
  *      timestamp (via the `storage` event), so activity in one tab keeps this
  *      tab alive immediately instead of waiting for the next poll — important
  *      when background-tab timer throttling delays the interval.
- *   4. Triggers `oktaAuth.signOut()` once the idle timeout is exceeded, which
- *      clears tokens, revokes them server-side, and redirects to the
- *      post-logout URI.
+ *   4. Once the idle timeout is exceeded, releases any measures / CQL libraries
+ *      the user has locked (via {@link performLogoutCleanup}) and then triggers
+ *      `oktaAuth.signOut()`, which clears tokens, revokes them server-side, and
+ *      redirects to the post-logout URI. Cleanup failures are logged but never
+ *      block logout. Only the tab whose check fires first performs cleanup;
+ *      other tabs observe the token removal via Okta's `syncStorage` and drop to
+ *      an unauthenticated state (tearing this hook down) without repeating it.
  *
  * The DOM listeners, the `storage` listener, and the periodic interval are torn
  * down when the user logs out (auth state flips to false) or the consuming
@@ -39,6 +48,12 @@ export const IDLE_CHECK_INTERVAL_MS = 30_000; // 30 seconds
 export const useInactivityLogout = (): void => {
   const { authState, oktaAuth } = useOktaAuth();
   const authenticated = authState?.isAuthenticated;
+
+  // Service instances used to release locked resources before signing out.
+  // Held in refs so the effect below is not re-created when the hooks return
+  // new-but-equivalent instances on each render.
+  const measureServiceApiRef = useRef(useMeasureServiceApi());
+  const cqlLibraryServiceApiRef = useRef(useCqlLibraryServiceApi());
 
   useEffect(() => {
     if (!authenticated) {
@@ -57,11 +72,21 @@ export const useInactivityLogout = (): void => {
         return;
       }
       signingOut = true;
-      Promise.resolve(oktaAuth.signOut()).catch((error) => {
-        // Allow a later check to retry if sign out failed.
-        signingOut = false;
-        console.error("[useInactivityLogout] Failed to sign out user", error);
-      });
+      // Release any measures/CQL libraries locked by this user before signing
+      // out so other team members aren't blocked. Cleanup failures are logged
+      // (inside performLogoutCleanup) but never block logout.
+      Promise.resolve(
+        performLogoutCleanup(
+          measureServiceApiRef.current,
+          cqlLibraryServiceApiRef.current
+        )
+      )
+        .then(() => oktaAuth.signOut())
+        .catch((error) => {
+          // Allow a later check to retry if sign out failed.
+          signingOut = false;
+          console.error("[useInactivityLogout] Failed to sign out user", error);
+        });
     };
 
     const intervalId = setInterval(checkIdleAndSignOut, IDLE_CHECK_INTERVAL_MS);
@@ -85,6 +110,20 @@ export const useInactivityLogout = (): void => {
       activityTracker.stopTracking();
     };
   }, [authenticated, oktaAuth]);
+};
+
+/**
+ * InactivityLogout
+ *
+ * Thin wrapper component that runs {@link useInactivityLogout} and renders
+ * nothing. It must be rendered **inside** the `ApiContextProvider`: the hook
+ * resolves the measure / CQL library service instances (used for pre-logout
+ * unlock cleanup) via `useMeasureServiceApi` / `useCqlLibraryServiceApi`, which
+ * read the service config from context and throw if that context is absent.
+ */
+export const InactivityLogout = (): null => {
+  useInactivityLogout();
+  return null;
 };
 
 export default useInactivityLogout;

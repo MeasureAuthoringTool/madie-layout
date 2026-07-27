@@ -14,10 +14,10 @@ import { MadieCqlLibrary } from "@madie/madie-cql-library";
 import { MadieAdmin } from "@madie/madie-admin";
 import NotFound from "../components/notfound/NotFound";
 import "../styles/LayoutStyles.scss";
-import TimeoutHandler from "../components/timeoutHandler/TimeoutHandler";
+import TimeoutWarningDialog from "../components/timeoutWarningDialog/TimeoutWarningDialog";
 import LayoutWrapper from "./LayoutWrapper";
 import { ApiContextProvider, getServiceConfig } from "@madie/madie-util";
-import { useInactivityLogout } from "../custom-hooks/useInactivityLogout";
+import { InactivityLogout } from "../custom-hooks/useInactivityLogout";
 
 function Router({ props }) {
   const { authState } = useOktaAuth();
@@ -31,11 +31,6 @@ function Router({ props }) {
       .catch((err) => setError(err.message));
   }, []);
 
-  // Track user activity while authenticated and automatically sign the user out
-  // after the idle timeout is exceeded. This attaches the DOM activity listeners
-  // (mousemove, mousedown, keydown, scroll, touchstart, click), writes the last
-  // activity timestamp to localStorage, and runs the periodic inactivity check.
-  useInactivityLogout();
   /*
     On initial page load we want to trigger a hard refresh because single spa loads the apps sequentially based on what contains what
     This init pattern pattern influences tab order so we need to refresh on first login.
@@ -88,12 +83,11 @@ function Router({ props }) {
   return (
     <div>
       <ApiContextProvider value={serviceConfig}>
-        {authenticated && (
-          <TimeoutHandler
-            timeLeft={25 * 60 * 1000}
-            warningTime={5 * 60 * 1000}
-          />
-        )}
+        {/* Rendered inside the provider so the service hooks used for
+            pre-logout unlock cleanup can read the service config. Tracks
+            activity and drives idle logout while authenticated. */}
+        <InactivityLogout />
+        {authenticated && <TimeoutWarningDialog />}
         <RouterProvider router={BrowserRouter} key={firstLogin ? 1 : 2} />
       </ApiContextProvider>
     </div>
