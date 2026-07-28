@@ -12,6 +12,7 @@ import {
   ServiceConfig,
 } from "@madie/madie-util";
 import { performLogoutCleanup } from "../../services/logoutCleanup";
+import { clearTimeoutReturnUrl } from "../../services/timeoutReturnUrl";
 const FormControl = styled.section(() => ({
   marginLeft: "10px",
 }));
@@ -37,6 +38,7 @@ function UserProfile() {
   }, [oktaAuth.token]);
 
   const logout = async () => {
+    clearTimeoutReturnUrl();
     //breaks because logoutLogger is using a hook
     logoutLogger(userInfo, config);
     // Release any measures/CQL libraries locked by this user before signing out

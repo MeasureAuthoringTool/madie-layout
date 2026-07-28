@@ -9,6 +9,7 @@ import {
   activityTracker,
   MADiE_LAST_ACTIVITY,
 } from "../services/activityTracker";
+import { MADIE_TIMEOUT_RETURN_URL } from "../services/timeoutReturnUrl";
 
 jest.mock("@okta/okta-react");
 
@@ -120,6 +121,24 @@ describe("useInactivityLogout", () => {
       await flushPromises();
     });
     expect(mockSignOut).toHaveBeenCalledTimes(1);
+  });
+
+  it("stores the current pathname only when signing out due to inactivity", async () => {
+    const setItemSpy = jest.spyOn(Storage.prototype, "setItem");
+
+    render(<HookHarness />);
+    idleSpy.mockReturnValue(true);
+    window.history.replaceState({}, "", "/measures/123");
+
+    await act(async () => {
+      jest.advanceTimersByTime(IDLE_CHECK_INTERVAL_MS);
+      await flushPromises();
+    });
+
+    expect(setItemSpy).toHaveBeenCalledWith(
+      MADIE_TIMEOUT_RETURN_URL,
+      "/measures/123"
+    );
   });
 
   it("unlocks measures and libraries before signing out on idle timeout", async () => {

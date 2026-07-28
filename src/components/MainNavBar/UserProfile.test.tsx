@@ -4,6 +4,7 @@ import UserProfile from "./UserProfile";
 import { MemoryRouter } from "react-router";
 import { useOktaAuth } from "@okta/okta-react";
 import { act, Simulate } from "react-dom/test-utils";
+import { clearTimeoutReturnUrl } from "../../services/timeoutReturnUrl";
 
 jest.mock("@okta/okta-react", () => ({
   useOktaAuth: jest.fn(),
@@ -16,6 +17,7 @@ jest.mock("@madie/madie-util", () => ({
   }),
   useCqlLibraryServiceApi: () => ({
     getUserInfo: jest.fn().mockResolvedValue({}),
+    unlockLibraries: jest.fn().mockResolvedValue({}),
   }),
 
   getServiceConfig: () => ({
@@ -48,11 +50,18 @@ jest.mock("../../custom-hooks/customLog", () => {
     },
   };
 });
+jest.mock("../../services/timeoutReturnUrl", () => ({
+  clearTimeoutReturnUrl: jest.fn(),
+}));
 const MockSignOut = jest.fn().mockImplementation(() => {
   return Promise.resolve();
 });
 
 beforeEach(() => {
+  mockLogoutLogger.mockClear();
+  MockSignOut.mockClear();
+  (clearTimeoutReturnUrl as jest.Mock).mockClear();
+
   const mockGetUserInfo = jest.fn().mockImplementation(() => {
     return Promise.resolve({ name: "test name", given_name: "test" });
   });
@@ -94,7 +103,7 @@ describe("UserProfile component", () => {
       fireEvent.select(userInputSelect, { target: { value: "Logout" } });
       expect(userInputSelect.value).toBe("Logout");
       Simulate.change(userInputSelect);
-      waitFor(() => expect(mockLogoutLogger).not.toHaveBeenCalled());
+      await waitFor(() => expect(mockLogoutLogger).toHaveBeenCalled());
     });
   });
 
@@ -114,7 +123,7 @@ describe("UserProfile component", () => {
       fireEvent.click(getByTestId("user-profile-input"));
       fireEvent.blur(getByTestId("user-profile-input"));
       fireEvent.click(getByTestId("user-profile-input"));
-      waitFor(() => expect(mockLogoutLogger).toHaveBeenCalled());
+      await waitFor(() => expect(mockLogoutLogger).toHaveBeenCalled());
     });
   });
 
@@ -145,8 +154,8 @@ describe("UserProfile component", () => {
       const userInputSelect = await getByTestId("user-profile-input");
       fireEvent.click(userInfoSelect);
       fireEvent.change(userInputSelect, { target: { value: "Logout" } });
-      waitFor(() => expect(mockLogoutLogger).toHaveBeenCalled());
-      waitFor(() => expect(MockSignOut).not.toHaveBeenCalled());
+      await waitFor(() => expect(mockLogoutLogger).toHaveBeenCalled());
+      await waitFor(() => expect(MockSignOut).toHaveBeenCalled());
     });
   });
 
@@ -163,8 +172,8 @@ describe("UserProfile component", () => {
       const userInputSelect = await getByTestId("user-profile-input");
       fireEvent.change(userInputSelect, { target: { value: "Logout" } });
       fireEvent.blur(getByTestId("user-profile-select"));
-      waitFor(() => expect(mockLogoutLogger).toHaveBeenCalled());
-      waitFor(() => expect(mockSignout).toHaveBeenCalled());
+      await waitFor(() => expect(mockLogoutLogger).toHaveBeenCalled());
+      await waitFor(() => expect(MockSignOut).toHaveBeenCalled());
     });
   });
 
@@ -181,7 +190,23 @@ describe("UserProfile component", () => {
       fireEvent.change(userInputSelect, { target: { value: "test" } });
       expect(userInputSelect.value).toBe("test");
       fireEvent.blur(getByTestId("user-profile-select"));
-      waitFor(() => expect(mockLogoutLogger).not.toHaveBeenCalled());
+      await waitFor(() => expect(mockLogoutLogger).not.toHaveBeenCalled());
     });
+  });
+
+  it("clears timeout return URL when user manually signs out", async () => {
+    const { getByTestId } = render(
+      <MemoryRouter>
+        <UserProfile />
+      </MemoryRouter>
+    );
+
+    const userInfoSelect = await getByTestId("user-profile-select");
+    fireEvent.click(userInfoSelect);
+    const userInputSelect = await getByTestId("user-profile-input");
+    fireEvent.change(userInputSelect, { target: { value: "Logout" } });
+
+    await waitFor(() => expect(clearTimeoutReturnUrl).toHaveBeenCalled());
+    await waitFor(() => expect(MockSignOut).toHaveBeenCalled());
   });
 });

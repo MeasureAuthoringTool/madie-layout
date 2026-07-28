@@ -9,6 +9,7 @@ import {
   MADiE_LAST_ACTIVITY,
 } from "../services/activityTracker";
 import { performLogoutCleanup } from "../services/logoutCleanup";
+import { setTimeoutReturnUrl } from "../services/timeoutReturnUrl";
 
 /**
  * Interval (ms) at which the hook checks whether the idle timeout has been
@@ -81,7 +82,10 @@ export const useInactivityLogout = (): void => {
           cqlLibraryServiceApiRef.current
         )
       )
-        .then(() => oktaAuth.signOut())
+        .then(() => {
+          setTimeoutReturnUrl(window.location.pathname);
+          return oktaAuth.signOut();
+        })
         .catch((error) => {
           // Allow a later check to retry if sign out failed.
           signingOut = false;
