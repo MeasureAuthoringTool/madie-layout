@@ -2,6 +2,9 @@ import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import OktaSecurity from "./OktaSecurity";
 import * as madieUtil from "@madie/madie-util";
+import { Security } from "@okta/okta-react";
+import { toRelativeUrl } from "@okta/okta-auth-js";
+import { MADIE_TIMEOUT_RETURN_URL } from "../services/timeoutReturnUrl";
 
 // Mock dependencies
 jest.mock("@madie/madie-util", () => ({
@@ -12,6 +15,10 @@ jest.mock("@okta/okta-react", () => ({
     <div data-testid="security">{children}</div>
   )),
 }));
+jest.mock("@okta/okta-auth-js", () => ({
+  OktaAuth: jest.fn().mockImplementation(() => ({})),
+  toRelativeUrl: jest.fn((uri) => uri),
+}));
 jest.mock("./../router/Router", () =>
   jest.fn(() => <div data-testid="router" />)
 );
@@ -19,6 +26,8 @@ jest.mock("./../router/Router", () =>
 describe("OktaSecurity", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    localStorage.clear();
+    sessionStorage.clear();
   });
 
   it("renders loading message initially", () => {
@@ -53,5 +62,73 @@ describe("OktaSecurity", () => {
       expect(screen.getByTestId("security")).toBeInTheDocument();
       expect(screen.getByTestId("router")).toBeInTheDocument();
     });
+  });
+
+  it("prioritizes timeout return URL over originalUri and clears it after use", async () => {
+    (madieUtil.getOktaConfig as jest.Mock).mockResolvedValue({
+      issuer: "https://example.com/oauth2/default",
+      clientId: "clientId",
+      redirectUri: "http://localhost:3000/login/callback",
+      scopes: ["openid", "profile", "email"],
+    });
+
+    sessionStorage.setItem(MADIE_TIMEOUT_RETURN_URL, "/libraries");
+    render(<OktaSecurity />);
+    await waitFor(() =>
+      expect(screen.getByTestId("security")).toBeInTheDocument()
+    );
+
+    const securityProps = (Security as jest.Mock).mock.calls[0][0];
+    await securityProps.restoreOriginalUri({}, "/from-okta");
+
+    expect(toRelativeUrl).toHaveBeenCalledWith(
+      "/libraries",
+      window.location.origin
+    );
+    expect(sessionStorage.getItem(MADIE_TIMEOUT_RETURN_URL)).toBeNull();
+  });
+
+  it("falls back to originalUri when timeout return URL is not set", async () => {
+    (madieUtil.getOktaConfig as jest.Mock).mockResolvedValue({
+      issuer: "https://example.com/oauth2/default",
+      clientId: "clientId",
+      redirectUri: "http://localhost:3000/login/callback",
+      scopes: ["openid", "profile", "email"],
+    });
+
+    render(<OktaSecurity />);
+    await waitFor(() =>
+      expect(screen.getByTestId("security")).toBeInTheDocument()
+    );
+
+    const securityProps = (Security as jest.Mock).mock.calls[0][0];
+    await securityProps.restoreOriginalUri({}, "/from-okta");
+
+    expect(toRelativeUrl).toHaveBeenCalledWith(
+      "/from-okta",
+      window.location.origin
+    );
+  });
+
+  it("falls back to /measures when neither timeout return URL nor originalUri is set", async () => {
+    (madieUtil.getOktaConfig as jest.Mock).mockResolvedValue({
+      issuer: "https://example.com/oauth2/default",
+      clientId: "clientId",
+      redirectUri: "http://localhost:3000/login/callback",
+      scopes: ["openid", "profile", "email"],
+    });
+
+    render(<OktaSecurity />);
+    await waitFor(() =>
+      expect(screen.getByTestId("security")).toBeInTheDocument()
+    );
+
+    const securityProps = (Security as jest.Mock).mock.calls[0][0];
+    await securityProps.restoreOriginalUri({}, undefined);
+
+    expect(toRelativeUrl).toHaveBeenCalledWith(
+      "/measures",
+      window.location.origin
+    );
   });
 });
