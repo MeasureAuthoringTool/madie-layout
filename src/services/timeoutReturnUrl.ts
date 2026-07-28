@@ -37,7 +37,6 @@ const getTimeoutReturnUrl = (): string | null => {
       "[TimeoutReturnUrl] Unable to read timeout return URL from sessionStorage",
       e
     );
-    return null;
   }
 };
 
