@@ -173,6 +173,46 @@ const PageHeader = () => {
     };
   }, [measureState?.id]);
 
+  // An event to listen if the Review Status has changed, if so use that info or reFetch the reviewStatus from backend
+  useEffect(() => {
+    const handleReviewSaved = (event: Event) => {
+      const savedReview = (event as CustomEvent<MeasureReview | undefined>)
+        .detail;
+      if (savedReview) {
+        setMeasureReview(savedReview);
+      } else if (measureState?.id) {
+        measureReviewServiceApiRef.current
+          .getMeasureReview(measureState.id)
+          .then(setMeasureReview)
+          .catch(() => setMeasureReview(null));
+      }
+    };
+    window.addEventListener("review-measure-saved", handleReviewSaved);
+    return () => {
+      window.removeEventListener("review-measure-saved", handleReviewSaved);
+    };
+  }, [measureState?.id]);
+
+  // An event to listen if the Review Status has changed, if so use that info or reFetch the reviewStatus from backend
+  useEffect(() => {
+    const handleReviewSaved = (event: Event) => {
+      const savedReview = (event as CustomEvent<CqlLibraryReview | undefined>)
+        .detail;
+      if (savedReview) {
+        setLibraryReview(savedReview);
+      } else if (libraryState?.id) {
+        cqlLibraryReviewServiceApiRef.current
+          .getCqlLibraryReview(libraryState.id)
+          .then(setLibraryReview)
+          .catch(() => setLibraryReview(null));
+      }
+    };
+    window.addEventListener("review-library-saved", handleReviewSaved);
+    return () => {
+      window.removeEventListener("review-library-saved", handleReviewSaved);
+    };
+  }, [libraryState?.id]);
+
   const libraryLockedByHarpId = libraryState?.cqlLibraryLock?.lockedBy;
   useEffect(() => {
     let isMounted = true;
