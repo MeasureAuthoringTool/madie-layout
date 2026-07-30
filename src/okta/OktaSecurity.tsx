@@ -3,6 +3,7 @@ import { Security } from "@okta/okta-react";
 import { OktaAuth, toRelativeUrl } from "@okta/okta-auth-js";
 import { getOktaConfig } from "@madie/madie-util";
 import Router from "../router/Router";
+import { consumeTimeoutReturnUrl } from "../services/timeoutReturnUrl";
 
 interface OktaConfig {
   baseUrl: string;
@@ -44,8 +45,10 @@ function OktaSecurity() {
     // previously we had two routers to have access to history.replace. router-dom6 does not like this.
     // New method is to just update the url using native function. Same with customAuthHandler.
     // This may also very likely not even be necessary at all with router-dom 6 based on how the routes are set
+    const timeoutReturnUrl = consumeTimeoutReturnUrl();
+    const redirectTarget = timeoutReturnUrl || originalUri || "/measures";
     window.location.assign(
-      toRelativeUrl(originalUri || "/measures", window.location.origin)
+      toRelativeUrl(redirectTarget, window.location.origin)
     );
   };
 
