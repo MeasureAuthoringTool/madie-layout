@@ -18,6 +18,20 @@ import TimeoutWarningDialog from "../components/timeoutWarningDialog/TimeoutWarn
 import LayoutWrapper from "./LayoutWrapper";
 import { ApiContextProvider, getServiceConfig } from "@madie/madie-util";
 import { InactivityLogout } from "../custom-hooks/useInactivityLogout";
+import { setTimeoutReturnUrl } from "../services/timeoutReturnUrl";
+
+const LOGIN_PATHS = ["/login", "/login/callback"];
+
+const RedirectToLogin = () => {
+  const currentPath = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+
+  if (LOGIN_PATHS.includes(window.location.pathname)) {
+    return null;
+  }
+
+  setTimeoutReturnUrl(currentPath);
+  return <Navigate to="login" replace />;
+};
 
 function Router({ props }) {
   const { authState } = useOktaAuth();
@@ -54,7 +68,7 @@ function Router({ props }) {
         element={
           <LayoutWrapper>
             <Outlet />
-            {authenticated === false && <Navigate to="login" />}
+            {authenticated === false && <RedirectToLogin />}
           </LayoutWrapper>
         }
       >
