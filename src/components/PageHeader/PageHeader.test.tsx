@@ -1293,6 +1293,174 @@ describe("Page Header and Dialogs", () => {
     });
     expect(queryByTestId("cql-library-status")).not.toBeInTheDocument();
   });
+
+  test("updates measure review status from the review-measure-saved event payload", async () => {
+    (checkUserCanEdit as jest.Mock).mockReturnValue(true);
+    const readyMeasure = {
+      ...mockFormikInfo,
+      id: "test-measure-id",
+      measureSet: { owner: "test user", acls: [] },
+    };
+    require("@madie/madie-util").measureStore.state = readyMeasure;
+    require("@madie/madie-util").measureStore.subscribe = (set) => {
+      set(readyMeasure);
+      return { unsubscribe: () => null };
+    };
+    require("@madie/madie-util").useMeasureReviewServiceApi = () => ({
+      getMeasureReview: jest
+        .fn()
+        .mockResolvedValue({ status: "NOT_READY_FOR_REVIEW" }),
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/measures/test-measure-id/edit/details"]}>
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+    await waitFor(() =>
+      expect(queryByTestId("info-QI-Core v4.1.1-0")).toBeInTheDocument()
+    );
+    expect(queryByTestId("measure-review-status")).not.toBeInTheDocument();
+
+    act(() => {
+      window.dispatchEvent(
+        new CustomEvent("review-measure-saved", {
+          detail: { status: "READY_FOR_REVIEW" },
+        })
+      );
+    });
+
+    expect(
+      await screen.findByTestId("measure-review-status")
+    ).toHaveTextContent("Review Status: Ready");
+  });
+
+  test("re-fetches measure review from DB when review-measure-saved event has no payload", async () => {
+    (checkUserCanEdit as jest.Mock).mockReturnValue(true);
+    const readyMeasure = {
+      ...mockFormikInfo,
+      id: "test-measure-id",
+      measureSet: { owner: "test user", acls: [] },
+    };
+    require("@madie/madie-util").measureStore.state = readyMeasure;
+    require("@madie/madie-util").measureStore.subscribe = (set) => {
+      set(readyMeasure);
+      return { unsubscribe: () => null };
+    };
+    const getMeasureReview = jest
+      .fn()
+      .mockResolvedValueOnce({ status: "NOT_READY_FOR_REVIEW" })
+      .mockResolvedValue({ status: "READY_FOR_REVIEW" });
+    require("@madie/madie-util").useMeasureReviewServiceApi = () => ({
+      getMeasureReview,
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/measures/test-measure-id/edit/details"]}>
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+    await waitFor(() =>
+      expect(queryByTestId("info-QI-Core v4.1.1-0")).toBeInTheDocument()
+    );
+    expect(queryByTestId("measure-review-status")).not.toBeInTheDocument();
+
+    act(() => {
+      window.dispatchEvent(new Event("review-measure-saved"));
+    });
+
+    expect(
+      await screen.findByTestId("measure-review-status")
+    ).toHaveTextContent("Review Status: Ready");
+    expect(getMeasureReview).toHaveBeenCalledTimes(2);
+  });
+
+  test("updates library review status from the review-library-saved event payload", async () => {
+    (checkUserCanEdit as jest.Mock).mockReturnValue(true);
+    const readyLibrary = {
+      ...mockLibraryInfo,
+      librarySet: { owner: "test user", acls: [] },
+    };
+    require("@madie/madie-util").cqlLibraryStore.state = readyLibrary;
+    require("@madie/madie-util").cqlLibraryStore.subscribe = (set) => {
+      set(readyLibrary);
+      return { unsubscribe: () => null };
+    };
+    require("@madie/madie-util").useCqlLibraryReviewServiceApi = () => ({
+      getCqlLibraryReview: jest
+        .fn()
+        .mockResolvedValue({ status: "NOT_READY_FOR_REVIEW" }),
+    });
+
+    render(
+      <MemoryRouter
+        initialEntries={["/cql-libraries/randomstring/edit/details"]}
+      >
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(queryByText("QI-Core v4.1.1")).toBeInTheDocument();
+    });
+    expect(queryByTestId("cql-library-status")).not.toBeInTheDocument();
+
+    act(() => {
+      window.dispatchEvent(
+        new CustomEvent("review-library-saved", {
+          detail: { status: "READY_FOR_REVIEW" },
+        })
+      );
+    });
+
+    expect(await screen.findByTestId("cql-library-status")).toHaveTextContent(
+      "Review Status: Ready"
+    );
+  });
+
+  test("re-fetches library review from DB when review-library-saved event has no payload", async () => {
+    (checkUserCanEdit as jest.Mock).mockReturnValue(true);
+    const readyLibrary = {
+      ...mockLibraryInfo,
+      librarySet: { owner: "test user", acls: [] },
+    };
+    require("@madie/madie-util").cqlLibraryStore.state = readyLibrary;
+    require("@madie/madie-util").cqlLibraryStore.subscribe = (set) => {
+      set(readyLibrary);
+      return { unsubscribe: () => null };
+    };
+    const getCqlLibraryReview = jest
+      .fn()
+      .mockResolvedValueOnce({ status: "NOT_READY_FOR_REVIEW" })
+      .mockResolvedValue({ status: "READY_FOR_REVIEW" });
+    require("@madie/madie-util").useCqlLibraryReviewServiceApi = () => ({
+      getCqlLibraryReview,
+    });
+
+    render(
+      <MemoryRouter
+        initialEntries={["/cql-libraries/randomstring/edit/details"]}
+      >
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(queryByText("QI-Core v4.1.1")).toBeInTheDocument();
+    });
+    expect(queryByTestId("cql-library-status")).not.toBeInTheDocument();
+
+    act(() => {
+      window.dispatchEvent(new Event("review-library-saved"));
+    });
+
+    expect(await screen.findByTestId("cql-library-status")).toHaveTextContent(
+      "Review Status: Ready"
+    );
+    expect(getCqlLibraryReview).toHaveBeenCalledTimes(2);
+  });
 });
 
 describe("Admin Page Header", () => {
