@@ -3,7 +3,10 @@ import { Security } from "@okta/okta-react";
 import { OktaAuth, toRelativeUrl } from "@okta/okta-auth-js";
 import { getOktaConfig } from "@madie/madie-util";
 import Router from "../router/Router";
-import { consumeTimeoutReturnUrl } from "../services/timeoutReturnUrl";
+import {
+  consumeTimeoutReturnUrl,
+  setTimeoutReturnUrl,
+} from "../services/timeoutReturnUrl";
 
 interface OktaConfig {
   baseUrl: string;
@@ -85,6 +88,9 @@ function OktaSecurity() {
   const [oktaConfigErr, setOktaConfigErr] = useState<string>();
 
   const customAuthHandler = () => {
+    setTimeoutReturnUrl(
+      `${window.location.pathname}${window.location.search}${window.location.hash}`
+    );
     window.location.href = "/login";
   };
 

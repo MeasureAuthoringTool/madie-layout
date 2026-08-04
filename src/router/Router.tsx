@@ -18,15 +18,52 @@ import TimeoutWarningDialog from "../components/timeoutWarningDialog/TimeoutWarn
 import LayoutWrapper from "./LayoutWrapper";
 import { ApiContextProvider, getServiceConfig } from "@madie/madie-util";
 import { InactivityLogout } from "../custom-hooks/useInactivityLogout";
+import { setTimeoutReturnUrl } from "../services/timeoutReturnUrl";
+
+const LOGIN_PATHS = ["/login", "/login/callback"];
 
 /**
- * Redirects to the login page once auth is definitively lost. Rendered inside
- * the (memoized) route tree and reads auth state itself, so redirecting stays
- * reactive without re-creating the router object on every auth-state change.
+ * Landing/default paths that must never be stored as a return URL. "/" (and
+ * its redirect target "/measures") is where the browser lands right after an
+ * inactivity sign-out — storing it here would overwrite the page the user was
+ * actually on, which useInactivityLogout saved moments earlier (MAT-7718).
+ * Skipping them loses nothing for deep links either: the post-login fallback
+ * is /measures anyway.
+ */
+const NON_STORABLE_PATHS = ["/", "/measures", "/404"];
+
+/**
+ * Redirects unauthenticated users to the login page and remembers where they
+ * were trying to go. Two jobs in one place:
+ *
+ * 1. Deep links (MAT-10043): when a logged-out user opens a direct MADiE URL,
+ *    the full path (incl. query + hash) is stored in the MAT-7718 return-URL
+ *    field so `restoreOriginalUri` sends them back there after login.
+ * 2. Session persistence (MAT-10040): when auth is lost mid-session (sign-out
+ *    in this tab, token removal synced from another tab, failed renewal),
+ *    navigate to the login screen.
+ *
+ * Why a separate component: the route tree it lives in is memoized, so a
+ * plain `{authenticated === false && ...}` expression would capture a stale
+ * value; this component subscribes to auth state itself via useOktaAuth. It
+ * checks `=== false` (not falsy) because authState is `null` while Okta is
+ * still initializing — redirecting then would bounce every page load through
+ * /login.
  */
 const AuthRedirect = (): React.ReactElement | null => {
   const { authState } = useOktaAuth();
-  return authState?.isAuthenticated === false ? <Navigate to="login" /> : null;
+  if (authState?.isAuthenticated !== false) {
+    return null;
+  }
+  const { pathname, search, hash } = window.location;
+  if (LOGIN_PATHS.includes(pathname)) {
+    // Already on the login flow — nothing to store, nowhere to redirect.
+    return null;
+  }
+  if (!NON_STORABLE_PATHS.includes(pathname)) {
+    setTimeoutReturnUrl(`${pathname}${search}${hash}`);
+  }
+  return <Navigate to="login" replace />;
 };
 
 function Router({ props }) {
@@ -57,10 +94,12 @@ function Router({ props }) {
     };
   }, []);
 
-  // Memoized: re-creating the router object on every render (each auth-state
-  // update, token renewal, or cross-tab storage sync re-renders this
-  // component) remounts the entire route tree — tearing down and re-mounting
-  // every micro-frontend mid-use.
+  // Why useMemo: this component re-renders on every auth-state update (token
+  // renewal, cross-tab storage sync, login/logout). Building a brand-new
+  // router object each time made RouterProvider remount the entire route
+  // tree, tearing down and re-mounting every micro-frontend mid-use. The
+  // routes only truly depend on the sign-in config, so the router is built
+  // once per config; auth reactivity lives in <AuthRedirect/> instead.
   const BrowserRouter = useMemo(
     () =>
       createBrowserRouter(
