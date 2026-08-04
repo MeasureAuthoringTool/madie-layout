@@ -83,9 +83,6 @@ describe("OktaSecurity", () => {
       storage: "localStorage",
     });
     expect(config.services).toEqual({
-      // Active renewal must stay on: with services.autoRenew disabled the SDK
-      // deletes (autoRemove) expired tokens instead of renewing them, hard
-      // logging out every tab without the idle-timeout warning.
       autoRenew: true,
       syncStorage: true,
       renewOnTabActivation: true,

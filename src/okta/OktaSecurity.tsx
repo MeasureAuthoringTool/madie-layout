@@ -13,25 +13,40 @@ interface OktaConfig {
 }
 
 /**
- * How long a successful Okta session check is trusted before we hit the
- * network again. `transformAuthState` runs on EVERY auth-state recalculation
- * (page load, route-driven re-render, token renewal, cross-tab storage sync),
- * and `session.exists()` is a network call that returns `false` on ANY
- * failure — network blip, rate limit (429), aborted request — not just when
- * the Okta session is genuinely gone. Without this cache, a burst of
- * refreshes/route changes (multiplied across open tabs by syncStorage events)
- * hammers /api/v1/sessions/me, and a single transient failure instantly flips
- * isAuthenticated to false and bounces an active user to the login page with
- * no timeout warning.
+ * How long one successful Okta session check is trusted before we verify
+ * against the server again.
+ *
+ * Why this cache exists: `transformAuthState` runs on EVERY auth-state
+ * recalculation — page load, token renewal, and (because `syncStorage` is on)
+ * every token event mirrored from other tabs. Each run used to make a network
+ * call to /api/v1/sessions/me, and `session.exists()` reports `false` for ANY
+ * failure (network blip, 429 rate limit, aborted request), not just a dead
+ * session. So a burst of refreshes/route changes could hammer that endpoint
+ * and a single transient failure logged an active user out with no warning.
+ * Trusting a recent positive result removes both the call volume and the
+ * false-logout window.
  */
 export const SESSION_CHECK_TTL_MS = 5 * 60 * 1000; // 5 minutes
 let lastSessionConfirmedAt = 0;
 
-/** Test-only: clears the session-check cache between test cases. */
+/**
+ * Test-only: module state survives between test cases, so tests reset the
+ * session-check cache here to keep each case independent.
+ */
 export const resetSessionCheckCache = (): void => {
   lastSessionConfirmedAt = 0;
 };
 
+/**
+ * Extra auth check layered on top of Okta's default (unexpired tokens exist).
+ *
+ * Why: tokens sitting in localStorage don't guarantee the user still has a
+ * live Okta SSO session (it may have been revoked or timed out server-side).
+ * Okta calls this hook every time it recalculates auth state; we confirm the
+ * server-side session before treating the user as authenticated — but only
+ * once per SESSION_CHECK_TTL_MS, and with one retry, so transient network
+ * failures can't end a valid session.
+ */
 export const transformAuthState = async (oktaAuth, authState) => {
   // verifies unexpired tokens are available from the tokenManager (default behavior)
   if (localStorage.getItem("madieDebug") || (window as any).madieDebug) {
@@ -126,7 +141,7 @@ function OktaSecurity() {
             // offline_access depends on the Okta/HARP app allowing refresh tokens and
             // is being decided separately.
             tokenManager: {
-              autoRenew: true, // renew tokens
+              autoRenew: true, // expired tokens are renewed, not removed
               storage: "localStorage", // required for cross-tab token sync
             },
             services: {
