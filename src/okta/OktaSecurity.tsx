@@ -40,16 +40,6 @@ export const resetSessionCheckCache = (): void => {
   lastSessionConfirmedAt = 0;
 };
 
-/**
- * Extra auth check layered on top of Okta's default (unexpired tokens exist).
- *
- * Why: tokens sitting in localStorage don't guarantee the user still has a
- * live Okta SSO session (it may have been revoked or timed out server-side).
- * Okta calls this hook every time it recalculates auth state; we confirm the
- * server-side session before treating the user as authenticated — but only
- * once per SESSION_CHECK_TTL_MS, and with one retry, so transient network
- * failures can't end a valid session.
- */
 export const transformAuthState = async (oktaAuth, authState) => {
   // verifies unexpired tokens are available from the tokenManager (default behavior)
   if (localStorage.getItem("madieDebug") || (window as any).madieDebug) {
@@ -64,7 +54,6 @@ export const transformAuthState = async (oktaAuth, authState) => {
   if (!authState.isAuthenticated) {
     return authState;
   }
-  // extra requirement: user must have valid Okta session.
   const now = Date.now();
   if (now - lastSessionConfirmedAt < SESSION_CHECK_TTL_MS) {
     return authState;
