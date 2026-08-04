@@ -64,6 +64,28 @@ describe("OktaSecurity", () => {
     });
   });
 
+  it("stores the requested URL before sending an unauthenticated user to login", async () => {
+    (madieUtil.getOktaConfig as jest.Mock).mockResolvedValue({
+      issuer: "https://example.com/oauth2/default",
+      clientId: "clientId",
+      redirectUri: "http://localhost:3000/login/callback",
+      scopes: ["openid", "profile", "email"],
+    });
+
+    window.history.replaceState({}, "", "/measures/123?version=2");
+    render(<OktaSecurity />);
+    await waitFor(() =>
+      expect(screen.getByTestId("security")).toBeInTheDocument()
+    );
+
+    const securityProps = (Security as jest.Mock).mock.calls[0][0];
+    securityProps.onAuthRequired();
+
+    expect(sessionStorage.getItem(MADIE_TIMEOUT_RETURN_URL)).toBe(
+      "/measures/123?version=2"
+    );
+  });
+
   it("prioritizes timeout return URL over originalUri and clears it after use", async () => {
     (madieUtil.getOktaConfig as jest.Mock).mockResolvedValue({
       issuer: "https://example.com/oauth2/default",
