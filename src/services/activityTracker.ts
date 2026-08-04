@@ -164,8 +164,14 @@ function startTracking(): void {
 }
 
 /**
- * Removes all DOM event listeners for user activity tracking and
- * clears stored activity state from localStorage.
+ * Removes all DOM event listeners for user activity tracking.
+ *
+ * NOTE: this deliberately does NOT remove `MADiE_LAST_ACTIVITY` (or the
+ * timeout override) from localStorage. The activity timestamp is shared by
+ * every open MADiE tab — one tab tearing down its tracker (logout, unmount)
+ * must not wipe the idle state other tabs are still relying on, and the
+ * timestamp must survive closing all tabs. On the next login,
+ * `startTracking()` force-records a fresh timestamp anyway.
  */
 function stopTracking(): void {
   if (!listenersAttached) {
@@ -176,13 +182,6 @@ function stopTracking(): void {
   });
   listenersAttached = false;
   lastRecordedTime = 0;
-
-  try {
-    localStorage.removeItem(MADiE_LAST_ACTIVITY);
-    localStorage.removeItem(MADiE_IDLE_TIMEOUT_OVERRIDE);
-  } catch (e) {
-    console.warn("[ActivityTracker] Unable to clear localStorage on stop", e);
-  }
 }
 
 /*

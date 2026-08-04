@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useEffect, useState } from "react";
+import React, { useLayoutEffect, useEffect, useMemo, useState } from "react";
 import {
   Route,
   Navigate,
@@ -18,6 +18,16 @@ import TimeoutWarningDialog from "../components/timeoutWarningDialog/TimeoutWarn
 import LayoutWrapper from "./LayoutWrapper";
 import { ApiContextProvider, getServiceConfig } from "@madie/madie-util";
 import { InactivityLogout } from "../custom-hooks/useInactivityLogout";
+
+/**
+ * Redirects to the login page once auth is definitively lost. Rendered inside
+ * the (memoized) route tree and reads auth state itself, so redirecting stays
+ * reactive without re-creating the router object on every auth-state change.
+ */
+const AuthRedirect = (): React.ReactElement | null => {
+  const { authState } = useOktaAuth();
+  return authState?.isAuthenticated === false ? <Navigate to="login" /> : null;
+};
 
 function Router({ props }) {
   const { authState } = useOktaAuth();
@@ -47,30 +57,38 @@ function Router({ props }) {
     };
   }, []);
 
-  const BrowserRouter = createBrowserRouter(
-    createRoutesFromElements(
-      <Route
-        path=""
-        element={
-          <LayoutWrapper>
-            <Outlet />
-            {authenticated === false && <Navigate to="login" />}
-          </LayoutWrapper>
-        }
-      >
-        <Route path="/" element={<Navigate to="/measures" />} />
-        <Route path="login/callback" element={LoginCallback} />
-        <Route path="measures/*" element={<MadieMeasure />} />
-        <Route path="cql-libraries/*" element={<MadieCqlLibrary />} />
-        <Route path="admin/*" element={<MadieAdmin />} />
-        <Route
-          path="login"
-          element={<Login config={props.oktaSignInConfig} />}
-        />
-        <Route path="404" element={<NotFound />} />
-        <Route path="*" element={<NotFound />} />
-      </Route>
-    )
+  // Memoized: re-creating the router object on every render (each auth-state
+  // update, token renewal, or cross-tab storage sync re-renders this
+  // component) remounts the entire route tree — tearing down and re-mounting
+  // every micro-frontend mid-use.
+  const BrowserRouter = useMemo(
+    () =>
+      createBrowserRouter(
+        createRoutesFromElements(
+          <Route
+            path=""
+            element={
+              <LayoutWrapper>
+                <Outlet />
+                <AuthRedirect />
+              </LayoutWrapper>
+            }
+          >
+            <Route path="/" element={<Navigate to="/measures" />} />
+            <Route path="login/callback" element={LoginCallback} />
+            <Route path="measures/*" element={<MadieMeasure />} />
+            <Route path="cql-libraries/*" element={<MadieCqlLibrary />} />
+            <Route path="admin/*" element={<MadieAdmin />} />
+            <Route
+              path="login"
+              element={<Login config={props.oktaSignInConfig} />}
+            />
+            <Route path="404" element={<NotFound />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        )
+      ),
+    [props.oktaSignInConfig]
   );
 
   if (error) {
