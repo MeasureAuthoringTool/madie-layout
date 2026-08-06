@@ -1,7 +1,7 @@
 import React from "react";
 import { IconButton } from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
-import SwapVertOutlinedIcon from "@mui/icons-material/SwapVertOutlined";
+import { ArrowRightLeft } from "lucide-react";
 
 import _ from "lodash";
 
@@ -35,7 +35,7 @@ export default function TransferAction(props: PropTypes) {
           disabled={!canTransfer}
           data-testid="transfer-action-btn"
         >
-          <SwapVertOutlinedIcon style={{ transform: "rotate(90deg)" }} />
+          <ArrowRightLeft size={20} />
         </IconButton>
       </span>
     </Tooltip>

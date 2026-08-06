@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { SpeedDial, SpeedDialAction, IconButton } from "@mui/material";
-import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
-import EditCalendarOutlinedIcon from "@mui/icons-material/EditCalendarOutlined";
-import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
-import HistoryIcon from "@mui/icons-material/History";
 import { MadieDiscardDialog } from "@madie/madie-design-system/dist/react";
 import { Measure } from "@madie/madie-models";
 import {
@@ -13,11 +9,11 @@ import {
   useUserRoles,
   useFeatureFlags,
 } from "@madie/madie-util";
-import FeedOutlinedIcon from "@mui/icons-material/FeedOutlined";
 import ShareAction, { SharedOptions } from "../shareAction/ShareAction";
 import ExportAction from "../exportAction/ExportAction";
 import TransferAction from "../transferAction/TransferAction";
 import ReviewIcon from "../../../icons/ReviewIcon";
+import { ClipboardPen, FileText, History, Network, Trash2 } from "lucide-react";
 
 interface PropTypes {
   canEdit: boolean;
@@ -115,7 +111,7 @@ const MeasureActionCenter = (props: PropTypes) => {
     actions.set("human readable", {
       icon: (
         <IconButton>
-          <FeedOutlinedIcon />
+          <FileText size={20} />
         </IconButton>
       ),
       name: routeHandlerState?.canTravel
@@ -127,7 +123,7 @@ const MeasureActionCenter = (props: PropTypes) => {
     actions.set("history", {
       icon: (
         <IconButton>
-          <HistoryIcon />
+          <History size={20} />
         </IconButton>
       ),
       name: "View History",
@@ -156,7 +152,7 @@ const MeasureActionCenter = (props: PropTypes) => {
         actions.set("draft measure", {
           icon: (
             <IconButton>
-              <EditCalendarOutlinedIcon />
+              <ClipboardPen size={20} />
             </IconButton>
           ),
           name: "Draft Measure",
@@ -168,7 +164,7 @@ const MeasureActionCenter = (props: PropTypes) => {
           actions.set("version measure", {
             icon: (
               <IconButton disabled data-testid="versionDisabled">
-                <AccountTreeOutlinedIcon />
+                <Network size={20} style={{ transform: "rotate(270deg)" }} />
               </IconButton>
             ),
             name: measureLockedBy,
@@ -177,7 +173,7 @@ const MeasureActionCenter = (props: PropTypes) => {
           actions.set("version measure", {
             icon: (
               <IconButton>
-                <AccountTreeOutlinedIcon />
+                <Network size={20} style={{ transform: "rotate(270deg)" }} />
               </IconButton>
             ),
             name: "Version Measure",
@@ -194,7 +190,7 @@ const MeasureActionCenter = (props: PropTypes) => {
                   disabled
                   data-testid="deleteDisabled"
                 >
-                  <DeleteOutlinedIcon />
+                  <Trash2 size={20} />
                 </IconButton>
               ),
               name: measureLockedBy,
@@ -203,7 +199,7 @@ const MeasureActionCenter = (props: PropTypes) => {
             actions.set("delete measure", {
               icon: (
                 <IconButton className="DeleteClass">
-                  <DeleteOutlinedIcon />
+                  <Trash2 size={20} />
                 </IconButton>
               ),
               name: "Delete Measure",
@@ -285,20 +281,42 @@ const MeasureActionCenter = (props: PropTypes) => {
       });
     }
 
-    // required order to display
-    const actionsListOrder = [
-      "review measure",
-      "transfer measure",
-      "human readable",
-      "history",
-      "draft measure",
-      "version measure",
-      "share/unshare measure",
-      "unshare measure from me",
-      "export measure",
-      "delete measure",
-    ];
-    return actionsListOrder.map((key) => actions.get(key)).filter(Boolean);
+    const groupedActions: any[] = [];
+
+    const appendGroup = (group: any[]) => {
+      const visibleGroup = group.filter(Boolean);
+      if (!visibleGroup.length) {
+        return;
+      }
+
+      if (groupedActions.length) {
+        groupedActions.push({
+          isSeparator: true,
+          key: `separator-${groupedActions.length}`,
+          testId: `action-separator-${groupedActions.length}`,
+        });
+      }
+
+      groupedActions.push(...visibleGroup);
+    };
+
+    // Rendered left-to-right (farthest to nearest):
+    // Delete, Export, Share/Unshare, Transfer | Version/Draft | View HR, History | Review
+    appendGroup([
+      actions.get("delete measure"),
+      actions.get("export measure"),
+      actions.get("share/unshare measure") ||
+        actions.get("unshare measure from me"),
+      actions.get("transfer measure"),
+    ]);
+
+    appendGroup([actions.get("version measure"), actions.get("draft measure")]);
+
+    appendGroup([actions.get("human readable"), actions.get("history")]);
+
+    appendGroup([actions.get("review measure")]);
+
+    return groupedActions.reverse();
   };
 
   return (
@@ -346,39 +364,58 @@ const MeasureActionCenter = (props: PropTypes) => {
         open={open}
         onClick={() => setOpen((prevOpen) => !prevOpen)}
       >
-        {actions.map((action) => (
-          <SpeedDialAction
-            key={action.name}
-            icon={action.icon}
-            tooltipTitle={action.name}
-            arrow
-            slotProps={{
-              tooltip: {
-                sx: {
-                  zIndex: 99,
-                  backgroundColor: "#333",
-                  "& .MuiTooltip-arrow": {
-                    color: "#333",
+        {actions.map((action) =>
+          action.isSeparator ? (
+            open ? (
+              <div
+                key={action.key}
+                data-testid={action.testId}
+                aria-hidden="true"
+                style={{
+                  color: "#8C8C8C",
+                  display: "flex",
+                  alignItems: "center",
+                  margin: "0 6px",
+                  fontSize: 18,
+                }}
+              >
+                |
+              </div>
+            ) : null
+          ) : (
+            <SpeedDialAction
+              key={action.name}
+              icon={action.icon}
+              tooltipTitle={action.name}
+              arrow
+              slotProps={{
+                tooltip: {
+                  sx: {
+                    zIndex: 99,
+                    backgroundColor: "#333",
+                    "& .MuiTooltip-arrow": {
+                      color: "#333",
+                    },
                   },
                 },
-              },
-            }}
-            data-testid={action.name.replace(/\s/g, "")}
-            onClick={() => {
-              setOpen(false);
-              if (action.onClick) {
-                action.onClick();
-              }
-            }}
-            sx={{
-              boxShadow: "none",
-              transition: "opacity 0s, visibility 0s",
-              margin: 0,
-              marginRight: 1,
-              transitionDelay: "0s",
-            }}
-          />
-        ))}
+              }}
+              data-testid={action.name.replace(/\s/g, "")}
+              onClick={() => {
+                setOpen(false);
+                if (action.onClick) {
+                  action.onClick();
+                }
+              }}
+              sx={{
+                boxShadow: "none",
+                transition: "opacity 0s, visibility 0s",
+                margin: 0,
+                marginRight: 1,
+                transitionDelay: "0s",
+              }}
+            />
+          )
+        )}
       </SpeedDial>
       <MadieDiscardDialog
         open={discardDialogOpen}

@@ -634,7 +634,7 @@ describe("MeasureActionCenter Component", () => {
     expect(screen.getByTestId("ViewHistory")).toBeInTheDocument();
   });
 
-  it("renders disabled Delete button when locked", () => {
+  it("renders disabled Delete button when locked", async () => {
     render(
       <MeasureActionCenter
         canEdit={true}
@@ -643,15 +643,15 @@ describe("MeasureActionCenter Component", () => {
         measureLockedBy="user1"
       />
     );
-    userEvent.click(screen.getByLabelText("Measure action center"));
+    await userEvent.click(screen.getByLabelText("Measure action center"));
 
-    const disabledDeleteBtn = screen.getByTestId("deleteDisabled");
+    const disabledDeleteBtn = await screen.findByTestId("deleteDisabled");
     expect(disabledDeleteBtn).toBeDefined(); // Ensure a disabled button is found
     expect(disabledDeleteBtn).toBeDisabled();
 
-    const disabledVersionBtn = screen.getByTestId("versionDisabled");
-    expect(disabledVersionBtn).toBeDefined(); // Ensure a disabled button is found
-    expect(disabledVersionBtn).toBeDisabled();
+    const disabledVersionBtns = await screen.findAllByTestId("versionDisabled");
+    expect(disabledVersionBtns.length).toBeGreaterThan(0);
+    disabledVersionBtns.forEach((btn) => expect(btn).toBeDisabled());
   });
 
   describe("Admin user transfer measure", () => {
