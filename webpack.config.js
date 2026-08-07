@@ -1,5 +1,6 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
+const webpack = require("webpack");
 const { mergeWithRules } = require("webpack-merge");
 const singleSpaDefaults = require("webpack-config-single-spa-react-ts");
 const path = require("path");
@@ -102,6 +103,16 @@ module.exports = (webpackConfigEnv, argv) => {
           __dirname,
           "node_modules/@madie/madie-root/dist/index.html"
         ),
+      }),
+      // react-draggable (used by the design system's MadieDialog) contains
+      // `if (process.env.DRAGGABLE_DEBUG) ...` which runs on every mousedown
+      // inside a dialog. Webpack 5 does not shim the Node `process` global in
+      // browser bundles and only replaces `process.env.NODE_ENV`, Defining
+      // the flag makes webpack substitute `false` at build time, so `process`
+      // is never evaluated in the browser (and the dead branch is stripped in
+      // production builds).
+      new webpack.DefinePlugin({
+        "process.env.DRAGGABLE_DEBUG": JSON.stringify(false),
       }),
     ],
   };
