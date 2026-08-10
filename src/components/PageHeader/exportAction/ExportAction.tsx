@@ -8,7 +8,7 @@ import {
   Paper,
   Popper,
 } from "@mui/material";
-import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
+import { Upload } from "lucide-react";
 
 interface PropTypes {
   onClick: (exportType: string) => void;
@@ -48,7 +48,7 @@ export default function ExportAction(props: PropTypes) {
         style={{ height: "40px" }}
       >
         <span>
-          <FileUploadOutlinedIcon />
+          <Upload size={20} />
         </span>
       </IconButton>
       <Popper
