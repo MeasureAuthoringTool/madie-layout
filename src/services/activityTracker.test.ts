@@ -377,38 +377,27 @@ describe("activityTracker", () => {
       expect(() => activityTracker.stopTracking()).not.toThrow();
     });
 
-    it("should remove the last activity key from localStorage", () => {
+    it("should preserve the last activity key in localStorage (shared across tabs)", () => {
       activityTracker.startTracking();
       // Verify activity was recorded
-      expect(localStorage.getItem(MADiE_LAST_ACTIVITY)).not.toBeNull();
+      const recorded = localStorage.getItem(MADiE_LAST_ACTIVITY);
+      expect(recorded).not.toBeNull();
 
       activityTracker.stopTracking();
 
-      expect(localStorage.getItem(MADiE_LAST_ACTIVITY)).toBeNull();
+      // The timestamp is shared by all open tabs and must survive one tab
+      // tearing down its tracker (and closing all tabs).
+      expect(localStorage.getItem(MADiE_LAST_ACTIVITY)).toEqual(recorded);
     });
 
-    it("should remove the idle timeout override key from localStorage", () => {
+    it("should preserve the idle timeout override key in localStorage", () => {
       localStorage.setItem(MADiE_IDLE_TIMEOUT_OVERRIDE, "300000");
       activityTracker.startTracking();
 
       activityTracker.stopTracking();
 
-      expect(localStorage.getItem(MADiE_IDLE_TIMEOUT_OVERRIDE)).toBeNull();
-    });
-
-    it("should handle localStorage errors gracefully when clearing", () => {
-      activityTracker.startTracking();
-
-      const error = new Error("SecurityError");
-      jest.spyOn(Storage.prototype, "removeItem").mockImplementation(() => {
-        throw error;
-      });
-      const warnSpy = jest.spyOn(console, "warn").mockImplementation();
-
-      expect(() => activityTracker.stopTracking()).not.toThrow();
-      expect(warnSpy).toHaveBeenCalledWith(
-        "[ActivityTracker] Unable to clear localStorage on stop",
-        error
+      expect(localStorage.getItem(MADiE_IDLE_TIMEOUT_OVERRIDE)).toEqual(
+        "300000"
       );
     });
 

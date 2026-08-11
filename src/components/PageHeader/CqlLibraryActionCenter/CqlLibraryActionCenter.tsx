@@ -6,10 +6,6 @@ import {
   MenuItem,
   IconButton,
 } from "@mui/material";
-import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
-import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
-import EditCalendarOutlinedIcon from "@mui/icons-material/EditCalendarOutlined";
-import HistoryIcon from "@mui/icons-material/History";
 import { MadieDiscardDialog } from "@madie/madie-design-system/dist/react";
 import { CqlLibrary } from "@madie/madie-models";
 import {
@@ -21,8 +17,14 @@ import {
   useFeatureFlags,
 } from "@madie/madie-util";
 import ShareIcon from "../shareAction/ShareIcon";
-import SwapVertOutlinedIcon from "@mui/icons-material/SwapVertOutlined";
 import ReviewIcon from "../../../icons/ReviewIcon";
+import {
+  ArrowRightLeft,
+  ClipboardPen,
+  History,
+  Network,
+  Trash2,
+} from "lucide-react";
 
 interface PropTypes {
   canEdit: boolean;
@@ -128,7 +130,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
     actions.set("history library", {
       icon: (
         <IconButton>
-          <HistoryIcon />
+          <History size={20} />
         </IconButton>
       ),
       name: "History",
@@ -146,7 +148,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
                   disabled
                   data-testid="deleteDisabled"
                 >
-                  <DeleteOutlinedIcon />
+                  <Trash2 size={20} />
                 </IconButton>
               ),
               name: props.libraryLockedBy,
@@ -155,7 +157,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
             actions.set("delete library", {
               icon: (
                 <IconButton className="DeleteClass">
-                  <DeleteOutlinedIcon />
+                  <Trash2 size={20} />
                 </IconButton>
               ),
               name: "Delete Library",
@@ -167,7 +169,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
           actions.set("version library", {
             icon: (
               <IconButton disabled data-testid="versionDisabled">
-                <AccountTreeOutlinedIcon />
+                <Network size={20} style={{ transform: "rotate(270deg)" }} />
               </IconButton>
             ),
             name: props.libraryLockedBy,
@@ -176,7 +178,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
           actions.set("version library", {
             icon: (
               <IconButton>
-                <AccountTreeOutlinedIcon />
+                <Network size={20} style={{ transform: "rotate(270deg)" }} />
               </IconButton>
             ),
             name: "Version Library",
@@ -188,7 +190,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
         actions.set("draft library", {
           icon: (
             <IconButton>
-              <EditCalendarOutlinedIcon />
+              <ClipboardPen size={20} />
             </IconButton>
           ),
           name: "Draft Library",
@@ -200,7 +202,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
       actions.set("transfer library", {
         icon: (
           <IconButton>
-            <SwapVertOutlinedIcon style={{ transform: "rotate(90deg)" }} />
+            <ArrowRightLeft size={20} />
           </IconButton>
         ),
         name: TRANSFER_LIBRARY,
@@ -250,18 +252,40 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
       });
     }
 
-    // required order to display
-    const actionsListOrder = [
-      "review library",
-      "transfer library",
-      "history library",
-      "draft library",
-      "version library",
-      "share library",
-      "unshare library from me",
-      "delete library",
-    ];
-    return actionsListOrder.map((key) => actions.get(key)).filter(Boolean);
+    const groupedActions: any[] = [];
+
+    const appendGroup = (group: any[]) => {
+      const visibleGroup = group.filter(Boolean);
+      if (!visibleGroup.length) {
+        return;
+      }
+
+      if (groupedActions.length) {
+        groupedActions.push({
+          isSeparator: true,
+          key: `separator-${groupedActions.length}`,
+          testId: `action-separator-${groupedActions.length}`,
+        });
+      }
+
+      groupedActions.push(...visibleGroup);
+    };
+
+    // Rendered left-to-right (farthest to nearest):
+    // Delete, Share/Unshare, Transfer | Version/Draft | History | Review
+    appendGroup([
+      actions.get("delete library"),
+      actions.get("share library") || actions.get("unshare library from me"),
+      actions.get("transfer library"),
+    ]);
+
+    appendGroup([actions.get("version library"), actions.get("draft library")]);
+
+    appendGroup([actions.get("history library")]);
+
+    appendGroup([actions.get("review library")]);
+
+    return groupedActions.reverse();
   };
 
   return (
@@ -309,37 +333,56 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
         open={open}
         onClick={() => setOpen((prevOpen) => !prevOpen)}
       >
-        {actions.map((action) => (
-          <SpeedDialAction
-            key={action.name}
-            icon={action.icon}
-            tooltipTitle={action.name}
-            data-testid={action.name.replace(/\s/g, "")}
-            onClick={(event: React.MouseEvent<HTMLElement>) => {
-              setOpen(false);
-              action.onClick(event);
-            }}
-            sx={{
-              boxShadow: "none",
-              transition: "opacity 0s, visibility 0s",
-              margin: 0,
-              marginRight: 1,
-              transitionDelay: "0s",
-            }}
-            arrow
-            slotProps={{
-              tooltip: {
-                sx: {
-                  zIndex: 99,
-                  backgroundColor: "#333",
-                  "& .MuiTooltip-arrow": {
-                    color: "#333",
+        {actions.map((action) =>
+          action.isSeparator ? (
+            open ? (
+              <div
+                key={action.key}
+                data-testid={action.testId}
+                aria-hidden="true"
+                style={{
+                  color: "#8C8C8C",
+                  display: "flex",
+                  alignItems: "center",
+                  margin: "0 6px",
+                  fontSize: 18,
+                }}
+              >
+                |
+              </div>
+            ) : null
+          ) : (
+            <SpeedDialAction
+              key={action.name}
+              icon={action.icon}
+              tooltipTitle={action.name}
+              data-testid={action.name.replace(/\s/g, "")}
+              onClick={(event: React.MouseEvent<HTMLElement>) => {
+                setOpen(false);
+                action.onClick(event);
+              }}
+              sx={{
+                boxShadow: "none",
+                transition: "opacity 0s, visibility 0s",
+                margin: 0,
+                marginRight: 1,
+                transitionDelay: "0s",
+              }}
+              arrow
+              slotProps={{
+                tooltip: {
+                  sx: {
+                    zIndex: 99,
+                    backgroundColor: "#333",
+                    "& .MuiTooltip-arrow": {
+                      color: "#333",
+                    },
                   },
                 },
-              },
-            }}
-          />
-        ))}
+              }}
+            />
+          )
+        )}
       </SpeedDial>
       <MadieDiscardDialog
         open={discardDialogOpen}
