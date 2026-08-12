@@ -24,6 +24,7 @@ interface PropTypes {
   measure: Measure;
   canDelete: boolean;
   measureLockedBy?: string;
+  reviewStatus?: string | null;
 }
 
 const isOwnerOfMeasure = (measure) => {
@@ -63,7 +64,8 @@ const MeasureActionCenter = (props: PropTypes) => {
         props.measure,
         props.canEdit,
         props.canDelete,
-        props.measureLockedBy
+        props.measureLockedBy,
+        props.reviewStatus
       )
     );
   }, [props, routeHandlerState, userRoles]);
@@ -101,11 +103,12 @@ const MeasureActionCenter = (props: PropTypes) => {
     measure: Measure,
     canEdit: boolean,
     canDelete: boolean,
-    measureLockedBy: string | undefined
+    measureLockedBy: string | undefined,
+    reviewStatus?: string | null
   ): any[] => {
     const ownerOfMeasure = isOwnerOfMeasure(measure);
     const sharedWithUser = isSharedWithUser(measure);
-    const canReviewMeasure = checkUserCanEdit(
+    const hasEditAccessToMeasure = checkUserCanEdit(
       measure?.measureSet?.owner,
       measure?.measureSet?.acls
     );
@@ -273,15 +276,27 @@ const MeasureActionCenter = (props: PropTypes) => {
       });
     }
 
-    if (canReviewMeasure && featureFlags?.MeasureReviewStatus) {
+    const isReviewer = !!userRoles?.isReviewer;
+    if (
+      featureFlags?.MeasureReviewStatus &&
+      (hasEditAccessToMeasure || isReviewer)
+    ) {
+      const reviewEnabled =
+        hasEditAccessToMeasure || (isReviewer && !!reviewStatus);
       actions.set("review measure", {
-        icon: (
+        icon: reviewEnabled ? (
           <IconButton>
+            <ReviewIcon />
+          </IconButton>
+        ) : (
+          <IconButton disabled data-testid="reviewDisabled">
             <ReviewIcon />
           </IconButton>
         ),
         name: "Review",
-        onClick: () => handleActionClick(new Event("review-measure")),
+        ...(reviewEnabled && {
+          onClick: () => handleActionClick(new Event("review-measure")),
+        }),
       });
     }
 
