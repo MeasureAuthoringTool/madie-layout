@@ -493,7 +493,7 @@ describe("CqlLibraryActionCenter Component", () => {
     expect(screen.queryByTestId("Share With-option")).not.toBeInTheDocument();
   });
 
-  it("renders disabled Delete and Version button when locked", () => {
+  it("renders disabled Delete and Version button when locked", async () => {
     render(
       <CqlLibraryActionCenter
         canEdit={true}
@@ -503,15 +503,15 @@ describe("CqlLibraryActionCenter Component", () => {
       />
     );
     const actionCenterButton = screen.getByLabelText("Library action center");
-    userEvent.click(actionCenterButton);
+    await userEvent.click(actionCenterButton);
 
-    const disabledDeleteBtn = screen.getByTestId("deleteDisabled");
+    const disabledDeleteBtn = await screen.findByTestId("deleteDisabled");
     expect(disabledDeleteBtn).toBeDefined(); // Ensure a disabled button is found
     expect(disabledDeleteBtn).toBeDisabled();
 
-    const disabledVersionBtn = screen.getByTestId("versionDisabled");
-    expect(disabledVersionBtn).toBeDefined(); // Ensure a disabled button is found
-    expect(disabledVersionBtn).toBeDisabled();
+    const disabledVersionBtns = await screen.findAllByTestId("versionDisabled");
+    expect(disabledVersionBtns.length).toBeGreaterThan(0);
+    disabledVersionBtns.forEach((btn) => expect(btn).toBeDisabled());
   });
 
   it("dispatches 'share-library' event when 'Share With' menu item is clicked", async () => {
