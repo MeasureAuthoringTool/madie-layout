@@ -75,12 +75,8 @@
   "dependencies": {
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
-    "@madie/madie-admin": "^0.0.1",
-    "@madie/madie-auth": "^0.0.2",
     "@madie/madie-design-system": "^1.2.92",
-    "@madie/madie-layout": "file:",
     "@madie/madie-models": "^1.4.71",
-    "@madie/madie-root": "^0.0.2",
     "@mui/icons-material": "^5.16.7",
     "@mui/lab": "^5.0.0-alpha.82",
     "@mui/material": "^5.6.2",
