@@ -1,4 +1,3 @@
-const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const webpack = require("webpack");
 const { mergeWithRules } = require("webpack-merge");
@@ -20,7 +19,6 @@ module.exports = (webpackConfigEnv, argv) => {
   const externalsConfig = {
     externals: [
       "@madie/madie-auth",
-      "@madie/madie-root",
       "@madie/madie-cql-library",
       "@madie/madie-measure",
       "@madie/madie-admin",
@@ -75,35 +73,7 @@ module.exports = (webpackConfigEnv, argv) => {
         },
       ],
     },
-    devServer: {
-      static: [
-        {
-          directory: path.join(__dirname, "local-dev-env"),
-          publicPath: "/importmap",
-        },
-        {
-          directory: path.join(
-            __dirname,
-            "node_modules/@madie/madie-root/dist/"
-          ),
-          publicPath: "/",
-        },
-        {
-          directory: path.join(
-            __dirname,
-            "node_modules/@madie/madie-auth/dist/"
-          ),
-          publicPath: "/madie-auth",
-        },
-      ],
-    },
     plugins: [
-      new HtmlWebpackPlugin({
-        template: path.join(
-          __dirname,
-          "node_modules/@madie/madie-root/dist/index.html"
-        ),
-      }),
       // react-draggable (used by the design system's MadieDialog) contains
       // `if (process.env.DRAGGABLE_DEBUG) ...` which runs on every mousedown
       // inside a dialog. Webpack 5 does not shim the Node `process` global in
