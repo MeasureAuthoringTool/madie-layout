@@ -67,7 +67,9 @@ jest.mock("@madie/madie-util", () => ({
       baseUrl: "test-cql-library-service-url",
     },
   }),
-  useUserRoles: jest.fn().mockReturnValue({ isAdmin: false, roles: [] }),
+  useUserRoles: jest
+    .fn()
+    .mockReturnValue({ isAdmin: false, roles: [], isReviewer: false }),
   checkUserCanEdit: jest
     .fn()
     .mockImplementationOnce(() => false)
@@ -78,7 +80,11 @@ describe("CqlLibraryActionCenter Component", () => {
   beforeEach(() => {
     jest.resetAllMocks();
     routeHandlerStore.state = { canTravel: true, pendingPath: "" };
-    (useUserRoles as jest.Mock).mockReturnValue({ isAdmin: false, roles: [] });
+    (useUserRoles as jest.Mock).mockReturnValue({
+      isAdmin: false,
+      roles: [],
+      isReviewer: false,
+    });
     (useFeatureFlags as jest.Mock).mockReturnValue({
       LibraryReviewStatus: true,
     });
@@ -148,7 +154,7 @@ describe("CqlLibraryActionCenter Component", () => {
     expect(screen.queryByTestId("DeleteLibrary")).not.toBeInTheDocument();
     expect(screen.queryByTestId("VersionLibrary")).not.toBeInTheDocument();
     expect(screen.queryByTestId("Transfer")).toBeInTheDocument();
-    expect(screen.queryByTestId("ReviewLibrary")).toBeInTheDocument();
+    expect(screen.queryByTestId("Review")).toBeInTheDocument();
   });
 
   it("should trigger review-library event when 'Review Library' action is clicked", async () => {
@@ -168,7 +174,7 @@ describe("CqlLibraryActionCenter Component", () => {
       userEvent.click(actionCenterButton);
     });
 
-    const reviewLibraryButton = screen.getByTestId("ReviewLibrary");
+    const reviewLibraryButton = screen.getByTestId("Review");
     await act(async () => {
       userEvent.click(reviewLibraryButton);
     });
@@ -633,6 +639,86 @@ describe("CqlLibraryActionCenter Component", () => {
     expect(dispatchEventSpy).toHaveBeenCalledWith(
       expect.objectContaining({ type: "unshare-library-from-me" })
     );
+  });
+
+  it("should render an enabled Review action for a reviewer without edit access when a review status is set", () => {
+    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+    (checkUserCanEdit as jest.Mock).mockReturnValue(false);
+    (useUserRoles as jest.Mock).mockReturnValue({
+      roles: ["MADiE-Reviewer"],
+      isAdmin: false,
+      isReviewer: true,
+    });
+
+    render(
+      <CqlLibraryActionCenter
+        canEdit={false}
+        library={cqlLibrary}
+        canDelete={false}
+        reviewStatus="IN_PROGRESS"
+      />
+    );
+
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    userEvent.click(actionCenterButton);
+
+    expect(screen.getByTestId("Review")).toBeInTheDocument();
+    expect(screen.queryByTestId("reviewDisabled")).not.toBeInTheDocument();
+
+    userEvent.click(screen.getByTestId("Review"));
+    expect(dispatchEventSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "review-library",
+      })
+    );
+  });
+
+  it("should render a disabled Review action for a reviewer without edit access when no review status is set", () => {
+    const dispatchEventSpy = jest.spyOn(window, "dispatchEvent");
+    (checkUserCanEdit as jest.Mock).mockReturnValue(false);
+    (useUserRoles as jest.Mock).mockReturnValue({
+      roles: ["MADiE-Reviewer"],
+      isAdmin: false,
+      isReviewer: true,
+    });
+
+    render(
+      <CqlLibraryActionCenter
+        canEdit={false}
+        library={cqlLibrary}
+        canDelete={false}
+      />
+    );
+
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    userEvent.click(actionCenterButton);
+
+    expect(screen.getByTestId("Review")).toBeInTheDocument();
+    expect(screen.getByTestId("reviewDisabled")).toBeDisabled();
+
+    userEvent.click(screen.getByTestId("Review"));
+    expect(dispatchEventSpy).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "review-library",
+      })
+    );
+  });
+
+  it("should render an enabled Review action for a user with edit access even when no review status is set", () => {
+    (checkUserCanEdit as jest.Mock).mockReturnValue(true);
+    render(
+      <CqlLibraryActionCenter
+        canEdit={true}
+        library={cqlLibrary}
+        canDelete={false}
+      />
+    );
+
+    const actionCenterButton = screen.getByLabelText("Library action center");
+    userEvent.click(actionCenterButton);
+
+    expect(screen.getByTestId("Review")).toBeInTheDocument();
+    expect(screen.queryByTestId("reviewDisabled")).not.toBeInTheDocument();
   });
 });
 

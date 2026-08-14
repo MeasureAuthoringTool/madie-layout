@@ -69,6 +69,7 @@ declare module "@madie/madie-util" {
   export interface UserRoles {
     roles: string[];
     isAdmin: boolean;
+    isReviewer: boolean;
   }
 
   export const cqlLibraryStore: {
