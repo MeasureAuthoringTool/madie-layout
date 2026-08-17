@@ -272,9 +272,6 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
             ? handleActionClick(new Event("review-library"))
             : undefined;
         },
-        // ...(reviewEnabled && {
-        //   onClick: () => handleActionClick(new Event("review-library")),
-        // }),
       });
     }
 
