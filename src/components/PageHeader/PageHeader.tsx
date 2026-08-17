@@ -517,6 +517,7 @@ const PageHeader = () => {
                   library={libraryState}
                   canDelete={libraryCanDelete}
                   libraryLockedBy={libraryLockedBy}
+                  reviewStatus={libraryReview?.status}
                 />
               </div>
             </div>
