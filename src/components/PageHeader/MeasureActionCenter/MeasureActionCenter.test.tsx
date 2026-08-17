@@ -61,6 +61,11 @@ describe("MeasureActionCenter Component", () => {
     (useFeatureFlags as jest.Mock).mockReturnValue({
       MeasureReviewStatus: true,
     });
+    (useUserRoles as jest.Mock).mockReturnValue({
+      roles: [],
+      isAdmin: false,
+      isReviewer: false,
+    });
   });
 
   afterEach(() => {
@@ -184,6 +189,89 @@ describe("MeasureActionCenter Component", () => {
     userEvent.click(actionCenterButton);
 
     expect(screen.queryByTestId("Review")).not.toBeInTheDocument();
+  });
+
+  it("should render an enabled Review action for a reviewer without edit access when a review status is set", () => {
+    (checkUserCanEdit as jest.Mock)
+      .mockImplementationOnce(() => false)
+      .mockImplementationOnce(() => false)
+      .mockImplementationOnce(() => false);
+    (useUserRoles as jest.Mock).mockReturnValue({
+      roles: ["MADiE-Reviewer"],
+      isAdmin: false,
+      isReviewer: true,
+    });
+
+    render(
+      <MeasureActionCenter
+        canEdit={false}
+        measure={draftMeasure}
+        canDelete={false}
+        reviewStatus="IN_PROGRESS"
+      />
+    );
+
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+
+    expect(screen.getByTestId("Review")).toBeInTheDocument();
+    expect(screen.queryByTestId("reviewDisabled")).not.toBeInTheDocument();
+
+    userEvent.click(screen.getByTestId("Review"));
+    expect(dispatchEventSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "review-measure",
+      })
+    );
+  });
+
+  it("should render a disabled Review action for a reviewer without edit access when no review status is set", () => {
+    (checkUserCanEdit as jest.Mock)
+      .mockImplementationOnce(() => false)
+      .mockImplementationOnce(() => false)
+      .mockImplementationOnce(() => false);
+    (useUserRoles as jest.Mock).mockReturnValue({
+      roles: ["MADiE-Reviewer"],
+      isAdmin: false,
+      isReviewer: true,
+    });
+
+    render(
+      <MeasureActionCenter
+        canEdit={false}
+        measure={draftMeasure}
+        canDelete={false}
+      />
+    );
+
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+
+    expect(screen.getByTestId("Review")).toBeInTheDocument();
+    expect(screen.getByTestId("reviewDisabled")).toBeDisabled();
+
+    userEvent.click(screen.getByTestId("Review"));
+    expect(dispatchEventSpy).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "review-measure",
+      })
+    );
+  });
+
+  it("should render an enabled Review action for a user with edit access even when no review status is set", () => {
+    render(
+      <MeasureActionCenter
+        canEdit={true}
+        measure={draftMeasure}
+        canDelete={false}
+      />
+    );
+
+    const actionCenterButton = screen.getByLabelText("Measure action center");
+    userEvent.click(actionCenterButton);
+
+    expect(screen.getByTestId("Review")).toBeInTheDocument();
+    expect(screen.queryByTestId("reviewDisabled")).not.toBeInTheDocument();
   });
 
   it("should not render Review action when MeasureReviewStatus feature flag is disabled", () => {

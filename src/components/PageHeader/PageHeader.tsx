@@ -350,6 +350,7 @@ const PageHeader = () => {
                   measure={measureState}
                   canDelete={measureCanDelete}
                   measureLockedBy={measureLockedBy}
+                  reviewStatus={measureReview?.status}
                 />
               </div>
             </div>
