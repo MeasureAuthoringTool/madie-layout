@@ -31,6 +31,7 @@ interface PropTypes {
   library: CqlLibrary;
   canDelete: boolean;
   libraryLockedBy?: string | undefined;
+  reviewStatus?: string | null;
 }
 
 const TRANSFER_LIBRARY = "Transfer";
@@ -48,7 +49,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
   );
   const [shareAnchorEl, setShareAnchorEl] = useState<null | HTMLElement>(null);
   const shareMenuOpen = Boolean(shareAnchorEl);
-  const isAdmin = useUserRoles()?.isAdmin;
+  const userRoles = useUserRoles();
   const featureFlags = useFeatureFlags();
 
   useEffect(() => {
@@ -76,8 +77,15 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
   }, [props.library]);
 
   useEffect(() => {
-    setActions(getActionArray(props.library, props.canEdit, props.canDelete));
-  }, [props, routeHandlerState, owner, isAdmin, featureFlags]);
+    setActions(
+      getActionArray(
+        props.library,
+        props.canEdit,
+        props.canDelete,
+        props.reviewStatus
+      )
+    );
+  }, [props, routeHandlerState, owner, userRoles, featureFlags]);
 
   const onContinue = () => {
     // we need every formik instance to use useFormikResetOnEvent on init
@@ -117,12 +125,13 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
   const getActionArray = (
     library: CqlLibrary,
     canEdit: boolean,
-    canDelete: boolean
+    canDelete: boolean,
+    reviewStatus?: string | null
   ): any[] => {
     const actions = new Map<string, any>();
     const ownerOfLibrary = isOwnerOfLibrary(library);
     const sharedWithUser = isSharedWithUser(library);
-    const canReviewLibrary = checkUserCanEdit(
+    const hasEditAccessToLibrary = checkUserCanEdit(
       library?.librarySet?.owner,
       library?.librarySet?.acls
     );
@@ -198,7 +207,7 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
         });
       }
     }
-    if (isAdmin || isOwnerOfLibrary(library)) {
+    if (userRoles?.isAdmin || isOwnerOfLibrary(library)) {
       actions.set("transfer library", {
         icon: (
           <IconButton>
@@ -212,20 +221,20 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
       });
     }
 
-    if ((canEdit && ownerOfLibrary) || isAdmin) {
+    if ((canEdit && ownerOfLibrary) || userRoles?.isAdmin) {
       actions.set("share library", {
         icon: (
           <IconButton>
             <ShareIcon />
           </IconButton>
         ),
-        name: `${isAdmin ? "Share/Unshare" : "Share Library"}`,
+        name: `${userRoles?.isAdmin ? "Share/Unshare" : "Share Library"}`,
         onClick: (event: React.MouseEvent<HTMLElement>) => {
           setOpen(false);
           setShareAnchorEl(event.currentTarget);
         },
       });
-    } else if ((canEdit && sharedWithUser) || isAdmin) {
+    } else if ((canEdit && sharedWithUser) || userRoles?.isAdmin) {
       actions.set("unshare library from me", {
         icon: (
           <IconButton>
@@ -240,15 +249,29 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
       });
     }
 
-    if (canReviewLibrary && featureFlags?.LibraryReviewStatus) {
+    const isReviewer = !!userRoles?.isReviewer;
+    if (
+      featureFlags?.LibraryReviewStatus &&
+      (hasEditAccessToLibrary || isReviewer)
+    ) {
+      const reviewEnabled =
+        hasEditAccessToLibrary || (isReviewer && !!reviewStatus);
       actions.set("review library", {
-        icon: (
+        icon: reviewEnabled ? (
           <IconButton>
             <ReviewIcon />
           </IconButton>
+        ) : (
+          <IconButton disabled data-testid="reviewDisabled">
+            <ReviewIcon />
+          </IconButton>
         ),
-        name: "Review Library",
-        onClick: () => handleActionClick(new Event("review-library")),
+        name: "Review",
+        onClick: () => {
+          reviewEnabled
+            ? handleActionClick(new Event("review-library"))
+            : undefined;
+        },
       });
     }
 
