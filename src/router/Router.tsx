@@ -16,6 +16,7 @@ import NotFound from "../components/notfound/NotFound";
 import "../styles/LayoutStyles.scss";
 import TimeoutWarningDialog from "../components/timeoutWarningDialog/TimeoutWarningDialog";
 import LayoutWrapper from "./LayoutWrapper";
+import UserRolesLoader from "./UserRolesLoader";
 import { ApiContextProvider, getServiceConfig } from "@madie/madie-util";
 import { InactivityLogout } from "../custom-hooks/useInactivityLogout";
 import { setTimeoutReturnUrl } from "../services/timeoutReturnUrl";
@@ -142,6 +143,7 @@ function Router({ props }) {
             The hook also guards internally, so this gating is defense-in-depth. */}
         {authenticated && <InactivityLogout />}
         {authenticated && <TimeoutWarningDialog />}
+        {authenticated && <UserRolesLoader />}
         <RouterProvider router={BrowserRouter} key={firstLogin ? 1 : 2} />
       </ApiContextProvider>
     </div>
