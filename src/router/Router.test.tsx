@@ -53,6 +53,11 @@ jest.mock("./LayoutWrapper", () => ({
   default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
+jest.mock("./UserRolesLoader", () => ({
+  __esModule: true,
+  default: jest.fn(() => <div data-testid="user-roles-loader" />),
+}));
+
 describe("Router", () => {
   beforeEach(() => {
     localStorage.clear();
@@ -90,6 +95,36 @@ describe("Router", () => {
       expect(sessionStorage.getItem(MADIE_TIMEOUT_RETURN_URL)).toBe(
         "/admin/userProfile/ethan.kaplan%40icf.com"
       );
+    });
+  });
+
+  it("refreshes the user roles once authenticated", async () => {
+    (useOktaAuth as jest.Mock).mockReturnValue({
+      authState: { isAuthenticated: true },
+    });
+
+    window.history.replaceState({}, "", "/cql-libraries");
+
+    const { findByTestId } = render(
+      <Router props={{ oktaSignInConfig: {} }} />
+    );
+
+    expect(await findByTestId("user-roles-loader")).toBeInTheDocument();
+  });
+
+  it("does not refresh the user roles while unauthenticated", async () => {
+    (useOktaAuth as jest.Mock).mockReturnValue({
+      authState: { isAuthenticated: false },
+    });
+
+    window.history.replaceState({}, "", "/login");
+
+    const { queryByTestId } = render(
+      <Router props={{ oktaSignInConfig: {} }} />
+    );
+
+    await waitFor(() => {
+      expect(queryByTestId("user-roles-loader")).not.toBeInTheDocument();
     });
   });
 
