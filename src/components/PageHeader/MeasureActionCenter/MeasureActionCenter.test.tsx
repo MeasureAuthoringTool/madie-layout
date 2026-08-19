@@ -404,7 +404,10 @@ describe("MeasureActionCenter Component", () => {
 
     const event = dispatchEventSpy.mock.calls[0][0] as CustomEvent;
     expect(event).toBeInstanceOf(CustomEvent);
-    expect(event.detail).toEqual({ elmErrorSeverity: "Error" });
+    expect(event.detail).toEqual({
+      elmErrorSeverity: "Error",
+      bundleType: "publish",
+    });
     expect(event.type).toEqual("export-measure");
   });
 
@@ -429,7 +432,10 @@ describe("MeasureActionCenter Component", () => {
 
     const event = dispatchEventSpy.mock.calls[0][0] as CustomEvent;
     expect(event).toBeInstanceOf(CustomEvent);
-    expect(event.detail).toEqual({ elmErrorSeverity: "Info" });
+    expect(event.detail).toEqual({
+      elmErrorSeverity: "Info",
+      bundleType: "export",
+    });
     expect(event.type).toEqual("export-measure");
   });
 
