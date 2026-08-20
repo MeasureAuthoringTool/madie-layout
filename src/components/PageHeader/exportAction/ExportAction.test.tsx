@@ -11,7 +11,7 @@ jest.mock("@madie/madie-util", () => ({
 }));
 
 describe("ExportAction", () => {
-  it("should call onClick when Export for Publishing button is clicked", async () => {
+  it("should call onClick when Publishable Export button is clicked", async () => {
     const mockOnClick = jest.fn();
     render(<ExportAction onClick={mockOnClick} />);
 
@@ -19,14 +19,14 @@ describe("ExportAction", () => {
     userEvent.click(exportIcon);
 
     const exportForPublishingButton = await screen.findByRole("menuitem", {
-      name: "Export for Publishing",
+      name: "Publishable Export",
     });
     userEvent.click(exportForPublishingButton);
     expect(mockOnClick).toHaveBeenCalledTimes(1);
-    expect(mockOnClick).toHaveBeenCalledWith("Export for Publishing");
+    expect(mockOnClick).toHaveBeenCalledWith("Publishable Export");
   });
 
-  it("should call onClick when Export button is clicked", async () => {
+  it("should call onClick when Executable Export button is clicked", async () => {
     const mockOnClick = jest.fn();
     render(<ExportAction onClick={mockOnClick} />);
 
@@ -34,11 +34,11 @@ describe("ExportAction", () => {
     userEvent.click(exportIcon);
 
     const exportButton = await screen.findByRole("menuitem", {
-      name: "Export",
+      name: "Executable Export",
     });
     userEvent.click(exportButton);
     expect(mockOnClick).toHaveBeenCalledTimes(1);
-    expect(mockOnClick).toHaveBeenCalledWith("Export");
+    expect(mockOnClick).toHaveBeenCalledWith("Executable Export");
   });
 });
 
