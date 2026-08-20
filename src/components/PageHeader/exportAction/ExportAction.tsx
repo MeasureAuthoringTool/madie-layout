@@ -21,7 +21,9 @@ export default function ExportAction(props: PropTypes) {
   // move anchorElement to a stable reference that does not change across renders.
   const anchorRef = useRef<HTMLButtonElement>(null);
 
-  const handleOptionClick = (option: "Export" | "Export for Publishing") => {
+  const handleOptionClick = (
+    option: "Executable Export" | "Publishable Export"
+  ) => {
     onClick(option);
     setOpen(false);
   };
@@ -78,20 +80,20 @@ export default function ExportAction(props: PropTypes) {
                   onKeyDown={handleListKeyDown}
                 >
                   <MenuItem
-                    data-testId="export-option"
+                    data-testId="executable-export-option"
                     onClick={(e) => {
-                      handleOptionClick("Export");
+                      handleOptionClick("Executable Export");
                     }}
                   >
-                    Export
+                    Executable Export
                   </MenuItem>
                   <MenuItem
-                    data-testId="export-publishing-option"
+                    data-testId="publishable-export-option"
                     onClick={(e) => {
-                      handleOptionClick("Export for Publishing");
+                      handleOptionClick("Publishable Export");
                     }}
                   >
-                    Export for Publishing
+                    Publishable Export
                   </MenuItem>
                 </MenuList>
               </ClickAwayListener>
