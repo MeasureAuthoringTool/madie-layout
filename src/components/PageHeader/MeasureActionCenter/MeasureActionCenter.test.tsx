@@ -398,7 +398,7 @@ describe("MeasureActionCenter Component", () => {
     userEvent.click(exportIcon);
 
     const exportForPublishingButton = await screen.findByRole("menuitem", {
-      name: "Export for Publishing",
+      name: "Publishable Export",
     });
     userEvent.click(exportForPublishingButton);
 
@@ -423,7 +423,7 @@ describe("MeasureActionCenter Component", () => {
     userEvent.click(exportIcon);
 
     const exportButton = await screen.findByRole("menuitem", {
-      name: "Export",
+      name: "Executable Export",
     });
     userEvent.click(exportButton);
 
@@ -448,7 +448,7 @@ describe("MeasureActionCenter Component", () => {
     userEvent.click(exportIcon);
 
     const exportForPublishingButton = await screen.findByRole("menuitem", {
-      name: "Export for Publishing",
+      name: "Publishable Export",
     });
 
     userEvent.click(exportForPublishingButton);
