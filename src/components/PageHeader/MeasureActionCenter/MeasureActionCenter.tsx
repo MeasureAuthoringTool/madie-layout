@@ -139,8 +139,10 @@ const MeasureActionCenter = (props: PropTypes) => {
       icon: (
         <ExportAction
           onClick={(exportType: string) => {
-            const elmErrorSeverity = exportType === "Export" ? "Info" : "Error";
-            const bundleType = exportType === "Export" ? "export" : "publish";
+            const bundleType =
+              exportType === "Executable Export" ? "export" : "publish";
+            const elmErrorSeverity =
+              exportType === "Executable Export" ? "Info" : "Error";
             const event = new CustomEvent("export-measure", {
               detail: { elmErrorSeverity, bundleType },
             });

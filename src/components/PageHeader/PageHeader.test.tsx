@@ -1344,3 +1344,229 @@ describe("Admin Page Header", () => {
     ).not.toBeInTheDocument();
   });
 });
+
+describe("Review status in the header", () => {
+  const util = () => require("@madie/madie-util");
+
+  const measureWithId = {
+    ...mockFormikInfo,
+    id: "test-measure-id",
+    measureSet: { owner: "test user", acls: [] },
+  };
+
+  const libraryWithId = {
+    ...mockLibraryInfo,
+    id: "test-library-id",
+    librarySet: { owner: "test user", acls: [] },
+  };
+
+  const setMeasureReview = (review: unknown) => {
+    const api = { getMeasureReview: () => Promise.resolve(review) };
+    util().useMeasureReviewServiceApi = () => api;
+  };
+
+  const setLibraryReview = (review: unknown) => {
+    const api = { getCqlLibraryReview: () => Promise.resolve(review) };
+    util().useCqlLibraryReviewServiceApi = () => api;
+  };
+
+  const setIsReviewer = (isReviewer: boolean) => {
+    const roles = { roles: [], isAdmin: false, isReviewer };
+    util().useUserRoles = () => roles;
+  };
+
+  beforeEach(() => {
+    axios.get.mockResolvedValue(getData);
+    (checkUserCanEdit as jest.Mock).mockReturnValue(true);
+    setIsReviewer(false);
+    setMeasureReview(null);
+    setLibraryReview(null);
+    util().measureStore.state = measureWithId;
+    util().measureStore.subscribe = (set) => {
+      set(measureWithId);
+      return { unsubscribe: () => null };
+    };
+    util().cqlLibraryStore.subscribe = (set) => {
+      set(libraryWithId);
+      return { unsubscribe: () => null };
+    };
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+    setIsReviewer(false);
+    setMeasureReview(null);
+    setLibraryReview(null);
+  });
+
+  const renderMeasureHeader = () =>
+    render(
+      <MemoryRouter initialEntries={["/measures/test-measure-id/edit/details"]}>
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+  const renderLibraryHeader = () =>
+    render(
+      <MemoryRouter
+        initialEntries={["/cql-libraries/test-library-id/edit/details"]}
+      >
+        <PageHeader />
+      </MemoryRouter>
+    );
+
+  describe("measure header", () => {
+    test.each([
+      ["READY_FOR_REVIEW", "Review Status: Ready"],
+      ["IN_PROGRESS", "Review Status: In Progress"],
+      ["COMPLETE", "Review Status: Complete"],
+    ])("displays %s as '%s'", async (status, expected) => {
+      setMeasureReview({ id: "review-1", status });
+
+      renderMeasureHeader();
+
+      expect(
+        await screen.findByTestId("measure-review-status")
+      ).toHaveTextContent(expected);
+    });
+
+    test("displays nothing when the measure has no review", async () => {
+      setMeasureReview(null);
+
+      renderMeasureHeader();
+
+      await screen.findByText(`Version ${measureWithId.version}`);
+      expect(
+        screen.queryByTestId("measure-review-status")
+      ).not.toBeInTheDocument();
+    });
+
+    test("displays nothing when the status is NOT_READY_FOR_REVIEW", async () => {
+      setMeasureReview({ id: "review-1", status: "NOT_READY_FOR_REVIEW" });
+
+      renderMeasureHeader();
+
+      await screen.findByText(`Version ${measureWithId.version}`);
+      expect(
+        screen.queryByTestId("measure-review-status")
+      ).not.toBeInTheDocument();
+    });
+
+    test("displays the status to a user with edit access who is not a reviewer", async () => {
+      (checkUserCanEdit as jest.Mock).mockReturnValue(true);
+      setIsReviewer(false);
+      setMeasureReview({ id: "review-1", status: "IN_PROGRESS" });
+
+      renderMeasureHeader();
+
+      expect(
+        await screen.findByTestId("measure-review-status")
+      ).toHaveTextContent("Review Status: In Progress");
+    });
+
+    test("displays the status to a reviewer without edit access", async () => {
+      (checkUserCanEdit as jest.Mock).mockReturnValue(false);
+      setIsReviewer(true);
+      setMeasureReview({ id: "review-1", status: "COMPLETE" });
+
+      renderMeasureHeader();
+
+      expect(
+        await screen.findByTestId("measure-review-status")
+      ).toHaveTextContent("Review Status: Complete");
+    });
+
+    test("hides the status from a user with neither edit access nor the reviewer role", async () => {
+      (checkUserCanEdit as jest.Mock).mockReturnValue(false);
+      setIsReviewer(false);
+      setMeasureReview({ id: "review-1", status: "READY_FOR_REVIEW" });
+
+      renderMeasureHeader();
+
+      await screen.findByText(`Version ${measureWithId.version}`);
+      expect(
+        screen.queryByTestId("measure-review-status")
+      ).not.toBeInTheDocument();
+    });
+
+    test("updates the status when a review is saved elsewhere", async () => {
+      setMeasureReview({ id: "review-1", status: "READY_FOR_REVIEW" });
+
+      renderMeasureHeader();
+
+      expect(
+        await screen.findByTestId("measure-review-status")
+      ).toHaveTextContent("Review Status: Ready");
+
+      act(() => {
+        window.dispatchEvent(
+          new CustomEvent("review-measure-saved", {
+            detail: { id: "review-1", status: "COMPLETE" },
+          })
+        );
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("measure-review-status")).toHaveTextContent(
+          "Review Status: Complete"
+        );
+      });
+    });
+  });
+
+  describe("library header", () => {
+    test.each([
+      ["READY_FOR_REVIEW", "Review Status: Ready"],
+      ["IN_PROGRESS", "Review Status: In Progress"],
+      ["COMPLETE", "Review Status: Complete"],
+    ])("displays %s as '%s'", async (status, expected) => {
+      setLibraryReview({ id: "review-1", status });
+
+      renderLibraryHeader();
+
+      expect(await screen.findByTestId("cql-library-status")).toHaveTextContent(
+        expected
+      );
+    });
+
+    test("displays the status to a reviewer without edit access", async () => {
+      (checkUserCanEdit as jest.Mock).mockReturnValue(false);
+      setIsReviewer(true);
+      setLibraryReview({ id: "review-1", status: "IN_PROGRESS" });
+
+      renderLibraryHeader();
+
+      expect(await screen.findByTestId("cql-library-status")).toHaveTextContent(
+        "Review Status: In Progress"
+      );
+    });
+
+    test("hides the status from a user with neither edit access nor the reviewer role", async () => {
+      (checkUserCanEdit as jest.Mock).mockReturnValue(false);
+      setIsReviewer(false);
+      setLibraryReview({ id: "review-1", status: "READY_FOR_REVIEW" });
+
+      renderLibraryHeader();
+
+      expect(
+        await screen.findByText(`Version ${libraryWithId.version}`)
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByTestId("cql-library-status")
+      ).not.toBeInTheDocument();
+    });
+
+    test("displays nothing when the library has no review", async () => {
+      setLibraryReview(null);
+
+      renderLibraryHeader();
+
+      expect(
+        await screen.findByText(`Version ${libraryWithId.version}`)
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByTestId("cql-library-status")
+      ).not.toBeInTheDocument();
+    });
+  });
+});

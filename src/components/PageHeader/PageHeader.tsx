@@ -18,13 +18,13 @@ import {
   useUserServiceApi,
   useMeasureReviewServiceApi,
   useCqlLibraryReviewServiceApi,
+  useUserRoles,
 } from "@madie/madie-util";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {
   UserDetails,
   MeasureReview,
   CqlLibraryReview,
-  ReviewStatus,
 } from "@madie/madie-models";
 import "twin.macro";
 import "styled-components/macro";
@@ -35,6 +35,15 @@ import Chip from "@mui/material/Chip";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Tooltip from "@mui/material/Tooltip";
 import MeasureStatusChips from "./MeasureStatusChip";
+
+const REVIEW_STATUS_LABEL: Record<string, string> = {
+  READY_FOR_REVIEW: "Ready",
+  IN_PROGRESS: "In Progress",
+  COMPLETE: "Complete",
+};
+
+const getReviewStatusLabel = (status?: string | null): string =>
+  status ? REVIEW_STATUS_LABEL[status] ?? "" : "";
 
 const USER_STATUS_LABEL: Record<string, string> = {
   ACTIVE: "Active",
@@ -88,6 +97,9 @@ const PageHeader = () => {
 
   const { getUserName } = useOktaTokens();
   const userName = getUserName();
+
+  const userRoles = useUserRoles();
+  const isReviewer = !!userRoles?.isReviewer;
 
   const userServiceApiRef = useRef(useUserServiceApi());
   const measureReviewServiceApiRef = useRef(useMeasureReviewServiceApi());
@@ -398,13 +410,15 @@ const PageHeader = () => {
                   {measureState?.model}
                 </p>
               )}
-              {measureCanEdit &&
-                measureReview?.status === ReviewStatus.READY_FOR_REVIEW && (
+              {(measureCanEdit || isReviewer) &&
+                getReviewStatusLabel(measureReview?.status) && (
                   <p
                     data-testid="measure-review-status"
                     tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0"
                   >
-                    Review Status: Ready
+                    {`Review Status: ${getReviewStatusLabel(
+                      measureReview?.status
+                    )}`}
                   </p>
                 )}
               {[readablePeriodStart + " - " + readablePeriodEnd].map(
@@ -564,13 +578,15 @@ const PageHeader = () => {
                     );
                 }
               )}
-              {libraryCanEdit &&
-                libraryReview?.status === ReviewStatus.READY_FOR_REVIEW && (
+              {(libraryCanEdit || isReviewer) &&
+                getReviewStatusLabel(libraryReview?.status) && (
                   <p
                     data-testid="cql-library-status"
                     tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0"
                   >
-                    Review Status: Ready
+                    {`Review Status: ${getReviewStatusLabel(
+                      libraryReview?.status
+                    )}`}
                   </p>
                 )}
               {libraryCanEdit && libraryState?.cqlLibraryLock && (
