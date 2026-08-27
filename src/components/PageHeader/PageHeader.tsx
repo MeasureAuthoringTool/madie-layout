@@ -42,8 +42,39 @@ const REVIEW_STATUS_LABEL: Record<string, string> = {
   COMPLETE: "Complete",
 };
 
+const REVIEW_TOOLTIP_STATUSES = new Set([
+  "READY_FOR_REVIEW",
+  "IN_PROGRESS",
+  "COMPLETE",
+]);
+
 const getReviewStatusLabel = (status?: string | null): string =>
   status ? REVIEW_STATUS_LABEL[status] ?? "" : "";
+
+type ReviewWithOptionalReviewers = {
+  status?: string;
+  reviewers?: string[];
+};
+
+const shouldShowReviewTooltip = (review?: ReviewWithOptionalReviewers) => {
+  return (
+    !!review?.status &&
+    REVIEW_TOOLTIP_STATUSES.has(review.status) &&
+    !!review?.reviewers?.length
+  );
+};
+
+const formatReviewerDisplayName = (
+  details: UserDetails | undefined,
+  harpId: string
+): string => {
+  const name = [details?.firstName, details?.lastName]
+    .map((value) => value?.trim())
+    .filter(Boolean)
+    .join(" ");
+
+  return name || harpId;
+};
 
 const USER_STATUS_LABEL: Record<string, string> = {
   ACTIVE: "Active",
@@ -225,6 +256,13 @@ const PageHeader = () => {
     };
   }, [libraryState?.id]);
 
+  const [libraryReviewerDisplayNames, setLibraryReviewerDisplayNames] =
+    useState<Record<string, string>>({});
+
+  const libraryReviewWithReviewers = libraryReview as CqlLibraryReview & {
+    reviewers?: string[];
+  };
+
   const libraryLockedByHarpId = libraryState?.cqlLibraryLock?.lockedBy;
   useEffect(() => {
     let isMounted = true;
@@ -249,6 +287,56 @@ const PageHeader = () => {
       isMounted = false;
     };
   }, [libraryState?.id]);
+
+  useEffect(() => {
+    const reviewerIds = Array.from(
+      new Set(libraryReviewWithReviewers?.reviewers ?? [])
+    ).filter((harpId): harpId is string => !!harpId);
+
+    if (!shouldShowReviewTooltip(libraryReviewWithReviewers)) {
+      setLibraryReviewerDisplayNames({});
+      return;
+    }
+
+    if (reviewerIds.length === 0) {
+      setLibraryReviewerDisplayNames({});
+      return;
+    }
+
+    let isMounted = true;
+
+    userServiceApiRef.current
+      .getBulkUserDetails(reviewerIds)
+      .then((userDetails) => {
+        if (!isMounted) {
+          return;
+        }
+
+        const nextDisplayNames: Record<string, string> = {};
+        reviewerIds.forEach((harpId) => {
+          nextDisplayNames[harpId] = formatReviewerDisplayName(
+            userDetails?.[harpId],
+            harpId
+          );
+        });
+        setLibraryReviewerDisplayNames(nextDisplayNames);
+      })
+      .catch(() => {
+        if (!isMounted) {
+          return;
+        }
+
+        const fallbackDisplayNames: Record<string, string> = {};
+        reviewerIds.forEach((harpId) => {
+          fallbackDisplayNames[harpId] = harpId;
+        });
+        setLibraryReviewerDisplayNames(fallbackDisplayNames);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [libraryReviewWithReviewers]);
 
   useEffect(() => {
     if (libraryLockedByHarpId) {
@@ -580,14 +668,39 @@ const PageHeader = () => {
               )}
               {(libraryCanEdit || isReviewer) &&
                 getReviewStatusLabel(libraryReview?.status) && (
-                  <p
-                    data-testid="cql-library-status"
-                    tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0"
+                  <Tooltip
+                    title={
+                      shouldShowReviewTooltip(libraryReviewWithReviewers) ? (
+                        <div>
+                          {libraryReviewWithReviewers.reviewers?.map(
+                            (reviewerId, index) => (
+                              <div
+                                key={`${libraryState?.id}-reviewer-${index}`}
+                              >
+                                {libraryReviewerDisplayNames[reviewerId] ??
+                                  reviewerId}
+                              </div>
+                            )
+                          )}
+                        </div>
+                      ) : (
+                        ""
+                      )
+                    }
+                    disableHoverListener={
+                      !shouldShowReviewTooltip(libraryReviewWithReviewers)
+                    }
+                    arrow
                   >
-                    {`Review Status: ${getReviewStatusLabel(
-                      libraryReview?.status
-                    )}`}
-                  </p>
+                    <p
+                      data-testid="cql-library-status"
+                      tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0"
+                    >
+                      {`Review Status: ${getReviewStatusLabel(
+                        libraryReview?.status
+                      )}`}
+                    </p>
+                  </Tooltip>
                 )}
               {libraryCanEdit && libraryState?.cqlLibraryLock && (
                 <div
