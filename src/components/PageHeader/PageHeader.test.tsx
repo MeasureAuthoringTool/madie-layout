@@ -1528,6 +1528,65 @@ describe("Review status in the header", () => {
         );
       });
     });
+
+    test.each(["READY_FOR_REVIEW", "IN_PROGRESS", "COMPLETE"])(
+      "shows reviewer names in a tooltip for %s",
+      async (status) => {
+        setMeasureReview({
+          id: "review-1",
+          status,
+          reviewers: ["reviewer1", "reviewer2"],
+        });
+
+        renderMeasureHeader();
+
+        const measureStatus = await screen.findByTestId(
+          "measure-review-status"
+        );
+        await userEvent.hover(measureStatus);
+
+        expect(await screen.findByText("Ada Lovelace")).toBeInTheDocument();
+        expect(screen.getByText("Grace Hopper")).toBeInTheDocument();
+      }
+    );
+
+    test("falls back to the harp id when a reviewer cannot be resolved", async () => {
+      util().useUserServiceApi = () => ({
+        getOwnerDetails: jest.fn().mockRejectedValue(new Error("not found")),
+        getBulkUserDetails: jest
+          .fn()
+          .mockRejectedValue(new Error("user service down")),
+      });
+      setMeasureReview({
+        id: "review-1",
+        status: "READY_FOR_REVIEW",
+        reviewers: ["reviewer1"],
+      });
+
+      renderMeasureHeader();
+
+      const measureStatus = await screen.findByTestId("measure-review-status");
+      await userEvent.hover(measureStatus);
+
+      expect(await screen.findByText("reviewer1")).toBeInTheDocument();
+    });
+
+    test("does not show a measure review tooltip when reviewers are missing", async () => {
+      setMeasureReview({
+        id: "review-1",
+        status: "IN_PROGRESS",
+        reviewers: [],
+      });
+
+      renderMeasureHeader();
+
+      const measureStatus = await screen.findByTestId("measure-review-status");
+      await userEvent.hover(measureStatus);
+
+      await waitFor(() => {
+        expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+      });
+    });
   });
 
   describe("library header", () => {

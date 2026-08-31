@@ -76,6 +76,82 @@ const formatReviewerDisplayName = (
   return name || harpId;
 };
 
+const useReviewerDisplayNames = (
+  review?: ReviewWithOptionalReviewers
+): Record<string, string> => {
+  const userServiceApiRef = useRef(useUserServiceApi());
+  const [reviewerDisplayNames, setReviewerDisplayNames] = useState<
+    Record<string, string>
+  >({});
+
+  useEffect(() => {
+    const reviewerIds = Array.from(new Set(review?.reviewers ?? [])).filter(
+      (harpId): harpId is string => !!harpId
+    );
+
+    if (!shouldShowReviewTooltip(review) || reviewerIds.length === 0) {
+      setReviewerDisplayNames({});
+      return;
+    }
+
+    let isMounted = true;
+
+    userServiceApiRef.current
+      .getBulkUserDetails(reviewerIds)
+      .then((userDetails) => {
+        if (!isMounted) {
+          return;
+        }
+
+        const nextDisplayNames: Record<string, string> = {};
+        reviewerIds.forEach((harpId) => {
+          nextDisplayNames[harpId] = formatReviewerDisplayName(
+            userDetails?.[harpId],
+            harpId
+          );
+        });
+        setReviewerDisplayNames(nextDisplayNames);
+      })
+      .catch(() => {
+        if (!isMounted) {
+          return;
+        }
+
+        const fallbackDisplayNames: Record<string, string> = {};
+        reviewerIds.forEach((harpId) => {
+          fallbackDisplayNames[harpId] = harpId;
+        });
+        setReviewerDisplayNames(fallbackDisplayNames);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [review]);
+
+  return reviewerDisplayNames;
+};
+
+const buildReviewerTooltipTitle = (
+  review: ReviewWithOptionalReviewers | undefined,
+  reviewerDisplayNames: Record<string, string>,
+  keyPrefix: string
+) => {
+  if (!shouldShowReviewTooltip(review)) {
+    return "";
+  }
+
+  return (
+    <div>
+      {review.reviewers?.map((reviewerId, index) => (
+        <div key={`${keyPrefix}-reviewer-${index}`}>
+          {reviewerDisplayNames[reviewerId] ?? reviewerId}
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const USER_STATUS_LABEL: Record<string, string> = {
   ACTIVE: "Active",
   DEACTIVATED: "Deactivated",
@@ -256,12 +332,19 @@ const PageHeader = () => {
     };
   }, [libraryState?.id]);
 
-  const [libraryReviewerDisplayNames, setLibraryReviewerDisplayNames] =
-    useState<Record<string, string>>({});
+  const measureReviewWithReviewers = measureReview as MeasureReview & {
+    reviewers?: string[];
+  };
+  const measureReviewerDisplayNames = useReviewerDisplayNames(
+    measureReviewWithReviewers
+  );
 
   const libraryReviewWithReviewers = libraryReview as CqlLibraryReview & {
     reviewers?: string[];
   };
+  const libraryReviewerDisplayNames = useReviewerDisplayNames(
+    libraryReviewWithReviewers
+  );
 
   const libraryLockedByHarpId = libraryState?.cqlLibraryLock?.lockedBy;
   useEffect(() => {
@@ -287,56 +370,6 @@ const PageHeader = () => {
       isMounted = false;
     };
   }, [libraryState?.id]);
-
-  useEffect(() => {
-    const reviewerIds = Array.from(
-      new Set(libraryReviewWithReviewers?.reviewers ?? [])
-    ).filter((harpId): harpId is string => !!harpId);
-
-    if (!shouldShowReviewTooltip(libraryReviewWithReviewers)) {
-      setLibraryReviewerDisplayNames({});
-      return;
-    }
-
-    if (reviewerIds.length === 0) {
-      setLibraryReviewerDisplayNames({});
-      return;
-    }
-
-    let isMounted = true;
-
-    userServiceApiRef.current
-      .getBulkUserDetails(reviewerIds)
-      .then((userDetails) => {
-        if (!isMounted) {
-          return;
-        }
-
-        const nextDisplayNames: Record<string, string> = {};
-        reviewerIds.forEach((harpId) => {
-          nextDisplayNames[harpId] = formatReviewerDisplayName(
-            userDetails?.[harpId],
-            harpId
-          );
-        });
-        setLibraryReviewerDisplayNames(nextDisplayNames);
-      })
-      .catch(() => {
-        if (!isMounted) {
-          return;
-        }
-
-        const fallbackDisplayNames: Record<string, string> = {};
-        reviewerIds.forEach((harpId) => {
-          fallbackDisplayNames[harpId] = harpId;
-        });
-        setLibraryReviewerDisplayNames(fallbackDisplayNames);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [libraryReviewWithReviewers]);
 
   useEffect(() => {
     if (libraryLockedByHarpId) {
@@ -500,14 +533,26 @@ const PageHeader = () => {
               )}
               {(measureCanEdit || isReviewer) &&
                 getReviewStatusLabel(measureReview?.status) && (
-                  <p
-                    data-testid="measure-review-status"
-                    tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0"
+                  <Tooltip
+                    title={buildReviewerTooltipTitle(
+                      measureReviewWithReviewers,
+                      measureReviewerDisplayNames,
+                      measureState?.id
+                    )}
+                    disableHoverListener={
+                      !shouldShowReviewTooltip(measureReviewWithReviewers)
+                    }
+                    arrow
                   >
-                    {`Review Status: ${getReviewStatusLabel(
-                      measureReview?.status
-                    )}`}
-                  </p>
+                    <p
+                      data-testid="measure-review-status"
+                      tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0"
+                    >
+                      {`Review Status: ${getReviewStatusLabel(
+                        measureReview?.status
+                      )}`}
+                    </p>
+                  </Tooltip>
                 )}
               {[readablePeriodStart + " - " + readablePeriodEnd].map(
                 (val, key) => {
@@ -669,24 +714,11 @@ const PageHeader = () => {
               {(libraryCanEdit || isReviewer) &&
                 getReviewStatusLabel(libraryReview?.status) && (
                   <Tooltip
-                    title={
-                      shouldShowReviewTooltip(libraryReviewWithReviewers) ? (
-                        <div>
-                          {libraryReviewWithReviewers.reviewers?.map(
-                            (reviewerId, index) => (
-                              <div
-                                key={`${libraryState?.id}-reviewer-${index}`}
-                              >
-                                {libraryReviewerDisplayNames[reviewerId] ??
-                                  reviewerId}
-                              </div>
-                            )
-                          )}
-                        </div>
-                      ) : (
-                        ""
-                      )
-                    }
+                    title={buildReviewerTooltipTitle(
+                      libraryReviewWithReviewers,
+                      libraryReviewerDisplayNames,
+                      libraryState?.id
+                    )}
                     disableHoverListener={
                       !shouldShowReviewTooltip(libraryReviewWithReviewers)
                     }
