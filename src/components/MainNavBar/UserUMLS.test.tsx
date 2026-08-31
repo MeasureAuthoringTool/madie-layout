@@ -69,6 +69,9 @@ describe("User UMLS Connection", () => {
     });
     expect(connectOption.querySelector("li")).not.toBeInTheDocument();
     expect(screen.getAllByRole("option")).toHaveLength(1);
+
+    fireEvent.click(connectOption);
+    expect(await screen.findByTestId("UMLS-connect-form")).toBeInTheDocument();
   });
 
   test("renders UMLS Active and Sign Out without nested list items", async () => {
