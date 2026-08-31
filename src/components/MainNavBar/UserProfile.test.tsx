@@ -90,6 +90,19 @@ describe("UserProfile component", () => {
     });
   });
 
+  test("labels the profile dropdown without aria-labelledby", async () => {
+    const { findByRole } = render(
+      <MemoryRouter>
+        <UserProfile />
+      </MemoryRouter>
+    );
+
+    const profileSelect = await findByRole("combobox", {
+      name: "Profile Select",
+    });
+    expect(profileSelect).not.toHaveAttribute("aria-labelledby");
+  });
+
   test("Should render user profile dropdown options and allow users to select logout", async () => {
     await act(async () => {
       const { getByTestId } = await render(

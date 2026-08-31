@@ -72,6 +72,10 @@ const UserUMLS = () => {
           id="user-umls-select"
           data-testid="user-umls-select"
           inputProps={{ "data-testid": "user-umls-input" }}
+          SelectDisplayProps={{
+            "aria-label": "UMLS Select",
+            "aria-labelledby": undefined,
+          }}
           sx={{
             height: "32px",
             borderColor: "transparent",
@@ -113,16 +117,21 @@ const UserUMLS = () => {
             key="userUmlsStatus"
             value={isLoggedInToUMLS ? "UMLS Active" : "Connect to UMLS"}
             data-testid="user-umls-status"
+            disabled={isLoggedInToUMLS}
+            onClick={() => setUmlsDialogOpen(true)}
           >
-            <li className="activity-button">
-              <button
-                onClick={() => setUmlsDialogOpen(!isLoggedInToUMLS)}
-                data-testid="UMLS-connect-button"
-              >
-                <div className={isLoggedInToUMLS ? "active" : "inactive"} />
-                {isLoggedInToUMLS ? "UMLS Active" : "Connect to UMLS"}
-              </button>
-            </li>
+            <div
+              className="activity-button"
+              data-testid={
+                !isLoggedInToUMLS ? "UMLS-connect-button" : undefined
+              }
+              onClick={
+                !isLoggedInToUMLS ? () => setUmlsDialogOpen(true) : undefined
+              }
+            >
+              <div className={isLoggedInToUMLS ? "active" : "inactive"} />
+              {isLoggedInToUMLS ? "UMLS Active" : "Connect to UMLS"}
+            </div>
           </MenuItem>
           {isLoggedInToUMLS && (
             <MenuItem
