@@ -53,7 +53,7 @@ const mockLibraryInfo = {
 const mockFormikInfo = {
   measureName: mockName,
   createdBy: "test",
-  model: Model.QICORE.valueOf(),
+  model: Model.QICORE_6_0_0.valueOf(),
   cqlLibraryName: mockLib,
   ecqmTitle: "ecqmTitle",
   measurementPeriodStart: "01/05/2022",
@@ -827,7 +827,7 @@ describe("Page Header and Dialogs", () => {
     );
     expect(queryByTestId("info-Active-0")).not.toBeInTheDocument();
     await waitFor(() =>
-      expect(queryByTestId("info-QI-Core v4.1.1-0")).toBeInTheDocument()
+      expect(queryByTestId("info-QI-Core v6.0.0-0")).toBeInTheDocument()
     );
     await waitFor(() =>
       expect(queryByTestId("info-1/5/2022 - 3/7/2022-1")).toBeInTheDocument()
