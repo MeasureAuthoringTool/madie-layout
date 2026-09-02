@@ -20,6 +20,16 @@ import { Model } from "@madie/madie-models/dist/Model";
 const mockLib = mockLibraryName();
 const mockName = mockMeasureName();
 const mockUser = "test user";
+const mockGetBulkUserDetails = jest.fn().mockResolvedValue({
+  reviewer1: {
+    firstName: "Ada",
+    lastName: "Lovelace",
+  },
+  reviewer2: {
+    firstName: "Grace",
+    lastName: "Hopper",
+  },
+});
 
 const mockLibraryInfo = {
   id: "randomstring",
@@ -141,6 +151,7 @@ jest.mock("@madie/madie-util", () => ({
   useIsRoleOrFeatureEnabled: jest.fn(),
   useUserServiceApi: () => ({
     getOwnerDetails: jest.fn().mockRejectedValue(new Error("not found")),
+    getBulkUserDetails: mockGetBulkUserDetails,
   }),
   useMeasureReviewServiceApi: () => ({
     getMeasureReview: jest.fn().mockResolvedValue(null),
@@ -182,6 +193,7 @@ describe("Page Header and Dialogs", () => {
     }),
     useUserServiceApi: () => ({
       getOwnerDetails: jest.fn().mockRejectedValue(new Error("not found")),
+      getBulkUserDetails: mockGetBulkUserDetails,
     }),
     useMeasureReviewServiceApi: () => ({
       getMeasureReview: jest.fn().mockResolvedValue(null),
@@ -1381,6 +1393,10 @@ describe("Review status in the header", () => {
     setIsReviewer(false);
     setMeasureReview(null);
     setLibraryReview(null);
+    util().useUserServiceApi = () => ({
+      getOwnerDetails: jest.fn().mockRejectedValue(new Error("not found")),
+      getBulkUserDetails: mockGetBulkUserDetails,
+    });
     util().measureStore.state = measureWithId;
     util().measureStore.subscribe = (set) => {
       set(measureWithId);
@@ -1512,6 +1528,65 @@ describe("Review status in the header", () => {
         );
       });
     });
+
+    test.each(["READY_FOR_REVIEW", "IN_PROGRESS", "COMPLETE"])(
+      "shows reviewer names in a tooltip for %s",
+      async (status) => {
+        setMeasureReview({
+          id: "review-1",
+          status,
+          reviewers: ["reviewer1", "reviewer2"],
+        });
+
+        renderMeasureHeader();
+
+        const measureStatus = await screen.findByTestId(
+          "measure-review-status"
+        );
+        await userEvent.hover(measureStatus);
+
+        expect(await screen.findByText("Ada Lovelace")).toBeInTheDocument();
+        expect(screen.getByText("Grace Hopper")).toBeInTheDocument();
+      }
+    );
+
+    test("falls back to the harp id when a reviewer cannot be resolved", async () => {
+      util().useUserServiceApi = () => ({
+        getOwnerDetails: jest.fn().mockRejectedValue(new Error("not found")),
+        getBulkUserDetails: jest
+          .fn()
+          .mockRejectedValue(new Error("user service down")),
+      });
+      setMeasureReview({
+        id: "review-1",
+        status: "READY_FOR_REVIEW",
+        reviewers: ["reviewer1"],
+      });
+
+      renderMeasureHeader();
+
+      const measureStatus = await screen.findByTestId("measure-review-status");
+      await userEvent.hover(measureStatus);
+
+      expect(await screen.findByText("reviewer1")).toBeInTheDocument();
+    });
+
+    test("does not show a measure review tooltip when reviewers are missing", async () => {
+      setMeasureReview({
+        id: "review-1",
+        status: "IN_PROGRESS",
+        reviewers: [],
+      });
+
+      renderMeasureHeader();
+
+      const measureStatus = await screen.findByTestId("measure-review-status");
+      await userEvent.hover(measureStatus);
+
+      await waitFor(() => {
+        expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+      });
+    });
   });
 
   describe("library header", () => {
@@ -1567,6 +1642,39 @@ describe("Review status in the header", () => {
       expect(
         screen.queryByTestId("cql-library-status")
       ).not.toBeInTheDocument();
+    });
+
+    test("shows reviewer names in a tooltip for eligible library review statuses", async () => {
+      setLibraryReview({
+        id: "review-1",
+        status: "READY_FOR_REVIEW",
+        reviewers: ["reviewer1", "reviewer2"],
+      });
+
+      renderLibraryHeader();
+
+      const libraryStatus = await screen.findByTestId("cql-library-status");
+      await userEvent.hover(libraryStatus);
+
+      expect(await screen.findByText("Ada Lovelace")).toBeInTheDocument();
+      expect(screen.getByText("Grace Hopper")).toBeInTheDocument();
+    });
+
+    test("does not show a library review tooltip when reviewers are missing", async () => {
+      setLibraryReview({
+        id: "review-1",
+        status: "IN_PROGRESS",
+        reviewers: [],
+      });
+
+      renderLibraryHeader();
+
+      const libraryStatus = await screen.findByTestId("cql-library-status");
+      await userEvent.hover(libraryStatus);
+
+      await waitFor(() => {
+        expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+      });
     });
   });
 });
