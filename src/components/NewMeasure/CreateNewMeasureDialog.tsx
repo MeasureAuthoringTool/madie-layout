@@ -80,13 +80,8 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
     // remove QI-Core 7.0.2 from model options if the feature flag is not enabled
     modelOptions = modelOptions.filter((model) => model !== "QICORE_7_0_2");
   }
-  // Discontinue 4.1.1 support when US_Quality_Core is available
-  if (featureFlags?.usQualityCore) {
-    modelOptions = modelOptions.filter((model) => model !== "QICORE");
-  } else {
-    // not supporting it yet.
-    modelOptions = modelOptions.filter((model) => model !== "US_QUALITY_0_5_0");
-  }
+  // 4.1.1 support is discontinued now that US Quality Core is available
+  modelOptions = modelOptions.filter((model) => model !== "QICORE");
   async function createMeasure(measure: Measure) {
     if (!config) {
       setToast({
