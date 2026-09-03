@@ -60,8 +60,6 @@ declare module "@madie/madie-util" {
     ShareMeasure: boolean;
     qiCore7: boolean;
     QICoreCompositeMeasure: boolean;
-    AdminUserList: boolean;
-    usQualityCore?: boolean;
     MeasureReviewStatus?: boolean;
     LibraryReviewStatus?: boolean;
   }

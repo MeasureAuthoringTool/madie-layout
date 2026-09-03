@@ -9,7 +9,7 @@ import UserAvatar from "./UserAvatar";
 import { Tabs, Tab } from "@madie/madie-design-system/dist/react";
 import "./MainNavBar.scss";
 import UserUMLS from "./UserUMLS";
-import { useFeatureFlags, useUserRoles } from "@madie/madie-util";
+import { useUserRoles } from "@madie/madie-util";
 // @ts-ignore
 import { UsaBanner } from "@uswds/elements";
 
@@ -33,9 +33,8 @@ const MainNavBar = () => {
   const [showFullLogo, setShowFullLogo] = useState(true);
 
   const { authState } = useOktaAuth();
-  const featureFlags = useFeatureFlags();
   const userRoles = useUserRoles();
-  const showAdminTab = featureFlags?.AdminUserList && userRoles?.isAdmin;
+  const showAdminTab = userRoles?.isAdmin;
 
   const resizeWindow = () => {
     const headerWidth =
