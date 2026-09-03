@@ -50,6 +50,61 @@ describe("User UMLS Connection", () => {
   const mockFormikInfo = {
     apiKey: "mfjdiajenfjgitjeandpsoekrmmanritjehs",
   };
+
+  test("labels the UMLS dropdown and renders Connect to UMLS without nested list items", async () => {
+    render(
+      <MemoryRouter>
+        <UserUMLS />
+      </MemoryRouter>
+    );
+
+    const umlsSelect = screen.getByRole("combobox", {
+      name: "UMLS Select",
+    });
+    expect(umlsSelect).not.toHaveAttribute("aria-labelledby");
+
+    fireEvent.mouseDown(umlsSelect);
+    const connectOption = await screen.findByRole("option", {
+      name: "Connect to UMLS",
+    });
+    expect(connectOption.querySelector("li")).not.toBeInTheDocument();
+    expect(screen.getAllByRole("option")).toHaveLength(1);
+
+    fireEvent.click(connectOption);
+    expect(await screen.findByTestId("UMLS-connect-form")).toBeInTheDocument();
+  });
+
+  test("renders UMLS Active and Sign Out without nested list items", async () => {
+    (useTerminologyServiceApi as jest.Mock).mockImplementation(() => ({
+      checkLogin: jest.fn().mockResolvedValue({ status: 200, data: true }),
+    }));
+
+    render(
+      <MemoryRouter>
+        <UserUMLS />
+      </MemoryRouter>
+    );
+
+    const umlsSelect = await screen.findByRole("combobox", {
+      name: "UMLS Select",
+    });
+    await waitFor(() => expect(umlsSelect).toHaveTextContent("UMLS Active"));
+    fireEvent.mouseDown(umlsSelect);
+
+    expect(
+      await screen.findByRole("option", { name: "UMLS Active" })
+    ).toHaveAttribute("aria-disabled", "true");
+    expect(
+      screen.getByRole("option", { name: "Sign Out" })
+    ).toBeInTheDocument();
+    expect(screen.queryByTestId("UMLS-connect-button")).not.toBeInTheDocument();
+    screen
+      .getAllByRole("option")
+      .forEach((option) =>
+        expect(option.querySelector("li")).not.toBeInTheDocument()
+      );
+  });
+
   test("Clicking on UMLS connection button opens a dialog, items are present", async () => {
     await act(async () => {
       const { findByTestId } = await render(
@@ -245,9 +300,7 @@ describe("User UMLS Connection", () => {
     );
     expect(screen.queryByText("UMLS Active")).toBeInTheDocument();
     expect(screen.queryByText("Connect to UMLS")).not.toBeInTheDocument();
-    const dialogButton = await screen.findByTestId("UMLS-connect-button");
-    expect(dialogButton).toBeTruthy();
-    fireEvent.click(dialogButton);
+    expect(screen.queryByTestId("UMLS-connect-button")).not.toBeInTheDocument();
     const dialog = await screen.queryByTestId("UMLS-connect-form");
     expect(dialog).not.toBeTruthy();
   });

@@ -64,6 +64,10 @@ function UserProfile() {
           id="user-profile-select"
           data-testid="user-profile-select"
           inputProps={{ "data-testid": "user-profile-input" }}
+          SelectDisplayProps={{
+            "aria-label": "Profile Select",
+            "aria-labelledby": undefined,
+          }}
           sx={{
             height: "32px",
             borderColor: "transparent",
