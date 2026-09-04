@@ -358,28 +358,26 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
       >
         {actions.map((action) =>
           action.isSeparator ? (
-            open ? (
-              <div
-                key={action.key}
-                data-testid={action.testId}
-                aria-hidden="true"
-                style={{
-                  color: "#8C8C8C",
-                  display: "flex",
-                  alignItems: "center",
-                  margin: "0 6px",
-                  fontSize: 18,
-                }}
-              >
-                |
-              </div>
-            ) : null
+            <div
+              key={action.key}
+              data-testid={action.testId}
+              aria-hidden="true"
+              style={{
+                color: "#8C8C8C",
+                display: "flex",
+                alignItems: "center",
+                margin: "0 6px",
+                fontSize: 18,
+              }}
+            >
+              |
+            </div>
           ) : (
             <SpeedDialAction
               key={action.name}
               icon={action.icon}
               tooltipTitle={action.name}
-              data-testid={action.name.replace(/\s/g, "")}
+              data-testid={action.name.replace(/\s/g,"")}
               onClick={(event: React.MouseEvent<HTMLElement>) => {
                 setOpen(false);
                 action.onClick(event);
@@ -392,6 +390,10 @@ const CqlLibraryActionCenter = (props: PropTypes) => {
                 transitionDelay: "0s",
               }}
               arrow
+              FabProps={{
+                tabIndex: open ? 0 : -1,
+                "aria-hidden": !open,
+              }}
               slotProps={{
                 tooltip: {
                   sx: {
