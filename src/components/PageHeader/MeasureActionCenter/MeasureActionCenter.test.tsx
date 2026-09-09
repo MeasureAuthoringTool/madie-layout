@@ -7,7 +7,7 @@ import {
   routeHandlerStore,
   checkUserCanEdit,
   useUserRoles,
-  useFeatureFlags, useOktaTokens
+  useFeatureFlags,
 } from "@madie/madie-util";
 
 const mockMeasureSet = {
@@ -187,8 +187,7 @@ describe("MeasureActionCenter Component", () => {
   });
 
   it("should not render Review action when user does not have edit access", () => {
-    (checkUserCanEdit as jest.Mock)
-      .mockImplementation(() => false);
+    (checkUserCanEdit as jest.Mock).mockImplementation(() => false);
 
     render(
       <MeasureActionCenter
@@ -239,8 +238,7 @@ describe("MeasureActionCenter Component", () => {
   });
 
   it("should render a disabled Review action for a reviewer without edit access when no review status is set", () => {
-    (checkUserCanEdit as jest.Mock)
-      .mockImplementation(() => false);
+    (checkUserCanEdit as jest.Mock).mockImplementation(() => false);
     (useUserRoles as jest.Mock).mockReturnValue({
       roles: ["MADiE-Reviewer"],
       isAdmin: false,
@@ -606,7 +604,7 @@ describe("MeasureActionCenter Component", () => {
       .mockImplementationOnce(() => true)
       .mockImplementationOnce(() => false)
       .mockImplementationOnce(() => true)
-    .mockImplementationOnce(() => true); // sharedWithUser = true
+      .mockImplementationOnce(() => true); // sharedWithUser = true
 
     render(
       <MeasureActionCenter
@@ -638,8 +636,7 @@ describe("MeasureActionCenter Component", () => {
   });
 
   it("should not render Share/Unshare or Unshare from me button when user is not owner and measure is not shared with them", () => {
-    (checkUserCanEdit as jest.Mock)
-      .mockImplementation(() => false); // sharedWithUser = false
+    (checkUserCanEdit as jest.Mock).mockImplementation(() => false); // sharedWithUser = false
 
     render(
       <MeasureActionCenter
