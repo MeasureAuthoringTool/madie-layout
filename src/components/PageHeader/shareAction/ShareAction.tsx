@@ -17,10 +17,11 @@ export enum SharedOptions {
 interface PropTypes {
   options: SharedOptions[];
   onClick: (option: string) => void;
+  isOpen?: boolean;
 }
 
 const ShareAction = (props: PropTypes) => {
-  const { options, onClick } = props;
+  const { options, onClick, isOpen = false } = props;
   const [open, setOpen] = useState(false);
   // move anchorElement to a stable reference that does not change across renders.
   const anchorRef = useRef<HTMLButtonElement>(null);
@@ -51,9 +52,12 @@ const ShareAction = (props: PropTypes) => {
     <>
       <span>
         <IconButton
+          tabIndex={isOpen ? 0 : -1}
           onClick={handleClick}
           data-testid="share-action-btn"
           ref={anchorRef}
+          aria-label="Share Measure"
+          aria-hidden={!isOpen}
         >
           <ShareIcon />
         </IconButton>

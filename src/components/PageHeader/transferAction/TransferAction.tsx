@@ -8,10 +8,11 @@ import _ from "lodash";
 interface PropTypes {
   canTransfer: boolean;
   onClick: () => void;
+  isOpen?: boolean;
 }
 
 export default function TransferAction(props: PropTypes) {
-  const { canTransfer, onClick } = props;
+  const { canTransfer, onClick, isOpen = false } = props;
 
   return (
     <Tooltip
@@ -31,9 +32,12 @@ export default function TransferAction(props: PropTypes) {
     >
       <span>
         <IconButton
+          tabIndex={isOpen ? 0 : -1}
           onClick={onClick}
           disabled={!canTransfer}
           data-testid="transfer-action-btn"
+          aria-label="Transfer Measure"
+          aria-hidden={!isOpen}
         >
           <ArrowRightLeft size={20} />
         </IconButton>
