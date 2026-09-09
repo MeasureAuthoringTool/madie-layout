@@ -12,10 +12,11 @@ import { Upload } from "lucide-react";
 
 interface PropTypes {
   onClick: (exportType: string) => void;
+  isOpen?: boolean;
 }
 
 export default function ExportAction(props: PropTypes) {
-  const { onClick } = props;
+  const { onClick, isOpen = false } = props;
 
   const [open, setOpen] = useState(false);
   // move anchorElement to a stable reference that does not change across renders.
@@ -42,12 +43,15 @@ export default function ExportAction(props: PropTypes) {
   return (
     <>
       <IconButton
+        tabIndex={isOpen ? 0 : -1}
         onClick={() => {
           setOpen(true);
         }}
         data-testid="export-action-btn"
         ref={anchorRef}
         style={{ height: "40px" }}
+        aria-label="Export Measure"
+        aria-hidden={!isOpen}
       >
         <span>
           <Upload size={20} />

@@ -64,7 +64,7 @@ const MeasureActionCenter = (props: PropTypes) => {
         props.reviewStatus
       )
     );
-  }, [props, routeHandlerState, userRoles]);
+  }, [props, routeHandlerState, userRoles, open, featureFlags]);
 
   const onContinue = async () => {
     // we need every formik instance to use useFormikResetOnEvent on init
@@ -113,7 +113,7 @@ const MeasureActionCenter = (props: PropTypes) => {
 
     actions.set("human readable", {
       icon: (
-        <IconButton>
+        <IconButton tabIndex={open ? 0 : -1} aria-label="View Human Readable">
           <FileText size={20} />
         </IconButton>
       ),
@@ -125,7 +125,7 @@ const MeasureActionCenter = (props: PropTypes) => {
 
     actions.set("history", {
       icon: (
-        <IconButton>
+        <IconButton tabIndex={open ? 0 : -1} aria-label="View History">
           <History size={20} />
         </IconButton>
       ),
@@ -138,6 +138,7 @@ const MeasureActionCenter = (props: PropTypes) => {
     actions.set("export measure", {
       icon: (
         <ExportAction
+          isOpen={open}
           onClick={(exportType: string) => {
             const bundleType =
               exportType === "Executable Export" ? "export" : "publish";
@@ -157,7 +158,7 @@ const MeasureActionCenter = (props: PropTypes) => {
       if (!measure?.measureMetaData?.draft) {
         actions.set("draft measure", {
           icon: (
-            <IconButton>
+            <IconButton tabIndex={open ? 0 : -1} aria-label="Draft Measure">
               <ClipboardPen size={20} />
             </IconButton>
           ),
@@ -169,7 +170,12 @@ const MeasureActionCenter = (props: PropTypes) => {
         if (measureLockedBy) {
           actions.set("version measure", {
             icon: (
-              <IconButton disabled data-testid="versionDisabled">
+              <IconButton
+                tabIndex={open ? 0 : -1}
+                disabled
+                data-testid="versionDisabled"
+                aria-label="Version Measure"
+              >
                 <Network size={20} style={{ transform: "rotate(270deg)" }} />
               </IconButton>
             ),
@@ -178,7 +184,7 @@ const MeasureActionCenter = (props: PropTypes) => {
         } else {
           actions.set("version measure", {
             icon: (
-              <IconButton>
+              <IconButton tabIndex={open ? 0 : -1} aria-label="Version Measure">
                 <Network size={20} style={{ transform: "rotate(270deg)" }} />
               </IconButton>
             ),
@@ -192,7 +198,9 @@ const MeasureActionCenter = (props: PropTypes) => {
             actions.set("delete measure", {
               icon: (
                 <IconButton
+                  tabIndex={open ? 0 : -1}
                   className="DeleteClass"
+                  aria-label="Delete Measure"
                   disabled
                   data-testid="deleteDisabled"
                 >
@@ -204,7 +212,11 @@ const MeasureActionCenter = (props: PropTypes) => {
           } else {
             actions.set("delete measure", {
               icon: (
-                <IconButton className="DeleteClass">
+                <IconButton
+                  tabIndex={open ? 0 : -1}
+                  className="DeleteClass"
+                  aria-label="Delete Measure"
+                >
                   <Trash2 size={20} />
                 </IconButton>
               ),
@@ -220,6 +232,7 @@ const MeasureActionCenter = (props: PropTypes) => {
       actions.set("share/unshare measure", {
         icon: (
           <ShareAction
+            isOpen={open}
             options={[SharedOptions.SHARE_WITH, SharedOptions.UNSHARE]}
             onClick={(option: string) =>
               handleActionClick(
@@ -252,6 +265,7 @@ const MeasureActionCenter = (props: PropTypes) => {
       actions.set("transfer measure", {
         icon: (
           <TransferAction
+            isOpen={open}
             canTransfer={ownerOfMeasure}
             onClick={() => {
               handleActionClick(new Event("transfer-measure"));
@@ -265,6 +279,7 @@ const MeasureActionCenter = (props: PropTypes) => {
       actions.set("transfer measure", {
         icon: (
           <TransferAction
+            isOpen={open}
             canTransfer={true}
             onClick={() => {
               handleActionClick(new Event("transfer-measure"));
@@ -284,11 +299,21 @@ const MeasureActionCenter = (props: PropTypes) => {
         hasEditAccessToMeasure || (isReviewer && !!reviewStatus);
       actions.set("review measure", {
         icon: reviewEnabled ? (
-          <IconButton>
+          <IconButton
+            tabIndex={open ? 0 : -1}
+            aria-hidden={!open}
+            aria-label="Review Measure"
+          >
             <ReviewIcon />
           </IconButton>
         ) : (
-          <IconButton disabled data-testid="reviewDisabled">
+          <IconButton
+            disabled
+            data-testid="reviewDisabled"
+            aria-label="Review Measure"
+            aria-hidden={!open}
+            tabIndex={open ? 0 : -1}
+          >
             <ReviewIcon />
           </IconButton>
         ),
