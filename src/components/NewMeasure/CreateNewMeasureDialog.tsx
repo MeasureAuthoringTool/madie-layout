@@ -34,6 +34,8 @@ interface Toast {
   toastMessage: string;
 }
 const DATE_FORMAT = "YYYY-MM-DD";
+export const CQL_LIBRARY_NAME_RECOMMENDATION =
+  "It is strongly recommended your library name remain under 30 characters";
 const CreateNewMeasureDialog = ({ open, onClose }) => {
   const { getAccessToken } = useOktaTokens();
   const featureFlags: FeatureFlags = useFeatureFlags();
@@ -299,6 +301,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
             onBlur("cqlLibraryName");
           }}
           maxLength={64}
+          recommendation={CQL_LIBRARY_NAME_RECOMMENDATION}
         />
       </Box>
 
