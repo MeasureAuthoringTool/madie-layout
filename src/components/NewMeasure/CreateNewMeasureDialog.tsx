@@ -35,7 +35,7 @@ interface Toast {
 }
 const DATE_FORMAT = "YYYY-MM-DD";
 export const CQL_LIBRARY_NAME_RECOMMENDATION =
-  "It is strongly recommended your library name remain under 30 characters";
+  "It is strongly recommended that your library name remain under 30 characters";
 const CreateNewMeasureDialog = ({ open, onClose }) => {
   const { getAccessToken } = useOktaTokens();
   const featureFlags: FeatureFlags = useFeatureFlags();
