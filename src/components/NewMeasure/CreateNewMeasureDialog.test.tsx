@@ -454,39 +454,6 @@ describe("Measures Create Dialog", () => {
     expect(getByTestId("measure-model-option-QDM v5.6")).toBeInTheDocument();
   });
 
-  test("Model dropdown does not shows QI-Core v7.0.2", async () => {
-    const { getByTestId, queryByTestId } = render(
-      <CreateNewMeasureDialog open={true} onClose={undefined} />
-    );
-    const modelSelectDropDown = getByTestId("measure-model-select");
-    const modelSelectBtn = within(modelSelectDropDown).getByRole("combobox");
-    userEvent.click(modelSelectBtn);
-    expect(
-      getByTestId("measure-model-option-QI-Core v6.0.0")
-    ).toBeInTheDocument();
-    expect(getByTestId("measure-model-option-QDM v5.6")).toBeInTheDocument();
-    expect(
-      queryByTestId("measure-model-option-QI-Core v7.0.2")
-    ).not.toBeInTheDocument();
-  });
-
-  test("Model dropdown shows QI-Core v7.0.2 when feature flag is on", async () => {
-    (useFeatureFlags as jest.Mock).mockReturnValue({ qiCore7: true });
-    const { getByTestId } = render(
-      <CreateNewMeasureDialog open={true} onClose={undefined} />
-    );
-    const modelSelectDropDown = getByTestId("measure-model-select");
-    const modelSelectBtn = within(modelSelectDropDown).getByRole("combobox");
-    userEvent.click(modelSelectBtn);
-    expect(
-      getByTestId("measure-model-option-QI-Core v6.0.0")
-    ).toBeInTheDocument();
-    expect(getByTestId("measure-model-option-QDM v5.6")).toBeInTheDocument();
-    expect(
-      getByTestId("measure-model-option-QI-Core v7.0.2")
-    ).toBeInTheDocument();
-  });
-
   test("Composite check box should be visible if feature flag is ON and model is QI-Core", async () => {
     (useFeatureFlags as jest.Mock).mockReturnValue({
       QICoreCompositeMeasure: true,
