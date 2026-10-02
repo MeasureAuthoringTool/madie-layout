@@ -34,8 +34,6 @@ interface Toast {
   toastMessage: string;
 }
 const DATE_FORMAT = "YYYY-MM-DD";
-export const CQL_LIBRARY_NAME_RECOMMENDATION =
-  "It is strongly recommended that your library name remain under 30 characters";
 const CreateNewMeasureDialog = ({ open, onClose }) => {
   const { getAccessToken } = useOktaTokens();
   const featureFlags: FeatureFlags = useFeatureFlags();
@@ -78,10 +76,6 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
   modelOptions = modelOptions.filter(
     (model) => model !== "FHIR_4_0_1" && model !== "US_CORE_6_1_0"
   );
-  if (!featureFlags?.qiCore7) {
-    // remove QI-Core 7.0.2 from model options if the feature flag is not enabled
-    modelOptions = modelOptions.filter((model) => model !== "QICORE_7_0_2");
-  }
   // 4.1.1 support is discontinued now that US Quality Core is available
   modelOptions = modelOptions.filter((model) => model !== "QICORE");
   async function createMeasure(measure: Measure) {
@@ -301,7 +295,6 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
             onBlur("cqlLibraryName");
           }}
           maxLength={64}
-          recommendation={CQL_LIBRARY_NAME_RECOMMENDATION}
         />
       </Box>
 

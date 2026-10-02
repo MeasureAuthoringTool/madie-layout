@@ -11,9 +11,7 @@ import {
 } from "@testing-library/react";
 import { act, Simulate } from "react-dom/test-utils";
 import userEvent from "@testing-library/user-event";
-import CreateNewMeasureDialog, {
-  CQL_LIBRARY_NAME_RECOMMENDATION,
-} from "./CreateNewMeasureDialog";
+import CreateNewMeasureDialog from "./CreateNewMeasureDialog";
 // @ts-ignore
 import { useFeatureFlags } from "@madie/madie-util";
 
@@ -70,9 +68,6 @@ describe("Measures Create Dialog", () => {
       expect(await findByTestId("measure-model-select")).toBeInTheDocument();
       expect(await findByTestId("cql-library-name")).toBeInTheDocument();
       expect(await findByTestId("ecqm-text-field")).toBeInTheDocument();
-      expect(
-        screen.getByText(CQL_LIBRARY_NAME_RECOMMENDATION)
-      ).toBeInTheDocument();
       expect(await findByTestId("continue-button")).toBeInTheDocument();
 
       const cancelButton = await findByTestId(
@@ -457,39 +452,6 @@ describe("Measures Create Dialog", () => {
       getByTestId("measure-model-option-QI-Core v6.0.0")
     ).toBeInTheDocument();
     expect(getByTestId("measure-model-option-QDM v5.6")).toBeInTheDocument();
-  });
-
-  test("Model dropdown does not shows QI-Core v7.0.2", async () => {
-    const { getByTestId, queryByTestId } = render(
-      <CreateNewMeasureDialog open={true} onClose={undefined} />
-    );
-    const modelSelectDropDown = getByTestId("measure-model-select");
-    const modelSelectBtn = within(modelSelectDropDown).getByRole("combobox");
-    userEvent.click(modelSelectBtn);
-    expect(
-      getByTestId("measure-model-option-QI-Core v6.0.0")
-    ).toBeInTheDocument();
-    expect(getByTestId("measure-model-option-QDM v5.6")).toBeInTheDocument();
-    expect(
-      queryByTestId("measure-model-option-QI-Core v7.0.2")
-    ).not.toBeInTheDocument();
-  });
-
-  test("Model dropdown shows QI-Core v7.0.2 when feature flag is on", async () => {
-    (useFeatureFlags as jest.Mock).mockReturnValue({ qiCore7: true });
-    const { getByTestId } = render(
-      <CreateNewMeasureDialog open={true} onClose={undefined} />
-    );
-    const modelSelectDropDown = getByTestId("measure-model-select");
-    const modelSelectBtn = within(modelSelectDropDown).getByRole("combobox");
-    userEvent.click(modelSelectBtn);
-    expect(
-      getByTestId("measure-model-option-QI-Core v6.0.0")
-    ).toBeInTheDocument();
-    expect(getByTestId("measure-model-option-QDM v5.6")).toBeInTheDocument();
-    expect(
-      getByTestId("measure-model-option-QI-Core v7.0.2")
-    ).toBeInTheDocument();
   });
 
   test("Composite check box should be visible if feature flag is ON and model is QI-Core", async () => {
