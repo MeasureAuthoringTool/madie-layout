@@ -11,7 +11,6 @@ import {
   useUserServiceApi,
 } from "@madie/madie-util";
 import { useOktaAuth } from "@okta/okta-react";
-import { loginLogger } from "../../custom-hooks/customLog";
 
 function Login({ config }: { config: OktaConfig }) {
   useDocumentTitle("MADiE Login");
@@ -44,16 +43,6 @@ function Login({ config }: { config: OktaConfig }) {
           // ignore errors
         }
         oktaAuth.handleLoginRedirect(tokens);
-        if (oktaAuth.token != null && oktaAuth.token.getUserInfo() != null) {
-          oktaAuth.token
-            .getUserInfo()
-            .then((info) => () => {
-              loginLogger(info, serviceConfig);
-            })
-            .catch((error) => {
-              console.error("Error writing Login info", error);
-            });
-        }
       },
       onError: (err) => {
         /* Placeholder to handle error returned from login widget  */

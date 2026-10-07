@@ -21,25 +21,21 @@ jest.mock("@okta/okta-react", () => ({
   useOktaAuth: jest.fn(),
 }));
 
-const mockLogoutLogger = jest.fn((args) => {
-  Promise.resolve("logged");
-});
-jest.mock("../../custom-hooks/customLog", () => {
-  //lazy load the mock otherwise will thorw ReferenceError: Cannot access 'mockLogoutLogger' before initialization
-  return {
-    logoutLogger: (args) => {
-      return mockLogoutLogger(args);
-    },
-  };
-});
 const MockSignOut = jest.fn().mockImplementation(() => {
   return Promise.resolve();
 });
 
 jest.mock("@madie/madie-util", () => ({
   useTerminologyServiceApi: jest.fn(),
-  useMeasureServiceApi: jest.fn(),
-  useCqlLibraryServiceApi: jest.fn(),
+  useMeasureServiceApi: jest.fn(() => ({
+    unlockMeasures: jest.fn().mockResolvedValue({}),
+  })),
+  useCqlLibraryServiceApi: jest.fn(() => ({
+    unlockLibraries: jest.fn().mockResolvedValue({}),
+  })),
+  useUserServiceApi: jest.fn(() => ({
+    logoutLog: jest.fn().mockResolvedValue({}),
+  })),
   useFeatureFlags: jest.fn().mockReturnValue({}),
   useUserRoles: jest.fn().mockReturnValue({ roles: [], isAdmin: false }),
   getServiceConfig: () => ({
@@ -80,6 +76,9 @@ beforeEach(() => {
       signOut: MockSignOut,
       tokenManager: {
         renew: mockRenewToken,
+        getTokens: jest
+          .fn()
+          .mockResolvedValue({ accessToken: { value: "token" } }),
       },
     },
     authState: { isAuthenticated: true },
