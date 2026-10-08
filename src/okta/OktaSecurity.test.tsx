@@ -18,19 +18,51 @@ jest.mock("@okta/okta-react", () => ({
     <div data-testid="security">{children}</div>
   )),
 }));
-jest.mock("@okta/okta-auth-js", () => ({
-  OktaAuth: jest.fn().mockImplementation((config) => ({ options: config })),
-  toRelativeUrl: jest.fn((uri) => uri),
-}));
+jest.mock("@okta/okta-auth-js", () => {
+  const actualOkta = jest.requireActual("@okta/okta-auth-js");
+  return {
+    __esModule: true,
+    OktaAuth: jest.fn().mockImplementation((config) => ({ options: config })),
+    toRelativeUrl: jest.fn(actualOkta.toRelativeUrl),
+  };
+});
 jest.mock("./../router/Router", () =>
   jest.fn(() => <div data-testid="router" />)
 );
 
 describe("OktaSecurity", () => {
+  const originalLocation = window.location;
+  const originalUrl = originalLocation.href;
+
   beforeEach(() => {
     jest.clearAllMocks();
     localStorage.clear();
     sessionStorage.clear();
+
+    // 1. Delete the read-only window.location property
+    delete (window as any).location;
+
+    // 2. Redefine it with a mock assign function and a default origin
+    window.location = {
+      ...originalLocation,
+      origin: "https://madie.cms.gov",
+      get pathname() {
+        return originalLocation.pathname;
+      },
+      get search() {
+        return originalLocation.search;
+      },
+      get hash() {
+        return originalLocation.hash;
+      },
+      assign: jest.fn(), // Create the spy
+    } as any;
+  });
+
+  afterEach(() => {
+    // 3. Clean up and restore the original global object
+    window.location = originalLocation;
+    window.history.replaceState({}, "", originalUrl);
   });
 
   it("renders loading message initially", () => {
@@ -124,6 +156,120 @@ describe("OktaSecurity", () => {
       "/libraries",
       window.location.origin
     );
+    expect(sessionStorage.getItem(MADIE_TIMEOUT_RETURN_URL)).toBeNull();
+  });
+
+  it("calls assign with the URL segment", async () => {
+    (madieUtil.getOktaConfig as jest.Mock).mockResolvedValue({
+      issuer: "https://example.com/oauth2/default",
+      clientId: "clientId",
+      redirectUri: "http://localhost:3000/login/callback",
+      scopes: ["openid", "profile", "email"],
+    });
+
+    render(<OktaSecurity />);
+    await waitFor(() =>
+      expect(screen.getByTestId("security")).toBeInTheDocument()
+    );
+
+    const securityProps = (Security as jest.Mock).mock.calls[0][0];
+    await securityProps.restoreOriginalUri({}, "/measures");
+
+    expect(toRelativeUrl).toHaveBeenCalled();
+
+    expect(window.location.assign).toHaveBeenCalledTimes(1);
+    expect(window.location.assign).toHaveBeenCalledWith("/measures");
+  });
+
+  it("calls assign including query parameters", async () => {
+    (madieUtil.getOktaConfig as jest.Mock).mockResolvedValue({
+      issuer: "https://example.com/oauth2/default",
+      clientId: "clientId",
+      redirectUri: "http://localhost:3000/login/callback",
+      scopes: ["openid", "profile", "email"],
+    });
+
+    render(<OktaSecurity />);
+    await waitFor(() =>
+      expect(screen.getByTestId("security")).toBeInTheDocument()
+    );
+
+    const securityProps = (Security as jest.Mock).mock.calls[0][0];
+    await securityProps.restoreOriginalUri({}, "/measures?page=1&limit=10");
+
+    expect(toRelativeUrl).toHaveBeenCalled();
+
+    expect(window.location.assign).toHaveBeenCalledTimes(1);
+    expect(window.location.assign).toHaveBeenCalledWith(
+      "/measures?page=1&limit=10"
+    );
+  });
+
+  it("does not call assign when a malicious URL is formed", async () => {
+    (madieUtil.getOktaConfig as jest.Mock).mockResolvedValue({
+      issuer: "https://example.com/oauth2/default",
+      clientId: "clientId",
+      redirectUri: "http://localhost:3000/login/callback",
+      scopes: ["openid", "profile", "email"],
+    });
+
+    render(<OktaSecurity />);
+    await waitFor(() =>
+      expect(screen.getByTestId("security")).toBeInTheDocument()
+    );
+
+    const securityProps = (Security as jest.Mock).mock.calls[0][0];
+    await securityProps.restoreOriginalUri({}, "//attacker.example");
+
+    expect(toRelativeUrl).toHaveBeenCalled();
+
+    expect(window.location.assign).not.toHaveBeenCalled();
+  });
+
+  it.each(["//attacker.example", "/\\attacker.example"])(
+    "does not navigate to an unsafe stored return URL: %s",
+    async (returnUrl) => {
+      (madieUtil.getOktaConfig as jest.Mock).mockResolvedValue({
+        issuer: "https://example.com/oauth2/default",
+        clientId: "clientId",
+        redirectUri: "http://localhost:3000/login/callback",
+        scopes: ["openid", "profile", "email"],
+      });
+      sessionStorage.setItem(MADIE_TIMEOUT_RETURN_URL, returnUrl);
+
+      render(<OktaSecurity />);
+      await waitFor(() =>
+        expect(screen.getByTestId("security")).toBeInTheDocument()
+      );
+
+      const securityProps = (Security as jest.Mock).mock.calls[0][0];
+      await securityProps.restoreOriginalUri({}, "/from-okta");
+
+      expect(window.location.assign).not.toHaveBeenCalled();
+      expect(sessionStorage.getItem(MADIE_TIMEOUT_RETURN_URL)).toBeNull();
+    }
+  );
+
+  it("restores a stored internal deep link with query and hash", async () => {
+    (madieUtil.getOktaConfig as jest.Mock).mockResolvedValue({
+      issuer: "https://example.com/oauth2/default",
+      clientId: "clientId",
+      redirectUri: "http://localhost:3000/login/callback",
+      scopes: ["openid", "profile", "email"],
+    });
+    const returnUrl = "/measures/123/edit?version=2#details";
+    sessionStorage.setItem(MADIE_TIMEOUT_RETURN_URL, returnUrl);
+
+    render(<OktaSecurity />);
+    await waitFor(() =>
+      expect(screen.getByTestId("security")).toBeInTheDocument()
+    );
+
+    const securityProps = (Security as jest.Mock).mock.calls[0][0];
+    await securityProps.restoreOriginalUri({}, "/from-okta");
+
+    expect(window.location.assign).toHaveBeenCalledTimes(1);
+    expect(window.location.assign).toHaveBeenCalledWith(returnUrl);
     expect(sessionStorage.getItem(MADIE_TIMEOUT_RETURN_URL)).toBeNull();
   });
 

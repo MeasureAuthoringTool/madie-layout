@@ -89,9 +89,19 @@ function OktaSecurity() {
     // New method is to just update the url using native function. Same with customAuthHandler.
     // This may also very likely not even be necessary at all with router-dom 6 based on how the routes are set
     const timeoutReturnUrl = consumeTimeoutReturnUrl();
-    const redirectTarget = timeoutReturnUrl || originalUri || "/measures";
+    const redirectTarget = (
+      timeoutReturnUrl ||
+      originalUri ||
+      "/measures"
+    ).trim();
+
+    const relativeUrl = toRelativeUrl(redirectTarget, window.location.origin);
+    const resolvedUrl = new URL(relativeUrl, window.location.origin);
+    if (resolvedUrl.origin !== window.location.origin) {
+      return; // Block Open Redirection attempt
+    }
     window.location.assign(
-      toRelativeUrl(redirectTarget, window.location.origin)
+      resolvedUrl.pathname + resolvedUrl.search + resolvedUrl.hash
     );
   };
 
