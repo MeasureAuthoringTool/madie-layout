@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useOktaAuth } from "@okta/okta-react";
-import { logoutLogger } from "../../custom-hooks/customLog";
 import tw, { styled } from "twin.macro";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -10,6 +9,7 @@ import {
   useCqlLibraryServiceApi,
   useServiceConfig,
   ServiceConfig,
+  useUserServiceApi,
 } from "@madie/madie-util";
 import { performLogoutCleanup } from "../../services/logoutCleanup";
 import { clearTimeoutReturnUrl } from "../../services/timeoutReturnUrl";
@@ -22,8 +22,10 @@ function UserProfile() {
   const config: ServiceConfig = useServiceConfig();
   const [userInfo, setUserInfo] = useState(null);
   const [userFirstName, setUserFirstName] = useState<string>("");
+  const [token, setToken] = useState(null);
   const measureServiceApiRef = useRef(useMeasureServiceApi());
   const cqlLibraryServiceApiRef = useRef(useCqlLibraryServiceApi());
+  const userServiceApiRef = useRef(useUserServiceApi());
   useEffect(() => {
     window.localStorage.removeItem("givenName");
     oktaAuth.token
@@ -35,12 +37,19 @@ function UserProfile() {
         window.dispatchEvent(new Event("storage"));
       })
       .catch((error) => {});
+
+    oktaAuth.tokenManager
+      .getTokens()
+      .then((tokens) => {
+        setToken(tokens.accessToken);
+      })
+      .catch((error) => {});
   }, [oktaAuth.token]);
 
   const logout = async () => {
     clearTimeoutReturnUrl();
     //breaks because logoutLogger is using a hook
-    logoutLogger(userInfo, config);
+    const userLogout = await userServiceApiRef.current.logoutLog(token);
     // Release any measures/CQL libraries locked by this user before signing out
     // so other team members aren't blocked. Failures are logged but never block
     // logout (handled inside performLogoutCleanup).

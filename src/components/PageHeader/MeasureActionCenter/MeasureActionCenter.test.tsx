@@ -102,14 +102,14 @@ describe("MeasureActionCenter Component", () => {
 
     expect(screen.queryByTestId("DeleteMeasure")).not.toBeInTheDocument();
     expect(screen.queryByTestId("VersionMeasure")).not.toBeInTheDocument();
-    expect(screen.getByTestId("Share/Unshare")).toBeInTheDocument();
+    expect(screen.getByTestId("ShareorUnshareMeasure")).toBeInTheDocument();
     const draftMeasureBtn = screen.getByTestId("DraftMeasure");
     expect(draftMeasureBtn).toBeInTheDocument();
     expect(screen.getByTestId("ExportMeasure")).toBeInTheDocument();
-    expect(screen.getByTestId("Viewhumanreadable")).toBeInTheDocument();
+    expect(screen.getByTestId("ViewHumanReadable")).toBeInTheDocument();
     expect(screen.getByTestId("ViewHistory")).toBeInTheDocument();
     expect(screen.getByTestId("Transfer")).toBeInTheDocument();
-    expect(screen.getByTestId("Review")).toBeInTheDocument();
+    expect(screen.getByTestId("ReviewMeasure")).toBeInTheDocument();
 
     userEvent.click(draftMeasureBtn);
     expect(dispatchEventSpy).toHaveBeenCalledWith(
@@ -132,7 +132,7 @@ describe("MeasureActionCenter Component", () => {
     userEvent.click(actionCenterButton);
     expect(screen.queryByTestId("DeleteMeasure")).not.toBeInTheDocument();
     expect(screen.queryByTestId("VersionMeasure")).not.toBeInTheDocument();
-    expect(screen.getByTestId("Share/Unshare")).toBeInTheDocument();
+    expect(screen.getByTestId("ShareorUnshareMeasure")).toBeInTheDocument();
     expect(screen.getByTestId("DraftMeasure")).toBeInTheDocument();
     expect(screen.getByTestId("ExportMeasure")).toBeInTheDocument();
     expect(screen.getByTestId("Transfer")).toBeInTheDocument();
@@ -161,7 +161,7 @@ describe("MeasureActionCenter Component", () => {
     const actionCenterButton = screen.getByLabelText("Measure action center");
     userEvent.click(actionCenterButton);
 
-    expect(screen.getByTestId("Review")).toBeInTheDocument();
+    expect(screen.getByTestId("ReviewMeasure")).toBeInTheDocument();
   });
 
   it("should trigger review-measure event when Review action is clicked", () => {
@@ -176,7 +176,7 @@ describe("MeasureActionCenter Component", () => {
     const actionCenterButton = screen.getByLabelText("Measure action center");
     userEvent.click(actionCenterButton);
 
-    const reviewButton = screen.getByTestId("Review");
+    const reviewButton = screen.getByTestId("ReviewMeasure");
     userEvent.click(reviewButton);
 
     expect(dispatchEventSpy).toHaveBeenCalledWith(
@@ -226,10 +226,10 @@ describe("MeasureActionCenter Component", () => {
     const actionCenterButton = screen.getByLabelText("Measure action center");
     userEvent.click(actionCenterButton);
 
-    expect(screen.getByTestId("Review")).toBeInTheDocument();
+    expect(screen.getByTestId("ReviewMeasure")).toBeInTheDocument();
     expect(screen.queryByTestId("reviewDisabled")).not.toBeInTheDocument();
 
-    userEvent.click(screen.getByTestId("Review"));
+    userEvent.click(screen.getByTestId("ReviewMeasure"));
     expect(dispatchEventSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         type: "review-measure",
@@ -256,10 +256,10 @@ describe("MeasureActionCenter Component", () => {
     const actionCenterButton = screen.getByLabelText("Measure action center");
     userEvent.click(actionCenterButton);
 
-    expect(screen.getByTestId("Review")).toBeInTheDocument();
+    expect(screen.getByTestId("ReviewMeasure")).toBeInTheDocument();
     expect(screen.getByTestId("reviewDisabled")).toBeDisabled();
 
-    userEvent.click(screen.getByTestId("Review"));
+    userEvent.click(screen.getByTestId("ReviewMeasure"));
     expect(dispatchEventSpy).not.toHaveBeenCalledWith(
       expect.objectContaining({
         type: "review-measure",
@@ -279,7 +279,7 @@ describe("MeasureActionCenter Component", () => {
     const actionCenterButton = screen.getByLabelText("Measure action center");
     userEvent.click(actionCenterButton);
 
-    expect(screen.getByTestId("Review")).toBeInTheDocument();
+    expect(screen.getByTestId("ReviewMeasure")).toBeInTheDocument();
     expect(screen.queryByTestId("reviewDisabled")).not.toBeInTheDocument();
   });
 
@@ -484,7 +484,7 @@ describe("MeasureActionCenter Component", () => {
     );
     const actionCenterButton = screen.getByLabelText("Measure action center");
     userEvent.click(actionCenterButton);
-    const viewHRButton = screen.getByTestId("Viewhumanreadable");
+    const viewHRButton = screen.getByTestId("ViewHumanReadable");
     userEvent.click(viewHRButton);
     expect(dispatchEventSpy).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -517,7 +517,7 @@ describe("MeasureActionCenter Component", () => {
     );
     const actionCenterButton = screen.getByLabelText("Measure action center");
     userEvent.click(actionCenterButton);
-    expect(screen.getByTestId("Share/Unshare")).toBeInTheDocument();
+    expect(screen.getByTestId("ShareorUnshareMeasure")).toBeInTheDocument();
   });
 
   it("should not render Share button if the user is not the owner of the measure", () => {
@@ -843,7 +843,7 @@ describe("MeasureActionCenter Component", () => {
       const actionCenterButton = screen.getByLabelText("Measure action center");
       userEvent.click(actionCenterButton);
 
-      expect(screen.getByTestId("Share/Unshare")).toBeInTheDocument();
+      expect(screen.getByTestId("ShareorUnshareMeasure")).toBeInTheDocument();
     });
 
     it("should not show Share/Unshare action for non-admin user", () => {

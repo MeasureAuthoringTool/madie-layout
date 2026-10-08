@@ -27,11 +27,6 @@ const mockUnlockLibraries = jest.fn();
 
 const mockLoginUser = jest.fn();
 
-// Mock loginLogger function
-jest.mock("../../custom-hooks/customLog", () => ({
-  loginLogger: jest.fn(),
-}));
-
 jest.mock("@madie/madie-util", () => ({
   useDocumentTitle: jest.fn(),
   useServiceConfig: jest.fn(() => mockConfig),
