@@ -118,7 +118,7 @@ const MeasureActionCenter = (props: PropTypes) => {
         </IconButton>
       ),
       name: routeHandlerState?.canTravel
-        ? `View human readable`
+        ? `View Human Readable`
         : `Save measure to view human readable`,
       onClick: () => handleActionClick(new Event("view-humanreadable")),
     });
@@ -245,7 +245,7 @@ const MeasureActionCenter = (props: PropTypes) => {
             }
           />
         ),
-        name: "Share/Unshare",
+        name: "Share or Unshare Measure",
       });
     } else if (sharedWithUser) {
       actions.set("unshare measure from me", {
@@ -317,7 +317,7 @@ const MeasureActionCenter = (props: PropTypes) => {
             <ReviewIcon />
           </IconButton>
         ),
-        name: "Review",
+        name: "Review Measure",
         ...(reviewEnabled && {
           onClick: () => handleActionClick(new Event("review-measure")),
         }),

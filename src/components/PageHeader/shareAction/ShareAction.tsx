@@ -56,7 +56,7 @@ const ShareAction = (props: PropTypes) => {
           onClick={handleClick}
           data-testid="share-action-btn"
           ref={anchorRef}
-          aria-label="Share Measure"
+          aria-label="Share or Unshare Measure"
           aria-hidden={!isOpen}
         >
           <ShareIcon />
