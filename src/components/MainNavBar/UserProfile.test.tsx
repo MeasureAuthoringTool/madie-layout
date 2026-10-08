@@ -3,23 +3,37 @@ import { fireEvent, render, waitFor, cleanup } from "@testing-library/react";
 import UserProfile from "./UserProfile";
 import { MemoryRouter } from "react-router";
 import { useOktaAuth } from "@okta/okta-react";
-import { act, Simulate } from "react-dom/test-utils";
+import { act } from "react-dom/test-utils";
 import { clearTimeoutReturnUrl } from "../../services/timeoutReturnUrl";
+import { performLogoutCleanup } from "../../services/logoutCleanup";
 
 jest.mock("@okta/okta-react", () => ({
   useOktaAuth: jest.fn(),
 }));
 
-jest.mock("@madie/madie-util", () => ({
-  useMeasureServiceApi: () => ({
-    getUserInfo: jest.fn().mockResolvedValue({}),
-    unlockMeasures: jest.fn().mockResolvedValue({}),
-  }),
-  useCqlLibraryServiceApi: () => ({
-    getUserInfo: jest.fn().mockResolvedValue({}),
-    unlockLibraries: jest.fn().mockResolvedValue({}),
-  }),
+jest.mock("../../services/timeoutReturnUrl", () => ({
+  clearTimeoutReturnUrl: jest.fn(),
+}));
 
+jest.mock("../../services/logoutCleanup", () => ({
+  performLogoutCleanup: jest.fn().mockResolvedValue(undefined),
+}));
+
+const mockLogoutLog = jest.fn().mockResolvedValue({});
+const mockUnlockMeasures = jest.fn().mockResolvedValue({});
+const mockUnlockLibraries = jest.fn().mockResolvedValue({});
+const mockSignOut = jest.fn().mockResolvedValue(undefined);
+
+jest.mock("@madie/madie-util", () => ({
+  useMeasureServiceApi: jest.fn(() => ({
+    unlockMeasures: mockUnlockMeasures,
+  })),
+  useCqlLibraryServiceApi: jest.fn(() => ({
+    unlockLibraries: mockUnlockLibraries,
+  })),
+  useUserServiceApi: jest.fn(() => ({
+    logoutLog: mockLogoutLog,
+  })),
   getServiceConfig: () => ({
     measureService: {
       baseUrl: "example-service-url",
@@ -39,55 +53,45 @@ jest.mock("@madie/madie-util", () => ({
   }),
 }));
 
-const mockLogoutLogger = jest.fn((args) => {
-  Promise.resolve("logged");
-});
-jest.mock("../../custom-hooks/customLog", () => {
-  //lazy load the mock otherwise will thorw ReferenceError: Cannot access 'mockLogoutLogger' before initialization
-  return {
-    logoutLogger: (args) => {
-      return mockLogoutLogger(args);
-    },
-  };
-});
-jest.mock("../../services/timeoutReturnUrl", () => ({
-  clearTimeoutReturnUrl: jest.fn(),
-}));
-const MockSignOut = jest.fn().mockImplementation(() => {
-  return Promise.resolve();
-});
-
 beforeEach(() => {
-  mockLogoutLogger.mockClear();
-  MockSignOut.mockClear();
+  jest.clearAllMocks();
+  mockLogoutLog.mockResolvedValue({});
+  mockUnlockMeasures.mockResolvedValue({});
+  mockUnlockLibraries.mockResolvedValue({});
   (clearTimeoutReturnUrl as jest.Mock).mockClear();
 
-  const mockGetUserInfo = jest.fn().mockImplementation(() => {
-    return Promise.resolve({ name: "test name", given_name: "test" });
+  const mockGetUserInfo = jest.fn().mockResolvedValue({
+    name: "test name",
+    given_name: "test",
   });
-  const mockToken = { getUserInfo: mockGetUserInfo };
+  const mockAccessToken = { value: "test-access-token" };
 
   (useOktaAuth as jest.Mock).mockImplementation(() => ({
     oktaAuth: {
-      token: mockToken,
-      signOut: MockSignOut,
+      token: { getUserInfo: mockGetUserInfo },
+      tokenManager: {
+        getTokens: jest
+          .fn()
+          .mockResolvedValue({ accessToken: mockAccessToken }),
+      },
+      signOut: mockSignOut,
     },
     authState: { isAuthenticated: true },
   }));
 });
+
 afterEach(cleanup);
 
 describe("UserProfile component", () => {
   test("Should render", async () => {
-    await act(async () => {
-      const { getByTestId } = await render(
-        <MemoryRouter>
-          <UserProfile />
-        </MemoryRouter>
-      );
-      expect(getByTestId("user-profile-form")).toBeInTheDocument();
-      expect(getByTestId("user-profile-select")).toBeInTheDocument();
-    });
+    const { getByTestId } = render(
+      <MemoryRouter>
+        <UserProfile />
+      </MemoryRouter>
+    );
+
+    expect(getByTestId("user-profile-form")).toBeInTheDocument();
+    expect(getByTestId("user-profile-select")).toBeInTheDocument();
   });
 
   test("labels the profile dropdown without aria-labelledby", async () => {
@@ -104,107 +108,77 @@ describe("UserProfile component", () => {
   });
 
   test("Should render user profile dropdown options and allow users to select logout", async () => {
-    await act(async () => {
-      const { getByTestId } = await render(
-        <MemoryRouter>
-          <UserProfile />
-        </MemoryRouter>
-      );
-      const userInfoSelect = await getByTestId("user-profile-select");
-      fireEvent.click(userInfoSelect);
-      const userInputSelect = await getByTestId("user-profile-input");
-      fireEvent.select(userInputSelect, { target: { value: "Logout" } });
-      expect(userInputSelect.value).toBe("Logout");
-      Simulate.change(userInputSelect);
-      await waitFor(() => expect(mockLogoutLogger).toHaveBeenCalled());
-    });
-  });
+    const { getByTestId } = render(
+      <MemoryRouter>
+        <UserProfile />
+      </MemoryRouter>
+    );
 
-  test("Should render user profile dropdown options and allow users to select logout, except done differently to trigger onChange", async () => {
-    await act(async () => {
-      const { getByTestId } = await render(
-        <MemoryRouter>
-          <UserProfile />
-        </MemoryRouter>
-      );
-      const userInfoSelect = await getByTestId("user-profile-select");
-      fireEvent.click(userInfoSelect);
-      const userInputSelect = await getByTestId("user-profile-input");
-      fireEvent.select(userInputSelect, { target: { value: "Logout" } });
-      expect(userInputSelect.value).toBe("Logout");
-      Simulate.change(userInputSelect);
-      fireEvent.click(getByTestId("user-profile-input"));
-      fireEvent.blur(getByTestId("user-profile-input"));
-      fireEvent.click(getByTestId("user-profile-input"));
-      await waitFor(() => expect(mockLogoutLogger).toHaveBeenCalled());
-    });
+    const userInputSelect = getByTestId("user-profile-input");
+    fireEvent.change(userInputSelect, { target: { value: "Logout" } });
+
+    await waitFor(() => expect(mockLogoutLog).toHaveBeenCalled());
+    await waitFor(() => expect(clearTimeoutReturnUrl).toHaveBeenCalled());
+    await waitFor(() => expect(performLogoutCleanup).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(mockSignOut).toHaveBeenCalledTimes(1));
   });
 
   test("Should render empty user name", async () => {
-    const mockGetUserInfo = jest.fn().mockImplementation(() => {
-      return Promise.reject("user name null");
-    });
-    const mockToken = { getUserInfo: mockGetUserInfo };
-    const MockSignOut = jest.fn().mockImplementation(() => {
-      Promise.resolve();
-    });
-
+    const mockGetUserInfo = jest
+      .fn()
+      .mockRejectedValue(new Error("user name null"));
     (useOktaAuth as jest.Mock).mockImplementation(() => ({
       oktaAuth: {
-        token: mockToken,
-        signOut: MockSignOut,
+        token: { getUserInfo: mockGetUserInfo },
+        tokenManager: {
+          getTokens: jest
+            .fn()
+            .mockResolvedValue({ accessToken: { value: "token" } }),
+        },
+        signOut: mockSignOut,
       },
       authState: { isAuthenticated: true },
     }));
-    await act(async () => {
-      const { getByTestId } = await render(
-        <MemoryRouter>
-          <UserProfile />
-        </MemoryRouter>
-      );
-      const userInfoSelect = await getByTestId("user-profile-select");
-      fireEvent.click(userInfoSelect);
-      const userInputSelect = await getByTestId("user-profile-input");
-      fireEvent.click(userInfoSelect);
-      fireEvent.change(userInputSelect, { target: { value: "Logout" } });
-      await waitFor(() => expect(mockLogoutLogger).toHaveBeenCalled());
-      await waitFor(() => expect(MockSignOut).toHaveBeenCalled());
-    });
+
+    const { getByTestId } = render(
+      <MemoryRouter>
+        <UserProfile />
+      </MemoryRouter>
+    );
+
+    expect(getByTestId("user-profile-form")).toBeInTheDocument();
+    expect(getByTestId("user-profile-input")).toBeInTheDocument();
+    expect(mockSignOut).not.toHaveBeenCalled();
   });
 
   it("Should do logging when user chooses Sign Out", async () => {
-    await act(async () => {
-      const { getByTestId } = await render(
-        <MemoryRouter>
-          <UserProfile />
-        </MemoryRouter>
-      );
+    const { getByTestId } = render(
+      <MemoryRouter>
+        <UserProfile />
+      </MemoryRouter>
+    );
 
-      const userInfoSelect = await getByTestId("user-profile-select");
-      fireEvent.click(userInfoSelect);
-      const userInputSelect = await getByTestId("user-profile-input");
-      fireEvent.change(userInputSelect, { target: { value: "Logout" } });
-      fireEvent.blur(getByTestId("user-profile-select"));
-      await waitFor(() => expect(mockLogoutLogger).toHaveBeenCalled());
-      await waitFor(() => expect(MockSignOut).toHaveBeenCalled());
-    });
+    const userInputSelect = getByTestId("user-profile-input");
+    fireEvent.change(userInputSelect, { target: { value: "Logout" } });
+
+    await waitFor(() => expect(mockLogoutLog).toHaveBeenCalled());
+    await waitFor(() => expect(performLogoutCleanup).toHaveBeenCalled());
+    await waitFor(() => expect(mockSignOut).toHaveBeenCalled());
   });
 
   test("Should not do logging when user chooses options other than Sign Out", async () => {
-    await act(async () => {
-      const { getByTestId } = await render(
-        <MemoryRouter>
-          <UserProfile />
-        </MemoryRouter>
-      );
-      const userInfoSelect = await getByTestId("user-profile-select");
-      fireEvent.click(userInfoSelect);
-      const userInputSelect = await getByTestId("user-profile-input");
-      fireEvent.change(userInputSelect, { target: { value: "test" } });
-      expect(userInputSelect.value).toBe("test");
-      fireEvent.blur(getByTestId("user-profile-select"));
-      await waitFor(() => expect(mockLogoutLogger).not.toHaveBeenCalled());
-    });
+    const { getByTestId } = render(
+      <MemoryRouter>
+        <UserProfile />
+      </MemoryRouter>
+    );
+
+    const userInputSelect = getByTestId("user-profile-input");
+    fireEvent.change(userInputSelect, { target: { value: "test" } });
+
+    await waitFor(() => expect(mockLogoutLog).not.toHaveBeenCalled());
+    await waitFor(() => expect(performLogoutCleanup).not.toHaveBeenCalled());
+    await waitFor(() => expect(mockSignOut).not.toHaveBeenCalled());
   });
 
   it("clears timeout return URL when user manually signs out", async () => {
@@ -214,12 +188,10 @@ describe("UserProfile component", () => {
       </MemoryRouter>
     );
 
-    const userInfoSelect = await getByTestId("user-profile-select");
-    fireEvent.click(userInfoSelect);
-    const userInputSelect = await getByTestId("user-profile-input");
+    const userInputSelect = getByTestId("user-profile-input");
     fireEvent.change(userInputSelect, { target: { value: "Logout" } });
 
     await waitFor(() => expect(clearTimeoutReturnUrl).toHaveBeenCalled());
-    await waitFor(() => expect(MockSignOut).toHaveBeenCalled());
+    await waitFor(() => expect(mockSignOut).toHaveBeenCalled());
   });
 });
