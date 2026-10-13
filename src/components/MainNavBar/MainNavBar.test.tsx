@@ -98,6 +98,21 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe("MainNavBar Component", () => {
+  test("DropMenu only has list items as direct children", () => {
+    const { container } = render(
+      <MemoryRouter>
+        <MainNavBar />
+      </MemoryRouter>
+    );
+
+    const dropMenu = container.querySelector("#dropdown_div > ul");
+
+    expect(dropMenu).not.toBeNull();
+    expect(
+      Array.from(dropMenu.children).every((child) => child.tagName === "LI")
+    ).toBe(true);
+  });
+
   test("Selecting different navigation routes, provides elements with classes as expected.", async () => {
     const { findByTestId } = render(
       <MemoryRouter>
