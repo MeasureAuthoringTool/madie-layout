@@ -31,7 +31,7 @@ const isSharedWithUser = (measure) => {
   return measure && checkUserCanEdit(null, measure?.measureSet?.acls);
 };
 
-const TRANSFER_MEASURE = "Transfer";
+const TRANSFER_MEASURE = "Transfer Measure";
 const CANNOT_TRANSFER = "You cannot transfer a measure you do not own.";
 
 const MeasureActionCenter = (props: PropTypes) => {
