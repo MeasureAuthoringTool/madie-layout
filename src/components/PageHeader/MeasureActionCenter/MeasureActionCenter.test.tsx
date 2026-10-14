@@ -108,7 +108,7 @@ describe("MeasureActionCenter Component", () => {
     expect(screen.getByTestId("ExportMeasure")).toBeInTheDocument();
     expect(screen.getByTestId("ViewHumanReadable")).toBeInTheDocument();
     expect(screen.getByTestId("ViewHistory")).toBeInTheDocument();
-    expect(screen.getByTestId("Transfer")).toBeInTheDocument();
+    expect(screen.getByTestId("TransferMeasure")).toBeInTheDocument();
     expect(screen.getByTestId("ReviewMeasure")).toBeInTheDocument();
 
     userEvent.click(draftMeasureBtn);
@@ -135,7 +135,7 @@ describe("MeasureActionCenter Component", () => {
     expect(screen.getByTestId("ShareorUnshareMeasure")).toBeInTheDocument();
     expect(screen.getByTestId("DraftMeasure")).toBeInTheDocument();
     expect(screen.getByTestId("ExportMeasure")).toBeInTheDocument();
-    expect(screen.getByTestId("Transfer")).toBeInTheDocument();
+    expect(screen.getByTestId("TransferMeasure")).toBeInTheDocument();
     const transferMeasureBtn = screen.getByTestId("transfer-action-btn");
     expect(transferMeasureBtn).toBeInTheDocument();
     expect(transferMeasureBtn).toBeEnabled();
@@ -797,7 +797,7 @@ describe("MeasureActionCenter Component", () => {
       const actionCenterButton = screen.getByLabelText("Measure action center");
       await userEvent.click(actionCenterButton);
 
-      expect(screen.getByTestId("Transfer")).toBeInTheDocument();
+      expect(screen.getByTestId("TransferMeasure")).toBeInTheDocument();
       const transferBtn = screen.getByTestId("transfer-action-btn");
       expect(transferBtn).toBeEnabled();
     });
