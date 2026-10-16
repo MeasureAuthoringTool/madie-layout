@@ -11,7 +11,9 @@ import {
 } from "@testing-library/react";
 import { act, Simulate } from "react-dom/test-utils";
 import userEvent from "@testing-library/user-event";
-import CreateNewMeasureDialog from "./CreateNewMeasureDialog";
+import CreateNewMeasureDialog, {
+  CQL_LIBRARY_NAME_RECOMMENDATION,
+} from "./CreateNewMeasureDialog";
 // @ts-ignore
 import { useFeatureFlags } from "@madie/madie-util";
 
@@ -68,6 +70,9 @@ describe("Measures Create Dialog", () => {
       expect(await findByTestId("measure-model-select")).toBeInTheDocument();
       expect(await findByTestId("cql-library-name")).toBeInTheDocument();
       expect(await findByTestId("ecqm-text-field")).toBeInTheDocument();
+      expect(
+        screen.getByText(CQL_LIBRARY_NAME_RECOMMENDATION)
+      ).toBeInTheDocument();
       expect(await findByTestId("continue-button")).toBeInTheDocument();
 
       const cancelButton = await findByTestId(
