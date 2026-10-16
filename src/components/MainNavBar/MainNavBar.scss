@@ -163,6 +163,14 @@ html {
           width: 32px;
         }
       }
+
+      .main-nav-bar-tabs {
+        padding: 0;
+
+        > * {
+          height: 100%;
+        }
+      }
     }
   }
 }
