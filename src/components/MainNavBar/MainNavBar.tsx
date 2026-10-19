@@ -97,57 +97,61 @@ const MainNavBar = () => {
           <DropMenu>
             {authState?.isAuthenticated && (
               <>
-                <Tabs size="standard" type="B" value={selected}>
-                  <Tab
-                    type="B"
-                    value="/measures"
-                    to="/measures"
-                    component={NavLink}
-                    name="measures"
-                    aria-label="Measures"
-                    id="measures-main-nav-bar-tab"
-                    data-testid="main-nav-bar-measures"
-                    label="Measures"
-                  />
-                  <Tab
-                    type="B"
-                    name="cql-libraries"
-                    component={NavLink}
-                    value="/cql-libraries"
-                    to="/cql-libraries"
-                    aria-label="CQL Library"
-                    id="cql-library-main-nav-bar-tab"
-                    data-testid="main-nav-bar-cql-library"
-                    label="Libraries"
-                  />
-                  {showAdminTab && (
+                <li className="main-nav-bar-tabs">
+                  <Tabs size="standard" type="B" value={selected}>
                     <Tab
                       type="B"
-                      value="/admin"
-                      to="/admin"
+                      value="/measures"
+                      to="/measures"
                       component={NavLink}
-                      name="admin"
-                      aria-label="Admin"
-                      id="admin-main-nav-bar-tab"
-                      data-testid="main-nav-bar-admin"
-                      label="Admin"
+                      name="measures"
+                      aria-label="Measures"
+                      id="measures-main-nav-bar-tab"
+                      data-testid="main-nav-bar-measures"
+                      label="Measures"
                     />
-                  )}
-                  <Tab
-                    type="B"
-                    aria-label="Help"
-                    data-testid="main-nav-bar-help"
-                    label="Help"
-                    value="help"
-                    onClick={() => {
-                      window.open(
-                        "https://www.emeasuretool.cms.gov/training-resources",
-                        "_blank"
-                      );
-                    }}
-                  />
-                </Tabs>
-                <UserUMLS />
+                    <Tab
+                      type="B"
+                      name="cql-libraries"
+                      component={NavLink}
+                      value="/cql-libraries"
+                      to="/cql-libraries"
+                      aria-label="CQL Library"
+                      id="cql-library-main-nav-bar-tab"
+                      data-testid="main-nav-bar-cql-library"
+                      label="Libraries"
+                    />
+                    {showAdminTab && (
+                      <Tab
+                        type="B"
+                        value="/admin"
+                        to="/admin"
+                        component={NavLink}
+                        name="admin"
+                        aria-label="Admin"
+                        id="admin-main-nav-bar-tab"
+                        data-testid="main-nav-bar-admin"
+                        label="Admin"
+                      />
+                    )}
+                    <Tab
+                      type="B"
+                      aria-label="Help"
+                      data-testid="main-nav-bar-help"
+                      label="Help"
+                      value="help"
+                      onClick={() => {
+                        window.open(
+                          "https://www.emeasuretool.cms.gov/training-resources",
+                          "_blank"
+                        );
+                      }}
+                    />
+                  </Tabs>
+                </li>
+                <li id="main-nav-bar-tab-user-umls">
+                  <UserUMLS />
+                </li>
                 <li id="main-nav-bar-tab-user-avatar">
                   <UserAvatar />
                 </li>
