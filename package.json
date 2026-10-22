@@ -8,7 +8,7 @@
     "dist/**/*"
   ],
   "scripts": {
-    "start": "node scripts/dev-server.js",
+    "start": "npm run build:webpack && webpack serve --port 8500",
     "build": "concurrently npm:build:*",
     "build:webpack": "webpack --mode=production",
     "analyze": "webpack --mode=production --env analyze",
@@ -17,7 +17,6 @@
     "format": "prettier --write .",
     "check-format": "prettier --check .",
     "test": "cross-env BABEL_ENV=test jest",
-    "test:server": "node --test scripts/dev-server.test.js",
     "test:styles": "node scripts/check-tailwind.cjs",
     "watch-tests": "cross-env BABEL_ENV=test jest --watch",
     "prepare": "husky install",
@@ -71,6 +70,7 @@
     "webpack": "^5.104.1",
     "webpack-cli": "^6.0.1",
     "webpack-config-single-spa-react-ts": "^8.0.0",
+    "webpack-dev-server": "^6.1.0",
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {

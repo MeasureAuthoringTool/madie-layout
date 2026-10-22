@@ -59,8 +59,8 @@ jobs:
       - name: Execute test coverage
         run: npm run-script coverage
 
-      - name: Check development server and utility styles
-        run: npm run test:server && npm run test:styles
+      - name: Check utility styles
+        run: npm run test:styles
 
       - name: Store the coverage report as an artifact
         uses: actions/upload-artifact@v4
