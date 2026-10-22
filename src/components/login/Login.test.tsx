@@ -278,7 +278,8 @@ describe("Login component", () => {
       expect(mockHandleLoginRedirect).toHaveBeenCalled();
     });
 
-    // Verify that mockLoginUser was resolved with the expected user data
-    expect(mockLoginUser).toHaveReturnedWith(Promise.resolve(mockUserData));
+    await expect(mockLoginUser.mock.results[0].value).resolves.toEqual(
+      mockUserData
+    );
   });
 });
