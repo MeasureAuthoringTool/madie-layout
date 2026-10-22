@@ -1,4 +1,6 @@
 import React from "react";
+import { redirectToUrl } from "./redirectToUrl";
+jest.mock("./redirectToUrl");
 import { render, screen, waitFor } from "@testing-library/react";
 import OktaSecurity, {
   transformAuthState,
@@ -38,30 +40,9 @@ describe("OktaSecurity", () => {
     jest.clearAllMocks();
     localStorage.clear();
     sessionStorage.clear();
-
-    // 1. Delete the read-only window.location property
-    delete (window as any).location;
-
-    // 2. Redefine it with a mock assign function and a default origin
-    window.location = {
-      ...originalLocation,
-      origin: "https://madie.cms.gov",
-      get pathname() {
-        return originalLocation.pathname;
-      },
-      get search() {
-        return originalLocation.search;
-      },
-      get hash() {
-        return originalLocation.hash;
-      },
-      assign: jest.fn(), // Create the spy
-    } as any;
   });
 
   afterEach(() => {
-    // 3. Clean up and restore the original global object
-    window.location = originalLocation;
     window.history.replaceState({}, "", originalUrl);
   });
 
@@ -177,8 +158,8 @@ describe("OktaSecurity", () => {
 
     expect(toRelativeUrl).toHaveBeenCalled();
 
-    expect(window.location.assign).toHaveBeenCalledTimes(1);
-    expect(window.location.assign).toHaveBeenCalledWith("/measures");
+    expect(redirectToUrl).toHaveBeenCalledTimes(1);
+    expect(redirectToUrl).toHaveBeenCalledWith("/measures");
   });
 
   it("calls assign including query parameters", async () => {
@@ -199,10 +180,8 @@ describe("OktaSecurity", () => {
 
     expect(toRelativeUrl).toHaveBeenCalled();
 
-    expect(window.location.assign).toHaveBeenCalledTimes(1);
-    expect(window.location.assign).toHaveBeenCalledWith(
-      "/measures?page=1&limit=10"
-    );
+    expect(redirectToUrl).toHaveBeenCalledTimes(1);
+    expect(redirectToUrl).toHaveBeenCalledWith("/measures?page=1&limit=10");
   });
 
   it("does not call assign when a malicious URL is formed", async () => {
@@ -223,7 +202,7 @@ describe("OktaSecurity", () => {
 
     expect(toRelativeUrl).toHaveBeenCalled();
 
-    expect(window.location.assign).not.toHaveBeenCalled();
+    expect(redirectToUrl).not.toHaveBeenCalled();
   });
 
   it.each(["//attacker.example", "/\\attacker.example"])(
@@ -245,7 +224,7 @@ describe("OktaSecurity", () => {
       const securityProps = (Security as jest.Mock).mock.calls[0][0];
       await securityProps.restoreOriginalUri({}, "/from-okta");
 
-      expect(window.location.assign).not.toHaveBeenCalled();
+      expect(redirectToUrl).not.toHaveBeenCalled();
       expect(sessionStorage.getItem(MADIE_TIMEOUT_RETURN_URL)).toBeNull();
     }
   );
@@ -268,8 +247,8 @@ describe("OktaSecurity", () => {
     const securityProps = (Security as jest.Mock).mock.calls[0][0];
     await securityProps.restoreOriginalUri({}, "/from-okta");
 
-    expect(window.location.assign).toHaveBeenCalledTimes(1);
-    expect(window.location.assign).toHaveBeenCalledWith(returnUrl);
+    expect(redirectToUrl).toHaveBeenCalledTimes(1);
+    expect(redirectToUrl).toHaveBeenCalledWith(returnUrl);
     expect(sessionStorage.getItem(MADIE_TIMEOUT_RETURN_URL)).toBeNull();
   });
 

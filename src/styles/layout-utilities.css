@@ -1,0 +1,10 @@
+@import "tailwindcss/theme.css" layer(theme) prefix(ml);
+@import "tailwindcss/utilities.css" prefix(ml) source(none);
+
+@source "../components";
+@source "./styles.tsx";
+
+@theme {
+  --color-blue-500: #3b82f6;
+  --color-blue-900: #1e3a8a;
+}

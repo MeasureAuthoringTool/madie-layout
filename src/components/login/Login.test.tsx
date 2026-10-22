@@ -158,7 +158,7 @@ describe("Login component", () => {
 
     const loginButton = screen.getByRole("button", { name: "Login Widget" });
     userEvent.click(loginButton);
-    await waitFor(() => expect(mockHandleLoginRedirect).toBeCalled());
+    await waitFor(() => expect(mockHandleLoginRedirect).toHaveBeenCalled());
   });
   it("Should login successfully with user info logged, even if unlock fails", async () => {
     const mockHandleLoginRedirect = jest.fn();
@@ -181,7 +181,7 @@ describe("Login component", () => {
 
     const loginButton = screen.getByRole("button", { name: "Login Widget" });
     userEvent.click(loginButton);
-    await waitFor(() => expect(mockHandleLoginRedirect).toBeCalled());
+    await waitFor(() => expect(mockHandleLoginRedirect).toHaveBeenCalled());
   });
 
   it("should call loginUser with access token on successful login", async () => {

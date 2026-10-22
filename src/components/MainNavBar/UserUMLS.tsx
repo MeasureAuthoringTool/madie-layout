@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import tw, { styled } from "twin.macro";
+import styled from "styled-components";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-const FormControl = styled.section(() => [tw`ml-2`]);
+const FormControl = styled.section.attrs({ className: "ml:ml-2" })``;
 import { MenuItem } from "@mui/material";
 import UMLSDialog from "./UMLSDialog";
 import {
