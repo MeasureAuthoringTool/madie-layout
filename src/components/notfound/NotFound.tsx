@@ -1,8 +1,10 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import tw from "twin.macro";
+import styled from "styled-components";
 import { useDocumentTitle } from "@madie/madie-util";
-const GoHomeLink = tw.button`text-blue-500 hover:text-blue-900`;
+const GoHomeLink = styled.button.attrs({
+  className: "ml:text-blue-500 ml:hover:text-blue-900",
+})``;
 
 const NotFound = () => {
   useDocumentTitle("MADiE Page not found");

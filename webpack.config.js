@@ -11,6 +11,7 @@ module.exports = (webpackConfigEnv, argv) => {
     webpackConfigEnv,
     orgPackagesAsExternal: false,
     disableHtmlGeneration: true, // false causes multiple assets served as index.html
+    outputSystemJS: true,
     argv,
   });
   // const mergeConfig

@@ -3,6 +3,7 @@ import { Security } from "@okta/okta-react";
 import { OktaAuth, toRelativeUrl } from "@okta/okta-auth-js";
 import { getOktaConfig } from "@madie/madie-util";
 import Router from "../router/Router";
+import { redirectToUrl } from "./redirectToUrl";
 import {
   consumeTimeoutReturnUrl,
   setTimeoutReturnUrl,
@@ -100,9 +101,7 @@ function OktaSecurity() {
     if (resolvedUrl.origin !== window.location.origin) {
       return; // Block Open Redirection attempt
     }
-    window.location.assign(
-      resolvedUrl.pathname + resolvedUrl.search + resolvedUrl.hash
-    );
+    redirectToUrl(resolvedUrl.pathname + resolvedUrl.search + resolvedUrl.hash);
   };
 
   useEffect(() => {
