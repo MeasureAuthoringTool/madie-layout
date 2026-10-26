@@ -1,10 +1,12 @@
 /** @format */
 
-import tw, { styled } from "twin.macro";
-export const DropDown = styled.div((props: any) => [
-  tw`lg:flex flex-grow items-center`,
-]);
-export const DropMenu = tw.ul`
-    flex flex-col lg:flex-row list-none lg:ml-auto md:w-full md:items-center
-    lg:justify-end
-`;
+import styled from "styled-components";
+
+export const DropDown = styled.div.attrs({
+  className: "ml:lg:flex ml:grow ml:items-center",
+})``;
+
+export const DropMenu = styled.ul.attrs({
+  className:
+    "ml:flex ml:flex-col ml:lg:flex-row ml:list-none ml:lg:ml-auto ml:md:w-full ml:md:items-center ml:lg:justify-end",
+})``;

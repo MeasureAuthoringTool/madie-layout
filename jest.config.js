@@ -2,6 +2,9 @@ module.exports = {
   roots: ["<rootDir>/src/"],
   modulePathIgnorePatterns: ["<rootDir>/dist/"],
   testEnvironment: "jsdom",
+  testEnvironmentOptions: {
+    url: "https://madie.cms.gov",
+  },
   transform: {
     "^.+\\.(j|t)sx?$": "babel-jest",
     "^.+\\.svg$": "<rootDir>/svgTransform.js",

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useOktaAuth } from "@okta/okta-react";
-import tw, { styled } from "twin.macro";
+import styled from "styled-components";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { MenuItem } from "@mui/material";
@@ -13,9 +13,9 @@ import {
 } from "@madie/madie-util";
 import { performLogoutCleanup } from "../../services/logoutCleanup";
 import { clearTimeoutReturnUrl } from "../../services/timeoutReturnUrl";
-const FormControl = styled.section(() => ({
-  marginLeft: "10px",
-}));
+const FormControl = styled.section.attrs({
+  className: "ml:ml-[10px]",
+})``;
 
 function UserProfile() {
   const { oktaAuth } = useOktaAuth();
