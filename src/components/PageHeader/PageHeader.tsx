@@ -26,7 +26,6 @@ import {
   MeasureReview,
   CqlLibraryReview,
 } from "@madie/madie-models";
-import "twin.macro";
 import "styled-components/macro";
 import "./pageHeader.scss";
 import { useIsOverflow } from "./useIsOverflow";
@@ -476,7 +475,7 @@ const PageHeader = () => {
       {pathname.includes("edit") && pathname.includes("measures") && (
         <Fade in={measureState?.measureName !== undefined}>
           <div className="details">
-            <div tw="pr-8" style={{ position: "relative" }}>
+            <div className="ml:pr-8" style={{ position: "relative" }}>
               <div style={{ position: "absolute", top: 0, right: 0 }}>
                 <MeasureActionCenter
                   canEdit={measureCanEdit}
@@ -490,14 +489,14 @@ const PageHeader = () => {
             <div>
               <Breadcrumbs aria-label="measures">
                 <Link
-                  tw="text-white hover:text-white"
+                  className="ml:text-white ml:hover:text-white"
                   to="/measures"
                   id="first-item"
                 >
                   Measures
                 </Link>
                 <Link
-                  tw="text-white hover:text-white"
+                  className="ml:text-white ml:hover:text-white"
                   to={`/measures/${measureState?.id}/edit/details`}
                 >
                   Details
@@ -507,8 +506,7 @@ const PageHeader = () => {
             <div>
               <h1
                 ref={overflowingText}
-                className="truncate-header"
-                tw="text-2xl text-white mb-3"
+                className="truncate-header ml:text-2xl ml:text-white ml:mb-3"
               >{`${measureState?.measureName}`}</h1>
               {/* Currently unable to test ResizeObserver with Jest and RTL due to limitations. Testable with cypress. */}
               {isOverflow && (
@@ -522,11 +520,11 @@ const PageHeader = () => {
               )}
             </div>
             <div className="header-metadata-info">
-              <p tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0">{`Version ${measureState?.version}`}</p>
+              <p className="ml:pl-4 ml:ml-4 ml:mb-0 ml:border-l-2 ml:border-[rgba(225,225,225,1)] ml:leading-none ml:first:pl-0 ml:first:ml-0 ml:first:border-0 ml:border-solid">{`Version ${measureState?.version}`}</p>
               {measureState?.model && (
                 <p
                   data-testid={`info-${measureState?.model}-0`}
-                  tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0"
+                  className="ml:pl-4 ml:ml-4 ml:mb-0 ml:border-l-2 ml:border-[rgba(225,225,225,1)] ml:leading-none ml:first:pl-0 ml:first:ml-0 ml:first:border-0 ml:border-solid"
                 >
                   {measureState?.model}
                 </p>
@@ -546,7 +544,7 @@ const PageHeader = () => {
                   >
                     <p
                       data-testid="measure-review-status"
-                      tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0"
+                      className="ml:pl-4 ml:ml-4 ml:mb-0 ml:border-l-2 ml:border-[rgba(225,225,225,1)] ml:leading-none ml:first:pl-0 ml:first:ml-0 ml:first:border-0 ml:border-solid"
                     >
                       {`Review Status: ${getReviewStatusLabel(
                         measureReview?.status
@@ -561,7 +559,7 @@ const PageHeader = () => {
                       <p
                         data-testid={`info-${val}-${key + 1}`}
                         key={`info-${val}-${key + 1}`}
-                        tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0"
+                        className="ml:pl-4 ml:ml-4 ml:mb-0 ml:border-l-2 ml:border-[rgba(225,225,225,1)] ml:leading-none ml:first:pl-0 ml:first:ml-0 ml:first:border-0 ml:border-solid"
                       >
                         {val}
                       </p>
@@ -657,7 +655,7 @@ const PageHeader = () => {
       {pathname.includes("edit") && pathname.includes("cql-libraries") && (
         <Fade in={libraryState?.cqlLibraryName !== undefined}>
           <div className="details">
-            <div tw="pr-8" style={{ position: "relative" }}>
+            <div className="ml:pr-8" style={{ position: "relative" }}>
               <div style={{ position: "absolute", top: 0, right: 0 }}>
                 <CqlLibraryActionCenter
                   canEdit={libraryCanEdit}
@@ -671,22 +669,22 @@ const PageHeader = () => {
             <div>
               <Breadcrumbs aria-label="Libraries">
                 <Link
-                  tw="text-white hover:text-white"
+                  className="ml:text-white ml:hover:text-white"
                   to="/cql-libraries"
                   id="first-item"
                 >
                   Libraries
                 </Link>
                 <Link
-                  tw="text-white hover:text-white"
+                  className="ml:text-white ml:hover:text-white"
                   to={`/cql-libraries/${libraryState?.id}/edit/details`}
                 >
                   Details
                 </Link>
               </Breadcrumbs>
             </div>
-            <div tw="py-4">
-              <h2 tw="text-2xl text-white mb-0">{`${libraryState?.cqlLibraryName}`}</h2>
+            <div className="ml:py-4">
+              <h2 className="ml:text-2xl ml:text-white ml:mb-0">{`${libraryState?.cqlLibraryName}`}</h2>
               {libraryState?.draft && (
                 <Chip
                   className="draft-chip"
@@ -696,7 +694,7 @@ const PageHeader = () => {
               )}
             </div>
             <div>
-              <p tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0">{`Version ${libraryState?.version}`}</p>
+              <p className="ml:pl-4 ml:ml-4 ml:mb-0 ml:border-l-2 ml:border-[rgba(225,225,225,1)] ml:leading-none ml:first:pl-0 ml:first:ml-0 ml:first:border-0 ml:border-solid">{`Version ${libraryState?.version}`}</p>
               {[libraryState?.model, readableLibraryStartDate].map(
                 (val, key) => {
                   if (val)
@@ -704,7 +702,7 @@ const PageHeader = () => {
                       <p
                         data-testid={`info-${val}-${key}`}
                         key={`info-${val}-${key}`}
-                        tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0"
+                        className="ml:pl-4 ml:ml-4 ml:mb-0 ml:border-l-2 ml:border-[rgba(225,225,225,1)] ml:leading-none ml:first:pl-0 ml:first:ml-0 ml:first:border-0 ml:border-solid"
                       >
                         {val}
                       </p>
@@ -726,7 +724,7 @@ const PageHeader = () => {
                   >
                     <p
                       data-testid="cql-library-status"
-                      tw="pl-4 ml-4 mb-0 border-l-2 border-[rgba(225,225,225, 1)] leading-none first:pl-0 first:ml-0 first:border-0"
+                      className="ml:pl-4 ml:ml-4 ml:mb-0 ml:border-l-2 ml:border-[rgba(225,225,225,1)] ml:leading-none ml:first:pl-0 ml:first:ml-0 ml:first:border-0 ml:border-solid"
                     >
                       {`Review Status: ${getReviewStatusLabel(
                         libraryReview?.status
