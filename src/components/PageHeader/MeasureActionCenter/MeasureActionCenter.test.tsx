@@ -926,4 +926,91 @@ describe("MeasureActionCenter Component", () => {
       );
     });
   });
+
+  describe("Admin clone measure", () => {
+    const nonOwnedMeasure = {
+      ...draftMeasure,
+      measureSet: {
+        ...mockMeasureSet,
+        owner: "someoneelse",
+      },
+    } as Measure;
+
+    const openActionCenter = (canEdit: boolean, measure: Measure) => {
+      render(
+        <MeasureActionCenter
+          canEdit={canEdit}
+          measure={measure}
+          canDelete={false}
+        />
+      );
+      userEvent.click(screen.getByLabelText("Measure action center"));
+    };
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+      if (dispatchEventSpy) {
+        dispatchEventSpy.mockClear();
+      }
+      (useUserRoles as jest.Mock).mockReturnValue({
+        roles: ["MADiE-Admin"],
+        isAdmin: true,
+      });
+    });
+
+    afterEach(() => {
+      cleanup();
+      jest.clearAllMocks();
+    });
+
+    it("should render Clone immediately right of Version Measure on a draft", () => {
+      openActionCenter(true, draftMeasure);
+
+      // MUI labels the action with its tooltip title
+      expect(screen.getByTestId("CloneMeasure")).toHaveAttribute(
+        "aria-label",
+        "Clone Measure"
+      );
+      expect(screen.getByTestId("CloneMeasure").nextElementSibling).toBe(
+        screen.getByTestId("VersionMeasure")
+      );
+    });
+
+    it("should render Clone immediately right of Draft Measure on a versioned measure", () => {
+      openActionCenter(true, versionedMeasure);
+
+      expect(screen.getByTestId("CloneMeasure").nextElementSibling).toBe(
+        screen.getByTestId("DraftMeasure")
+      );
+    });
+
+    it("should render Clone for an admin on a measure they cannot edit", () => {
+      (checkUserCanEdit as jest.Mock).mockReturnValue(false);
+      openActionCenter(false, nonOwnedMeasure);
+
+      expect(screen.getByTestId("CloneMeasure")).toBeInTheDocument();
+      expect(screen.queryByTestId("VersionMeasure")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("DraftMeasure")).not.toBeInTheDocument();
+    });
+
+    it("should not dispatch any event when Clone is clicked", () => {
+      openActionCenter(true, draftMeasure);
+      dispatchEventSpy.mockClear();
+
+      userEvent.click(screen.getByTestId("CloneMeasure"));
+
+      expect(dispatchEventSpy).not.toHaveBeenCalled();
+    });
+
+    it("should not render Clone for a non-admin user", () => {
+      (useUserRoles as jest.Mock).mockReturnValue({
+        roles: ["MADiE-User"],
+        isAdmin: false,
+      });
+      openActionCenter(true, draftMeasure);
+
+      expect(screen.getByTestId("VersionMeasure")).toBeInTheDocument();
+      expect(screen.queryByTestId("CloneMeasure")).not.toBeInTheDocument();
+    });
+  });
 });

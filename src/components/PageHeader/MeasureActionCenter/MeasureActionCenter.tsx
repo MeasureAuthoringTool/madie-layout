@@ -13,7 +13,14 @@ import ShareAction, { SharedOptions } from "../shareAction/ShareAction";
 import ExportAction from "../exportAction/ExportAction";
 import TransferAction from "../transferAction/TransferAction";
 import ReviewIcon from "../../../icons/ReviewIcon";
-import { ClipboardPen, FileText, History, Network, Trash2 } from "lucide-react";
+import {
+  ClipboardPen,
+  Copy,
+  FileText,
+  History,
+  Network,
+  Trash2,
+} from "lucide-react";
 
 interface PropTypes {
   canEdit: boolean;
@@ -228,6 +235,17 @@ const MeasureActionCenter = (props: PropTypes) => {
       }
     }
 
+    if (userRoles?.isAdmin) {
+      actions.set("clone measure", {
+        icon: (
+          <IconButton tabIndex={open ? 0 : -1} aria-label="Clone Measure">
+            <Copy size={20} />
+          </IconButton>
+        ),
+        name: "Clone Measure",
+      });
+    }
+
     if (ownerOfMeasure || userRoles?.isAdmin) {
       actions.set("share/unshare measure", {
         icon: (
@@ -344,7 +362,7 @@ const MeasureActionCenter = (props: PropTypes) => {
     };
 
     // Rendered left-to-right (farthest to nearest):
-    // Delete, Export, Share/Unshare, Transfer | Version/Draft | View HR, History | Review
+    // Delete, Export, Share/Unshare, Transfer | Version/Draft, Clone | View HR, History | Review
     appendGroup([
       actions.get("delete measure"),
       actions.get("export measure"),
@@ -353,7 +371,11 @@ const MeasureActionCenter = (props: PropTypes) => {
       actions.get("transfer measure"),
     ]);
 
-    appendGroup([actions.get("version measure"), actions.get("draft measure")]);
+    appendGroup([
+      actions.get("version measure"),
+      actions.get("draft measure"),
+      actions.get("clone measure"),
+    ]);
 
     appendGroup([actions.get("human readable"), actions.get("history")]);
 
