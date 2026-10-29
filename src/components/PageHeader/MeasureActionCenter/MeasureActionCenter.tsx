@@ -243,6 +243,7 @@ const MeasureActionCenter = (props: PropTypes) => {
           </IconButton>
         ),
         name: "Clone Measure",
+        onClick: () => handleActionClick(new Event("clone-measure")),
       });
     }
 

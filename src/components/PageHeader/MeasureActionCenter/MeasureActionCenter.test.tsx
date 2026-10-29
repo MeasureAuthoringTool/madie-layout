@@ -993,13 +993,14 @@ describe("MeasureActionCenter Component", () => {
       expect(screen.queryByTestId("DraftMeasure")).not.toBeInTheDocument();
     });
 
-    it("should not dispatch any event when Clone is clicked", () => {
+    it("should trigger clone-measure event when Clone is clicked", () => {
       openActionCenter(true, draftMeasure);
-      dispatchEventSpy.mockClear();
 
       userEvent.click(screen.getByTestId("CloneMeasure"));
 
-      expect(dispatchEventSpy).not.toHaveBeenCalled();
+      expect(dispatchEventSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ type: "clone-measure" })
+      );
     });
 
     it("should not render Clone for a non-admin user", () => {
