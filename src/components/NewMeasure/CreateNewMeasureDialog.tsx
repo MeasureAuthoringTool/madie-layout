@@ -407,10 +407,11 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
       )}
 
       <Box sx={formRowGapped} data-testid="measurement-period-div">
+        {/* DateField puts `required` on its wrapper; null suppresses the unsupported ARIA attribute. */}
         <DateField
           id="measurement-period-start"
           data-testid="measurement-period-start"
-          required={true}
+          required={null}
           label={
             <>
               Measurement Period - Start Date
@@ -433,7 +434,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
           value={formik.values.measurementPeriodStart}
           textFieldSx={{ width: "100%" }}
           {...formik.getFieldProps("measurementPeriodStart")}
-          InputProps={{
+          inputProps={{
             "data-testid": "measurement-period-start-input",
             "aria-describedby": "measurement-period-start-helper-text",
             "aria-required": true,
@@ -445,7 +446,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
         <DateField
           id="measurement-period-end"
           testid="measurement-period-end"
-          required={true}
+          required={null}
           label={
             <>
               Measurement Period - End Date
@@ -454,7 +455,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
               </span>
             </>
           }
-          InputProps={{
+          inputProps={{
             "data-testid": "measurement-period-end-input",
             "aria-describedby": "measurement-period-end-helper-text",
             required: true,
