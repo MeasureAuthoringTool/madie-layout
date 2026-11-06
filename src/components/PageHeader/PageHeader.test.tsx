@@ -247,6 +247,9 @@ describe("Page Header and Dialogs", () => {
     await waitFor(() => {
       expect(queryByText("Draft")).toBeInTheDocument();
     });
+    expect(
+      document.getElementById("library-header-actions").parentElement
+    ).toHaveClass("library-header-metadata");
   });
 
   test("Clicking on new library button retains the same library page", () => {

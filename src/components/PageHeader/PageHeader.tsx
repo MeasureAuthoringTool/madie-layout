@@ -693,7 +693,7 @@ const PageHeader = () => {
                 />
               )}
             </div>
-            <div>
+            <div className="library-header-metadata">
               <p className="ml:pl-4 ml:ml-4 ml:mb-0 ml:border-l-2 ml:border-[rgba(225,225,225,1)] ml:leading-none ml:first:pl-0 ml:first:ml-0 ml:first:border-0 ml:border-solid">{`Version ${libraryState?.version}`}</p>
               {[libraryState?.model, readableLibraryStartDate].map(
                 (val, key) => {
@@ -773,6 +773,7 @@ const PageHeader = () => {
                   />
                 </div>
               )}
+              <div id="library-header-actions" />
             </div>
           </div>
         </Fade>

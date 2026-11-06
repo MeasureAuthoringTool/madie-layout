@@ -222,6 +222,17 @@
       color: #fff;
       align-items: center;
 
+      &.library-header-metadata {
+        flex-wrap: wrap;
+
+        #library-header-actions {
+          display: flex;
+          align-items: center;
+          height: 0;
+          margin-left: auto;
+        }
+      }
+
       .MuiBreadcrumbs-ol > .MuiBreadcrumbs-li > a:focus {
         color: #fff;
         border-color: #fff;
