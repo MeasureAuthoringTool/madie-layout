@@ -411,7 +411,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
         <DateField
           id="measurement-period-start"
           data-testid="measurement-period-start"
-          required={null}
+          required={true}
           label={
             <>
               Measurement Period - Start Date
@@ -446,7 +446,7 @@ const CreateNewMeasureDialog = ({ open, onClose }) => {
         <DateField
           id="measurement-period-end"
           testid="measurement-period-end"
-          required={null}
+          required={true}
           label={
             <>
               Measurement Period - End Date
