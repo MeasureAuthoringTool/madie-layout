@@ -224,11 +224,11 @@
 
       &.library-header-metadata {
         flex-wrap: wrap;
+        min-height: 40px;
 
         #library-header-actions {
           display: flex;
           align-items: center;
-          height: 0;
           margin-left: auto;
         }
       }
